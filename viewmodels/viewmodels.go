@@ -9,13 +9,13 @@ func GetTasks(deleted bool) []types.Task {
 	return db.GetTasks(deleted)
 }
 
-func SearchTask(query string) []types.Task{
+func SearchTask(query string) []types.Task {
 	return db.SearchTask(query)
 }
 
 func AddTask(title, content string) bool {
 	err := db.AddTask(title, content)
-	if err!=nil{
+	if err != nil {
 		return false
 	}
 	return true
@@ -37,9 +37,9 @@ func DeleteTask(id int) bool {
 	return true
 }
 
-func DeleteAll() bool{
+func DeleteAll() bool {
 	err := db.DeleteAll()
-	if err!=nil{
+	if err != nil {
 		return false
 	}
 	return true
@@ -53,11 +53,11 @@ func ArchiveTask(id int) bool {
 	return true
 }
 
-func GetTaskById(id int) types.Task{
+func GetTaskById(id int) types.Task {
 	return db.GetTaskById(id)
 }
 
-func UpdateTask(id int, title string, content string) bool{
+func UpdateTask(id int, title string, content string) bool {
 	err := db.UpdateTask(id, title, content)
 	if err != nil {
 		return false
@@ -65,6 +65,6 @@ func UpdateTask(id int, title string, content string) bool{
 	return true
 }
 
-func Close(){
+func Close() {
 	db.Close()
 }

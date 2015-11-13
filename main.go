@@ -59,7 +59,7 @@ func ShowAllTasks(w http.ResponseWriter, r *http.Request, parm httprouter.Params
 	homeTemplate.Execute(w, context)
 }
 
-func SearchTask(w http.ResponseWriter, r *http.Request, _ httprouter.Params){
+func SearchTask(w http.ResponseWriter, r *http.Request, _ httprouter.Params) {
 	r.ParseForm()
 	query := r.Form.Get("query")
 	context := viewmodels.SearchTask(query)
@@ -83,7 +83,7 @@ func ShowTrashTask(w http.ResponseWriter, r *http.Request, parm httprouter.Param
 
 func EditTask(w http.ResponseWriter, r *http.Request, param httprouter.Params) {
 	id, err := strconv.Atoi(param.ByName("id"))
-	if err!=nil{
+	if err != nil {
 		fmt.Println(err)
 	} else {
 		task := viewmodels.GetTaskById(id)
@@ -103,7 +103,7 @@ func ArchiveTask(w http.ResponseWriter, r *http.Request, param httprouter.Params
 
 func DeleteTask(w http.ResponseWriter, r *http.Request, param httprouter.Params) {
 	id := param.ByName("id")
-	if id == "all"{
+	if id == "all" {
 		viewmodels.DeleteAll()
 		http.Redirect(w, r, "/", http.StatusFound)
 	} else {
@@ -130,7 +130,7 @@ func RestoreTask(w http.ResponseWriter, r *http.Request, param httprouter.Params
 func UpdateTask(w http.ResponseWriter, r *http.Request, param httprouter.Params) {
 	r.ParseForm()
 	id, err := strconv.Atoi(r.Form.Get("id"))
-	if err!=nil{
+	if err != nil {
 		fmt.Println(err)
 	}
 	title := r.Form.Get("title")
