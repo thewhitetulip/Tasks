@@ -107,8 +107,8 @@
 						  <span class="glyphicon glyphicon-lock"></span> Mask</a></li>
 					  <li role="presentation"><a role="menuitem" tabindex="-1" href="/archive/{{.Id}}">
                         <span class="glyphicon glyphicon-inbox"></span>  Edit</a></li>!-->
-                      <li role="presentation"><a role="menuitem" tabindex="-1" href="/delete/{{.Id}}">
-                        <span class="glyphicon glyphicon-trash"></span>  Delete</a></li>
+                      <li role="presentation"><a role="menuitem" tabindex="-1" href="/trash/{{.Id}}">
+                        <span class="glyphicon glyphicon-trash"></span>  Trash</a></li>
                       <!-- <li role="presentation"><a role="menuitem" tabindex="-1" href="/restore/{{.Id}}">
                            <span class="glyphicon glyphicon-inbox"></span>  Restore</a></li> -->
                         </ul>
