@@ -67,26 +67,14 @@
 						<li class="sidebar-group"><span>Tasks</span>
 							<ul class="sidebar-group-menu">
 								<li class="sidebar-item">
-									<a href="/" class="active"><span class="glyphicon glyphicon-file"></span> <span class="nav-item">All</span></a>
-								</li>
-								<!--<li class="sidebar-item">
-
-									<a href="" ><span class="glyphicon glyphicon-time"></span>  <span class="nav-item"> Reminders</span></a>
-								</li>-->
-								<li class="sidebar-item">
-									<a href="/trash/" ><span class="glyphicon glyphicon-trash"></span>  <span class="nav-item"> Trash</span></a>
-								</li>
-<!--
-								<li class="sidebar-item"><a href="">
-									<span class="glyphicon glyphicon-folder-open"></span> <span class="nav-item">Uncategorized</span></a>
+									<a href="/" class="active"><span class="glyphicon glyphicon-tasks"></span> <span class="nav-item">Pending</span></a>
 								</li>
 								<li class="sidebar-item">
-									<a href=""><span class="glyphicon glyphicon-cog"></span> <span class="nav-item">Settings</span></a>
+									<a href="/complete/" ><span class="glyphicon glyphicon-check"></span>  <span class="nav-item"> Completed</span></a>
 								</li>
 								<li class="sidebar-item">
-									<a href="#changeLogModal"  data-toggle="modal"><span class="glyphicon glyphicon-hand-up"></span> ChangeLog</a>
+									<a href="/deleted/" ><span class="glyphicon glyphicon-trash"></span>  <span class="nav-item"> Deleted</span></a>
 								</li>
--->
 							</ul>
 						</li>
 
@@ -126,22 +114,7 @@
 			</div>
 		</div>
 
-		<!-- modal for opening note -->
-		<div class="modal fade" id="openNoteModal" tabindex="-1" role="dialog" aria-hidden="true">
-			<div class="modal-dialog">
-				<div class="modal-content">
-					<div class="modal-header">
-						<button class="close" data-dismiss="modal"> &times;</button>
-						<h4 class="modal-title"></h4>
-					</div>
-					<div class="modal-body">
-
-					</div>
-				</div>
-			</div>
-		</div>
-
-          <div class="timeline">
+ <div class="timeline">
 		{{ if .}}
 		    {{range .}}
             <div class="note">
@@ -155,14 +128,13 @@
                     <!--  <li role="presentation">
                           <a role="menuitem" tabindex="-1" href="/mask/{{.Id}}">
 						  <span class="glyphicon glyphicon-lock"></span> Mask</a></li> !-->
-					  <li role="presentation"><a role="menuitem" tabindex="-1" href="/edit/{{.Id}}">
+                      <li role="presentation"><a role="menuitem" tabindex="-1" href="/trash/{{.Id}}">
+                           <span class="glyphicon glyphicon-trash"></span>  Trash</a></li>
+                      <li role="presentation"><a role="menuitem" tabindex="-1" href="/complete/{{.Id}}">
+                        <span class="glyphicon glyphicon-check"></span>  Complete</a></li>
+					  					<li role="presentation"><a role="menuitem" tabindex="-1" href="/edit/{{.Id}}">
                         <span class="glyphicon glyphicon-pencil"></span>  Edit</a></li>
-                      <li role="presentation"><a role="menuitem" tabindex="-1" href="/archive/{{.Id}}">
-                        <span class="glyphicon glyphicon-inbox"></span>  Complete</a></li>
-<!--
-                      <li role="presentation"><a role="menuitem" tabindex="-1" href="/delete/{{.Id}}">
-                           <span class="glyphicon glyphicon-trash"></span>  Delete</a></li>
--->
+
                         </ul>
                 </span>
             </div>

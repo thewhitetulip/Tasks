@@ -5,8 +5,8 @@ import (
 	"github.com/thewhitetulip/task/types"
 )
 
-func GetTasks(deleted bool) []types.Task {
-	return db.GetTasks(deleted)
+func GetTasks(status string) []types.Task {
+	return db.GetTasks(status)
 }
 
 func SearchTask(query string) []types.Task {
@@ -15,6 +15,14 @@ func SearchTask(query string) []types.Task {
 
 func AddTask(title, content string) bool {
 	err := db.AddTask(title, content)
+	if err != nil {
+		return false
+	}
+	return true
+}
+
+func TrashTask(id int) bool {
+	err := db.TrashTask(id)
 	if err != nil {
 		return false
 	}
@@ -45,8 +53,8 @@ func DeleteAll() bool {
 	return true
 }
 
-func ArchiveTask(id int) bool {
-	err := db.ArchiveTask(id)
+func CompleteTask(id int) bool {
+	err := db.CompleteTask(id)
 	if err != nil {
 		return false
 	}

@@ -23,17 +23,19 @@ func Close() {
 	database.Close()
 }
 
-func GetTasks(deleted bool) []types.Task {
+func GetTasks(status string) []types.Task {
 	var task []types.Task
 	var TaskId int
 	var TaskTitle string
 	var TaskContent string
 	var TaskCreated time.Time
 	var getTasksql string
-	if deleted == true {
-		getTasksql = "select id, title, content, created_date from task where is_deleted!='Y' order by created_date asc"
-	} else {
+	if status == "pending" {
+		getTasksql = "select id, title, content, created_date from task where finish_date is null and is_deleted='N' order by created_date asc"
+	} else if status == "trashed" {
 		getTasksql = "select id, title, content, created_date from task where is_deleted='Y' order by created_date asc"
+	} else if status == "complete" {
+		getTasksql = "select id, title, content, created_date from task where finish_date is not null order by created_date asc"
 	}
 
 	rows, err := database.Query(getTasksql)
@@ -76,7 +78,26 @@ func GetTaskById(id int) types.Task {
 	return task
 }
 
-func ArchiveTask(id int) error {
+func TrashTask(id int) error {
+	trashSql, err := database.Prepare("update task set is_deleted='Y',last_modified_at=datetime() where id=?")
+	if err != nil {
+		fmt.Println(err)
+	}
+	tx, err := database.Begin()
+	if err != nil {
+		fmt.Println(err)
+	}
+	_, err = tx.Stmt(trashSql).Exec(id)
+	if err != nil {
+		fmt.Println("doing rollback")
+		tx.Rollback()
+	} else {
+		tx.Commit()
+	}
+	return err
+}
+
+func CompleteTask(id int) error {
 	stmt, err := database.Prepare("update task set is_deleted='Y', finish_date=datetime(),last_modified_at=datetime() where id=?")
 	if err != nil {
 		fmt.Println(err)
