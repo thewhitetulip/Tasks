@@ -4,4 +4,5 @@ type Task struct {
 	Id      int
 	Title   string
 	Content string
+	Created string
 }

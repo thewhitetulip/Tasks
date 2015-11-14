@@ -6,13 +6,11 @@ import (
 	_ "github.com/mattn/go-sqlite3"
 	"github.com/thewhitetulip/task/types"
 	"strings"
+	"time"
 )
 
 var database *sql.DB
 var err error
-var tag string
-var name string
-var tags string
 
 func init() {
 	database, err = sql.Open("sqlite3", "./tasks.db")
@@ -30,11 +28,12 @@ func GetTasks(deleted bool) []types.Task {
 	var TaskId int
 	var TaskTitle string
 	var TaskContent string
+	var TaskCreated time.Time
 	var getTasksql string
 	if deleted == true {
-		getTasksql = "select id, title, content from task where is_deleted!='Y' order by created_date asc"
+		getTasksql = "select id, title, content, created_date from task where is_deleted!='Y' order by created_date asc"
 	} else {
-		getTasksql = "select id, title, content from task where is_deleted='Y' order by created_date asc"
+		getTasksql = "select id, title, content, created_date from task where is_deleted='Y' order by created_date asc"
 	}
 
 	rows, err := database.Query(getTasksql)
@@ -43,11 +42,12 @@ func GetTasks(deleted bool) []types.Task {
 	}
 	defer rows.Close()
 	for rows.Next() {
-		err := rows.Scan(&TaskId, &TaskTitle, &TaskContent)
+		err := rows.Scan(&TaskId, &TaskTitle, &TaskContent, &TaskCreated)
 		if err != nil {
 			fmt.Println(err)
 		}
-		a := types.Task{Id: TaskId, Title: TaskTitle, Content: TaskContent}
+		TaskCreated = TaskCreated.Local()
+		a := types.Task{Id: TaskId, Title: TaskTitle, Content: TaskContent, Created: TaskCreated.Format(time.UnixDate)[0:20]}
 		task = append(task, a)
 	}
 

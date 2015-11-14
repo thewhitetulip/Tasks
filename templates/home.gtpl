@@ -149,10 +149,10 @@
                 <p class="noteContent">{{.Content}}</p>
                 <span class="notefooter">
                     <ul class="menu">
-                     <!-- <li role="presentation">
-                          <a role="menuitem" tabindex="-1" href="/share/{{.Id}}">
-                          <span class="glyphicon glyphicon-share"></span>  Share</a></li>
                       <li role="presentation">
+                          <!-- <a role="menuitem" tabindex="-1" href="/share/{{.Id}}"> </a>-->
+                          <span class="glyphicon glyphicon-time"></span> {{.Created}}</li>
+                    <!--  <li role="presentation">
                           <a role="menuitem" tabindex="-1" href="/mask/{{.Id}}">
 						  <span class="glyphicon glyphicon-lock"></span> Mask</a></li> !-->
 					  <li role="presentation"><a role="menuitem" tabindex="-1" href="/edit/{{.Id}}">
