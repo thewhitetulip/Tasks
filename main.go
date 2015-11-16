@@ -7,7 +7,7 @@ package main
 import (
 	"fmt"
 	"github.com/julienschmidt/httprouter"
-	"github.com/thewhitetulip/task/viewmodels"
+	"github.com/thewhitetulip/Tasks/viewmodels"
 	"log"
 	"net/http"
 	"strconv"

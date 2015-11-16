@@ -1,8 +1,8 @@
 package viewmodels
 
 import (
-	"github.com/thewhitetulip/task/db"
-	"github.com/thewhitetulip/task/types"
+	"github.com/thewhitetulip/Tasks/db"
+	"github.com/thewhitetulip/Tasks/types"
 )
 
 func GetTasks(status string) []types.Task {
