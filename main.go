@@ -39,7 +39,6 @@ func main() {
 		fmt.Println(err)
 	}
 	templates, err = template.ParseFiles(allFiles...)
-	fmt.Println(templates)
 	homeTemplate = templates.Lookup("home.gtpl")
 	deletedTemplate = templates.Lookup("deleted.gtpl")
 
