@@ -8,9 +8,11 @@ import (
 	"fmt"
 	"github.com/julienschmidt/httprouter"
 	"github.com/thewhitetulip/Tasks/viewmodels"
+	"io/ioutil"
 	"log"
 	"net/http"
 	"strconv"
+	"strings"
 	"text/template"
 )
 
@@ -19,31 +21,31 @@ var deletedTemplate *template.Template
 var completedTemplate *template.Template
 var editTemplate *template.Template
 var searchTemplate *template.Template
+var templates *template.Template
 var err error
 
 func main() {
 	defer viewmodels.Close()
-	homeTemplate, err = template.ParseFiles("./templates/home.gtpl")
-	if err != nil {
-		fmt.Println(err)
-	}
-	deletedTemplate, err = template.ParseFiles("./templates/deleted.gtpl")
-	if err != nil {
-		fmt.Println(err)
+	var allFiles []string
+	files, err := ioutil.ReadDir("./templates")
+	for _, file := range files {
+		filename := file.Name()
+		if strings.HasSuffix(filename, ".gtpl") {
+			allFiles = append(allFiles, "./templates/"+filename)
+		}
 	}
 
-	editTemplate, err = template.ParseFiles("./templates/edit.gtpl")
 	if err != nil {
 		fmt.Println(err)
 	}
-	searchTemplate, err = template.ParseFiles("./templates/search.gtpl")
-	if err != nil {
-		fmt.Println(err)
-	}
-	completedTemplate, err = template.ParseFiles("./templates/completed.gtpl")
-	if err != nil {
-		fmt.Println(err)
-	}
+	templates, err = template.ParseFiles(allFiles...)
+	fmt.Println(templates)
+	homeTemplate = templates.Lookup("home.gtpl")
+	deletedTemplate = templates.Lookup("deleted.gtpl")
+
+	editTemplate = templates.Lookup("edit.gtpl")
+	searchTemplate = templates.Lookup("search.gtpl")
+	completedTemplate = templates.Lookup("completed.gtpl")
 
 	router := httprouter.New()
 	router.GET("/", ShowAllTasks)
