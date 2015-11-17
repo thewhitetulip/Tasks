@@ -64,7 +64,8 @@
 					<li class="sidebar-group"><span>Tasks</span>
 						<ul class="sidebar-group-menu">
 							<li class="sidebar-item">
-								<a href="/" <!-- class="active" --> ><span class="glyphicon glyphicon-tasks"></span> <span class="nav-item">Pending</span></a>
+								<a href="/"  ><span class="glyphicon glyphicon-tasks"></span> <span class="nav-item">Pending</span></a>
+								<!-- class="active" -->
 							</li>
 							<li class="sidebar-item">
 								<a href="/complete/"><span class="glyphicon glyphicon-check"></span>  <span class="nav-item"> Completed</span></a>
