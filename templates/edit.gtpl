@@ -11,10 +11,8 @@
             <input type="text" name="title" value="{{.Title}}" class="form-control" id="add-note-title" placeholder="Title" style="border:none;border-bottom:1px solid gray; box-shadow:none;">
           </div>
           <div class="form-group">
-            <!--
-						<textarea class="form-control" name="content" value="{{.Title}}" id="add-note-content" placeholder="Content" rows="10" style="border:none;border-bottom:1px solid gray; box-shadow:none;"></textarea>
--->
-            <input type="text" name="content" value="{{.Content}}" class="form-control" id="add-note-title" placeholder="Title" style="border:none;border-bottom:1px solid gray; box-shadow:none;">
+						<textarea class="form-control" name="content" id="add-note-content" placeholder="Content" 
+            rows="10" style="border:none;border-bottom:1px solid gray; box-shadow:none;">{{.Content}}</textarea>
 
             <input type="text" name="id" value="{{.Id}}" class="hidden" />
           </div>
