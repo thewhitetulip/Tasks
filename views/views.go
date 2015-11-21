@@ -42,6 +42,7 @@ func PopulateTemplates() {
 	templates, err = template.ParseFiles(allFiles...)
 	if err != nil {
 		fmt.Println(err)
+		os.Exit(1)
 	}
 	homeTemplate = templates.Lookup("home.html")
 	deletedTemplate = templates.Lookup("deleted.html")
@@ -84,15 +85,15 @@ func SearchTaskFunc(w http.ResponseWriter, r *http.Request) {
 
 //AddTaskFunc is used to handle the addition of new task, "/add" URL
 func AddTaskFunc(w http.ResponseWriter, r *http.Request) {
-	if r.Method == "POST" {
+	if r.Method == "POST" { // Will work only for GET requests, will redirect to home
 		r.ParseForm()
 		title := r.Form.Get("title")
 		content := r.Form.Get("content")
 		truth := db.AddTask(title, content)
 		if truth != nil {
-			http.Redirect(w, r, "/", http.StatusFound)
-		} else {
 			fmt.Println(err)
+		} else {
+			http.Redirect(w, r, "/", http.StatusFound)
 		}
 	} else {
 		http.Redirect(w, r, "/", http.StatusFound)
@@ -135,7 +136,6 @@ func CompleteTaskFunc(w http.ResponseWriter, r *http.Request) {
 			if err != nil {
 				fmt.Println(err)
 			}
-			fmt.Println("redirecting to home")
 			http.Redirect(w, r, "/", http.StatusFound)
 		}
 	} else {
@@ -155,7 +155,10 @@ func DeleteTaskFunc(w http.ResponseWriter, r *http.Request) {
 			if err != nil {
 				fmt.Println(err)
 			} else {
-				db.DeleteTask(id)
+				err = db.DeleteTask(id)
+				if err != nil {
+					fmt.Println(err)
+				}
 				http.Redirect(w, r, "/deleted/", http.StatusFound)
 			}
 		}
@@ -171,7 +174,10 @@ func TrashTaskFunc(w http.ResponseWriter, r *http.Request) {
 		if err != nil {
 			fmt.Println(err)
 		} else {
-			db.TrashTask(id)
+			err = db.TrashTask(id)
+			if err != nil {
+				fmt.Println(err)
+			}
 			http.Redirect(w, r, "/", http.StatusFound)
 		}
 	} else {
@@ -204,7 +210,10 @@ func UpdateTaskFunc(w http.ResponseWriter, r *http.Request) {
 		}
 		title := r.Form.Get("title")
 		content := r.Form.Get("content")
-		db.UpdateTask(id, title, content)
+		err = db.UpdateTask(id, title, content)
+		if err != nil {
+			fmt.Println(err)
+		}
 		http.Redirect(w, r, "/", http.StatusFound)
 	} else {
 		http.Redirect(w, r, "/", http.StatusFound)
