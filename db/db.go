@@ -3,7 +3,7 @@ package db
 import (
 	"database/sql"
 	"fmt"
-	_ "github.com/mattn/go-sqlite3"
+	_ "github.com/mattn/go-sqlite3" //we want to use sqlite natively
 	"github.com/thewhitetulip/Tasks/types"
 	"strings"
 	"time"
@@ -19,13 +19,16 @@ func init() {
 	}
 }
 
+//Close function closes this database connection
 func Close() {
 	database.Close()
 }
 
+//GetTasks retrieves all the tasks depending on the
+//status pending or trashed or completed
 func GetTasks(status string) []types.Task {
 	var task []types.Task
-	var TaskId int
+	var TaskID int
 	var TaskTitle string
 	var TaskContent string
 	var TaskCreated time.Time
@@ -44,21 +47,23 @@ func GetTasks(status string) []types.Task {
 	}
 	defer rows.Close()
 	for rows.Next() {
-		err := rows.Scan(&TaskId, &TaskTitle, &TaskContent, &TaskCreated)
+		err := rows.Scan(&TaskID, &TaskTitle, &TaskContent, &TaskCreated)
+		TaskContent = strings.Replace(TaskContent, "\n", "<br>", -1)
 		if err != nil {
 			fmt.Println(err)
 		}
 		TaskCreated = TaskCreated.Local()
-		a := types.Task{Id: TaskId, Title: TaskTitle, Content: TaskContent, Created: TaskCreated.Format(time.UnixDate)[0:20]}
+		a := types.Task{Id: TaskID, Title: TaskTitle, Content: TaskContent, Created: TaskCreated.Format(time.UnixDate)[0:20]}
 		task = append(task, a)
 	}
 
 	return task
 }
 
+//GetTaskById function gets the tasks from the ID passed to the function
 func GetTaskById(id int) types.Task {
 	var task types.Task
-	var TaskId int
+	var TaskID int
 	var TaskTitle string
 	var TaskContent string
 	getTasksql := "select id, title, content from task where id=?"
@@ -69,17 +74,18 @@ func GetTaskById(id int) types.Task {
 	}
 	defer rows.Close()
 	if rows.Next() {
-		err := rows.Scan(&TaskId, &TaskTitle, &TaskContent)
+		err := rows.Scan(&TaskID, &TaskTitle, &TaskContent)
 		if err != nil {
 			fmt.Println(err)
 		}
-		task = types.Task{Id: TaskId, Title: TaskTitle, Content: TaskContent}
+		task = types.Task{Id: TaskID, Title: TaskTitle, Content: TaskContent}
 	}
 	return task
 }
 
+//TrashTask is used to delete the task
 func TrashTask(id int) error {
-	trashSql, err := database.Prepare("update task set is_deleted='Y',last_modified_at=datetime() where id=?")
+	trashSQL, err := database.Prepare("update task set is_deleted='Y',last_modified_at=datetime() where id=?")
 	if err != nil {
 		fmt.Println(err)
 	}
@@ -87,7 +93,7 @@ func TrashTask(id int) error {
 	if err != nil {
 		fmt.Println(err)
 	}
-	_, err = tx.Stmt(trashSql).Exec(id)
+	_, err = tx.Stmt(trashSQL).Exec(id)
 	if err != nil {
 		fmt.Println("doing rollback")
 		tx.Rollback()
@@ -97,6 +103,7 @@ func TrashTask(id int) error {
 	return err
 }
 
+//CompleteTask  is used to mark tasks as complete
 func CompleteTask(id int) error {
 	stmt, err := database.Prepare("update task set is_deleted='Y', finish_date=datetime(),last_modified_at=datetime() where id=?")
 	if err != nil {
@@ -116,6 +123,7 @@ func CompleteTask(id int) error {
 	return err
 }
 
+//DeleteAll is used to empty the trash
 func DeleteAll() error {
 	stmt, err := database.Prepare("delete from task where is_deleted='Y'")
 	if err != nil {
@@ -135,8 +143,9 @@ func DeleteAll() error {
 	return err
 }
 
+//RestoreTask is used to restore tasks from the Trash
 func RestoreTask(id int) error {
-	restoreSql, err := database.Prepare("update task set is_deleted='N',last_modified_at=datetime() where id=?")
+	restoreSQL, err := database.Prepare("update task set is_deleted='N',last_modified_at=datetime() where id=?")
 	if err != nil {
 		fmt.Println(err)
 	}
@@ -144,7 +153,7 @@ func RestoreTask(id int) error {
 	if err != nil {
 		fmt.Println(err)
 	}
-	_, err = tx.Stmt(restoreSql).Exec(id)
+	_, err = tx.Stmt(restoreSQL).Exec(id)
 	if err != nil {
 		fmt.Println("doing rollback")
 		tx.Rollback()
@@ -154,6 +163,7 @@ func RestoreTask(id int) error {
 	return err
 }
 
+//DeleteTask is used to delete the task from the database
 func DeleteTask(id int) error {
 	deleteSQL, err := database.Prepare("delete from task where id = ?")
 	if err != nil {
@@ -173,13 +183,14 @@ func DeleteTask(id int) error {
 	return err
 }
 
+//AddTask is used to add the task in the database
 func AddTask(title, content string) error {
-	restoreSql, err := database.Prepare("insert into task(title, content, created_date, last_modified_at) values(?,?,datetime(), datetime())")
+	restoreSQL, err := database.Prepare("insert into task(title, content, created_date, last_modified_at) values(?,?,datetime(), datetime())")
 	if err != nil {
 		fmt.Println(err)
 	}
 	tx, err := database.Begin()
-	_, err = tx.Stmt(restoreSql).Exec(title, content)
+	_, err = tx.Stmt(restoreSQL).Exec(title, content)
 	if err != nil {
 		fmt.Println(err)
 		tx.Rollback()
@@ -189,8 +200,9 @@ func AddTask(title, content string) error {
 	return err
 }
 
+//UpdateTask is used to update the tasks in the database
 func UpdateTask(id int, title string, content string) error {
-	Sql, err := database.Prepare("update task set title=?, content=? where id=?")
+	SQL, err := database.Prepare("update task set title=?, content=? where id=?")
 	if err != nil {
 		fmt.Println(err)
 	}
@@ -199,7 +211,7 @@ func UpdateTask(id int, title string, content string) error {
 	if err != nil {
 		fmt.Println(err)
 	}
-	_, err = tx.Stmt(Sql).Exec(title, content, id)
+	_, err = tx.Stmt(SQL).Exec(title, content, id)
 	if err != nil {
 		fmt.Println(err)
 		tx.Rollback()
@@ -209,10 +221,11 @@ func UpdateTask(id int, title string, content string) error {
 	return err
 }
 
+//SearchTask is used to return the search results depending on the query
 func SearchTask(query string) []types.Task {
 	stmt := "select id, title, content from task where title like '%" + query + "%' or content like '%" + query + "%'"
 	var task []types.Task
-	var TaskId int
+	var TaskID int
 	var TaskTitle string
 	var TaskContent string
 
@@ -221,13 +234,13 @@ func SearchTask(query string) []types.Task {
 		fmt.Println(err)
 	}
 	for rows.Next() {
-		err := rows.Scan(&TaskId, &TaskTitle, &TaskContent)
+		err := rows.Scan(&TaskID, &TaskTitle, &TaskContent)
 		if err != nil {
 			fmt.Println(err)
 		}
 		TaskTitle = strings.Replace(TaskTitle, query, "<span class='highlight'>"+query+"</span>", -1)
 		TaskContent = strings.Replace(TaskContent, query, "<span class='highlight'>"+query+"</span>", -1)
-		a := types.Task{Id: TaskId, Title: TaskTitle, Content: TaskContent}
+		a := types.Task{Id: TaskID, Title: TaskTitle, Content: TaskContent}
 		task = append(task, a)
 	}
 	return task
