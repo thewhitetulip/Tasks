@@ -40,7 +40,6 @@
       <span class="notefooter">
                     <ul class="menu">
                       <li role="presentation">
-                          <!-- <a role="menuitem" tabindex="-1" href="/share/{{.Id}}"> </a>-->
                           <span class="glyphicon glyphicon-time"></span> {{.Created}}</li>
       <!--  <li role="presentation">
                           <a role="menuitem" tabindex="-1" href="/mask/{{.Id}}">
@@ -62,7 +61,10 @@
       </span>
     </div>
     {{end}} {{else}}
-    <p>No tasks here</p>
+    <div class="note">
+      <p class="noteHeading">No Tasks here</p>
+      <p class="notefooter">Create new task<button class="floating-action-icon-add" style="border:none;border-bottom:1px solid gray; box-shadow:none;"> here </button> </p>
+    </div>
     {{end}}
   </div>
 	{{template "footer.gtpl"}}
