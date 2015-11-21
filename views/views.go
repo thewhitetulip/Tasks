@@ -71,7 +71,7 @@ func SearchTaskFunc(w http.ResponseWriter, r *http.Request) {
 		context := db.SearchTask(query)
 		searchTemplate.Execute(w, context)
 	} else {
-
+		http.Redirect(w, r, "/", http.StatusFound)
 	}
 
 }
@@ -88,6 +88,8 @@ func AddTaskFunc(w http.ResponseWriter, r *http.Request) {
 		} else {
 			fmt.Println(err)
 		}
+	} else {
+		http.Redirect(w, r, "/", http.StatusFound)
 	}
 }
 
@@ -96,17 +98,23 @@ func ShowCompleteTasksFunc(w http.ResponseWriter, r *http.Request) {
 	if r.Method == "GET" {
 		context := db.GetTasks("complete") //false when you want finished notes
 		completedTemplate.Execute(w, context)
+	} else {
+		http.Redirect(w, r, "/", http.StatusFound)
 	}
 }
 
 //EditTaskFunc is used to edit tasks, handles "/edit/" URL
 func EditTaskFunc(w http.ResponseWriter, r *http.Request) {
-	id, err := strconv.Atoi(r.URL.Path[len("/edit/"):])
-	if err != nil {
-		fmt.Println(err)
+	if r.Method == "GET" {
+		id, err := strconv.Atoi(r.URL.Path[len("/edit/"):])
+		if err != nil {
+			fmt.Println(err)
+		} else {
+			task := db.GetTaskByID(id)
+			editTemplate.Execute(w, task)
+		}	
 	} else {
-		task := db.GetTaskByID(id)
-		editTemplate.Execute(w, task)
+		http.Redirect(w, r, "/", http.StatusFound)
 	}
 }
 
@@ -124,6 +132,8 @@ func CompleteTaskFunc(w http.ResponseWriter, r *http.Request) {
 			fmt.Println("redirecting to home")
 			http.Redirect(w, r, "/", http.StatusFound)
 		}
+	} else {
+		http.Redirect(w, r, "/", http.StatusFound)
 	}
 }
 
@@ -143,42 +153,56 @@ func DeleteTaskFunc(w http.ResponseWriter, r *http.Request) {
 				http.Redirect(w, r, "/deleted/", http.StatusFound)
 			}
 		}
+	} else {
+		http.Redirect(w, r, "/", http.StatusFound)
 	}
 }
 
 //TrashTaskFunc is used to populate the "/trash/" URL
 func TrashTaskFunc(w http.ResponseWriter, r *http.Request) {
-	id, err := strconv.Atoi(r.URL.Path[len("/trash/"):])
-	if err != nil {
-		fmt.Println(err)
+	if r.Method == "GET" {
+		id, err := strconv.Atoi(r.URL.Path[len("/trash/"):])
+		if err != nil {
+			fmt.Println(err)
+		} else {
+			db.TrashTask(id)
+			http.Redirect(w, r, "/", http.StatusFound)
+		}
 	} else {
-		db.TrashTask(id)
 		http.Redirect(w, r, "/", http.StatusFound)
 	}
 }
 
 //RestoreTaskFunc is used to restore task from trash, handles "/restore/" URL
 func RestoreTaskFunc(w http.ResponseWriter, r *http.Request) {
-	id, err := strconv.Atoi(r.URL.Path[len("/restore/"):])
-	if err != nil {
-		fmt.Println(err)
+	if r.Method == "GET" {
+		id, err := strconv.Atoi(r.URL.Path[len("/restore/"):])
+		if err != nil {
+			fmt.Println(err)
+		} else {
+			db.RestoreTask(id)
+			http.Redirect(w, r, "/deleted/", http.StatusFound)
+		}
 	} else {
-		db.RestoreTask(id)
-		http.Redirect(w, r, "/deleted/", http.StatusFound)
+		http.Redirect(w, r, "/", http.StatusFound)
 	}
 }
 
 //UpdateTaskFunc is used to update a task, handes "/update/" URL
 func UpdateTaskFunc(w http.ResponseWriter, r *http.Request) {
-	r.ParseForm()
-	id, err := strconv.Atoi(r.Form.Get("id"))
-	if err != nil {
-		fmt.Println(err)
+	if r.Method == "POST"{	
+		r.ParseForm()
+		id, err := strconv.Atoi(r.Form.Get("id"))
+		if err != nil {
+			fmt.Println(err)
+		}
+		title := r.Form.Get("title")
+		content := r.Form.Get("content")
+		db.UpdateTask(id, title, content)
+		http.Redirect(w, r, "/", http.StatusFound)
+	} else {
+		http.Redirect(w, r, "/", http.StatusFound)
 	}
-	title := r.Form.Get("title")
-	content := r.Form.Get("content")
-	db.UpdateTask(id, title, content)
-	http.Redirect(w, r, "/", http.StatusFound)
 }
 
 //ServeStaticFunc is used to serve static files
