@@ -5,12 +5,13 @@ package main
  * License: MIT
  **/
 import (
+	"bufio"
 	"fmt"
-	"github.com/julienschmidt/httprouter"
-	"github.com/thewhitetulip/Tasks/viewmodels"
+	"github.com/thewhitetulip/Tasks/db"
 	"io/ioutil"
 	"log"
 	"net/http"
+	"os"
 	"strconv"
 	"strings"
 	"text/template"
@@ -25,13 +26,14 @@ var templates *template.Template
 var err error
 
 func main() {
-	defer viewmodels.Close()
+	defer db.Close()
 	var allFiles []string
-	files, err := ioutil.ReadDir("./templates")
+	templatesDir := "./public/templates/"
+	files, err := ioutil.ReadDir(templatesDir)
 	for _, file := range files {
 		filename := file.Name()
 		if strings.HasSuffix(filename, ".html") {
-			allFiles = append(allFiles, "./templates/"+filename)
+			allFiles = append(allFiles, templatesDir+filename)
 		}
 	}
 
@@ -46,113 +48,146 @@ func main() {
 	searchTemplate = templates.Lookup("search.html")
 	completedTemplate = templates.Lookup("completed.html")
 
-	router := httprouter.New()
-	router.GET("/", ShowAllTasks)
-	router.GET("/complete/:id", CompleteTask)
-	router.GET("/delete/:id", DeleteTask)
-	router.GET("/deleted/", ShowTrashTask)
-	router.GET("/trash/:id", TrashTask)
-	router.GET("/edit/:id", EditTask)
-	router.GET("/complete/", ShowCompleteTasks)
-	router.GET("/restore/:id", RestoreTask)
-	router.POST("/add/", AddTask)
-	router.POST("/update/", UpdateTask)
-	router.POST("/search/", SearchTask)
-	router.NotFound = http.FileServer(http.Dir("public"))
+	http.HandleFunc("/", ShowAllTasksFunc)
+	http.HandleFunc("/complete/", CompleteTaskFunc)
+	http.HandleFunc("/delete/", DeleteTaskFunc)
+	http.HandleFunc("/deleted/", ShowTrashTaskFunc)
+	http.HandleFunc("/trash/", TrashTaskFunc)
+	http.HandleFunc("/edit/", EditTaskFunc)
+	http.HandleFunc("/completed/", ShowCompleteTasksFunc)
+	http.HandleFunc("/restore/", RestoreTaskFunc)
+	http.HandleFunc("/add/", AddTaskFunc)
+	http.HandleFunc("/update/", UpdateTaskFunc)
+	http.HandleFunc("/search/", SearchTaskFunc)
+	//http.HandleFunc("/static/", ServeStaticFunc)
+	http.Handle("/static/", http.FileServer(http.Dir("public")))
 	fmt.Println("running on 8080")
-	log.Fatal(http.ListenAndServe(":8080", router))
+	log.Fatal(http.ListenAndServe(":8080", nil))
 }
 
-func ShowAllTasks(w http.ResponseWriter, r *http.Request, parm httprouter.Params) {
-	context := viewmodels.GetTasks("pending") //true when you want non deleted notes
-	homeTemplate.Execute(w, context)
-}
-
-func ShowTrashTask(w http.ResponseWriter, r *http.Request, parm httprouter.Params) {
-	context := viewmodels.GetTasks("trashed") //false when you want deleted notes
-	deletedTemplate.Execute(w, context)
-}
-
-func SearchTask(w http.ResponseWriter, r *http.Request, _ httprouter.Params) {
-	r.ParseForm()
-	query := r.Form.Get("query")
-	context := viewmodels.SearchTask(query)
-	searchTemplate.Execute(w, context)
-}
-
-func AddTask(w http.ResponseWriter, r *http.Request, _ httprouter.Params) {
-	r.ParseForm()
-	title := r.Form.Get("title")
-	content := r.Form.Get("content")
-	truth := viewmodels.AddTask(title, content)
-	if truth == true {
-		http.Redirect(w, r, "/", http.StatusFound)
+//ShowAllTasksFunc is used to handle the "/" URL which is the default ons
+func ShowAllTasksFunc(w http.ResponseWriter, r *http.Request) {
+	if r.Method == "GET" {
+		context := db.GetTasks("pending") //true when you want non deleted notes
+		homeTemplate.Execute(w, context)
 	}
 }
 
-func ShowCompleteTasks(w http.ResponseWriter, r *http.Request, parm httprouter.Params) {
-	context := viewmodels.GetTasks("complete") //false when you want finished notes
-	completedTemplate.Execute(w, context)
-}
-
-func EditTask(w http.ResponseWriter, r *http.Request, param httprouter.Params) {
-	id, err := strconv.Atoi(param.ByName("id"))
-	if err != nil {
-		fmt.Println(err)
-	} else {
-		task := viewmodels.GetTaskById(id)
-		editTemplate.Execute(w, task)
+//ShowTrashTaskFunc is used to handle the "/trash" URL which is used to show the deleted tasks
+func ShowTrashTaskFunc(w http.ResponseWriter, r *http.Request) {
+	if r.Method == "GET" {
+		context := db.GetTasks("trashed") //false when you want deleted notes
+		deletedTemplate.Execute(w, context)
 	}
 }
 
-func CompleteTask(w http.ResponseWriter, r *http.Request, param httprouter.Params) {
-	id, err := strconv.Atoi(param.ByName("id"))
-	if err != nil {
-		fmt.Println(err)
+//SearchTaskFunc is used to handle the /search/ url, handles the search function
+func SearchTaskFunc(w http.ResponseWriter, r *http.Request) {
+	if r.Method == "POST" {
+		r.ParseForm()
+		query := r.Form.Get("query")
+		context := db.SearchTask(query)
+		searchTemplate.Execute(w, context)
 	} else {
-		viewmodels.CompleteTask(id)
-		http.Redirect(w, r, "/", http.StatusFound)
+
 	}
+
 }
 
-func DeleteTask(w http.ResponseWriter, r *http.Request, param httprouter.Params) {
-	id := param.ByName("id")
-	if id == "all" {
-		viewmodels.DeleteAll()
-		http.Redirect(w, r, "/", http.StatusFound)
-	} else {
-		id, err := strconv.Atoi(id)
-		if err != nil {
-			fmt.Println(err)
+//AddTaskFunc is used to handle the addition of new task, "/add" URL
+func AddTaskFunc(w http.ResponseWriter, r *http.Request) {
+	if r.Method == "POST" {
+		r.ParseForm()
+		title := r.Form.Get("title")
+		content := r.Form.Get("content")
+		truth := db.AddTask(title, content)
+		if truth != nil {
+			http.Redirect(w, r, "/", http.StatusFound)
 		} else {
-			viewmodels.DeleteTask(id)
-			http.Redirect(w, r, "/deleted/", http.StatusFound)
+			fmt.Println(err)
 		}
 	}
 }
 
-func TrashTask(w http.ResponseWriter, r *http.Request, param httprouter.Params) {
-	id, err := strconv.Atoi(param.ByName("id"))
+//ShowCompleteTasksFunc is used to populate the "/completed/" URL
+func ShowCompleteTasksFunc(w http.ResponseWriter, r *http.Request) {
+	if r.Method == "GET" {
+		context := db.GetTasks("complete") //false when you want finished notes
+		completedTemplate.Execute(w, context)
+	}
+}
+
+//EditTaskFunc is used to edit tasks, handles "/edit/" URL
+func EditTaskFunc(w http.ResponseWriter, r *http.Request) {
+	id, err := strconv.Atoi(r.URL.Path[len("/edit/"):])
 	if err != nil {
 		fmt.Println(err)
 	} else {
-		fmt.Println("deleting ", id)
-		viewmodels.TrashTask(id)
+		task := db.GetTaskById(id)
+		editTemplate.Execute(w, task)
+	}
+}
+
+//CompleteTaskFunc is used to show the complete tasks, handles "/completed/" url
+func CompleteTaskFunc(w http.ResponseWriter, r *http.Request) {
+	if r.Method == "GET"{
+		id, err := strconv.Atoi(r.URL.Path[len("/complete/"):])
+		if err != nil {
+			fmt.Println(err)
+		} else {
+			err := db.CompleteTask(id)
+			if err!=nil{
+				fmt.Println(err)
+			}
+			fmt.Println("redirecting to home")
+			http.Redirect(w, r, "/", http.StatusFound)
+		}
+	}
+}
+
+//DeleteTaskFunc is used to
+func DeleteTaskFunc(w http.ResponseWriter, r *http.Request) {
+	if r.Method == "GET"{
+		id := r.URL.Path[len("/delete/"):]
+		if id == "all" {
+			db.DeleteAll()
+			http.Redirect(w, r, "/", http.StatusFound)
+		} else {
+			id, err := strconv.Atoi(id)
+			if err != nil {
+				fmt.Println(err)
+			} else {
+				db.DeleteTask(id)
+				http.Redirect(w, r, "/deleted/", http.StatusFound)
+			}
+		}
+	}
+}
+
+//TrashTaskFunc is used to populate the "/trash/" URL
+func TrashTaskFunc(w http.ResponseWriter, r *http.Request) {
+	id, err := strconv.Atoi(r.URL.Path[len("/trash/"):])
+	if err != nil {
+		fmt.Println(err)
+	} else {
+		db.TrashTask(id)
 		http.Redirect(w, r, "/", http.StatusFound)
 	}
 }
 
-func RestoreTask(w http.ResponseWriter, r *http.Request, param httprouter.Params) {
-	id, err := strconv.Atoi(param.ByName("id"))
+//RestoreTaskFunc is used to restore task from trash, handles "/restore/" URL
+func RestoreTaskFunc(w http.ResponseWriter, r *http.Request) {
+	id, err := strconv.Atoi(r.URL.Path[len("/restore/"):])
 	if err != nil {
 		fmt.Println(err)
 	} else {
-		viewmodels.RestoreTask(id)
+		db.RestoreTask(id)
 		http.Redirect(w, r, "/", http.StatusFound)
 	}
 }
 
-func UpdateTask(w http.ResponseWriter, r *http.Request, param httprouter.Params) {
+//UpdateTaskFunc is used to update a task, handes "/update/" URL
+func UpdateTaskFunc(w http.ResponseWriter, r *http.Request) {
 	r.ParseForm()
 	id, err := strconv.Atoi(r.Form.Get("id"))
 	if err != nil {
@@ -160,6 +195,33 @@ func UpdateTask(w http.ResponseWriter, r *http.Request, param httprouter.Params)
 	}
 	title := r.Form.Get("title")
 	content := r.Form.Get("content")
-	viewmodels.UpdateTask(id, title, content)
+	db.UpdateTask(id, title, content)
 	http.Redirect(w, r, "/", http.StatusFound)
+}
+
+//ServeStaticFunc is used to serve static files
+func ServeStaticFunc(w http.ResponseWriter, r *http.Request) {
+	path := "./public" + r.URL.Path
+	var contentType string
+	if strings.HasSuffix(path, ".css") {
+		contentType = "text/css"
+	} else if strings.HasSuffix(path, ".png") {
+		contentType = "image/png"
+	} else if strings.HasSuffix(path, ".png") {
+		contentType = "application/javascript"
+	} else {
+		contentType = "plain/text"
+	}
+
+	f, err := os.Open(path)
+
+	if err == nil {
+		defer f.Close()
+		w.Header().Add("Content Type", contentType)
+
+		br := bufio.NewReader(f)
+		br.WriteTo(w)
+	} else {
+		w.WriteHeader(404)
+	}
 }
