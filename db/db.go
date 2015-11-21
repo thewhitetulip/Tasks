@@ -26,18 +26,20 @@ func Close() {
 
 //GetTasks retrieves all the tasks depending on the
 //status pending or trashed or completed
-func GetTasks(status string) []types.Task {
+func GetTasks(status string) types.Context {
 	var task []types.Task
+	var context types.Context
 	var TaskID int
 	var TaskTitle string
 	var TaskContent string
 	var TaskCreated time.Time
 	var getTasksql string
+
 	if status == "pending" {
 		getTasksql = "select id, title, content, created_date from task where finish_date is null and is_deleted='N' order by created_date asc"
-	} else if status == "trashed" {
+	} else if status == "deleted" {
 		getTasksql = "select id, title, content, created_date from task where is_deleted='Y' order by created_date asc"
-	} else if status == "complete" {
+	} else if status == "completed" {
 		getTasksql = "select id, title, content, created_date from task where finish_date is not null order by created_date asc"
 	}
 
@@ -56,8 +58,8 @@ func GetTasks(status string) []types.Task {
 		a := types.Task{Id: TaskID, Title: TaskTitle, Content: TaskContent, Created: TaskCreated.Format(time.UnixDate)[0:20]}
 		task = append(task, a)
 	}
-
-	return task
+	context = types.Context{Tasks: task, Navigation: status}
+	return context
 }
 
 //GetTaskByID function gets the tasks from the ID passed to the function

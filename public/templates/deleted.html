@@ -1,4 +1,4 @@
-{{template "_head.html"}}
+{{template "_head.html" .}}
 <!--end mainHeader -->
 {{if .}}
 <a href="/delete/all">
@@ -7,7 +7,7 @@
 {{end}}
 
 <div class="timeline">
-  {{ if .}} {{range .}}
+  {{ if .}} {{range .Tasks}}
   <div class="note">
     <p class="noteHeading">{{.Title}}</p>
     <hr>

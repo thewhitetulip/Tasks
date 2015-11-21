@@ -26,6 +26,9 @@ func PopulateTemplates() {
 	var allFiles []string
 	templatesDir := "./public/templates/"
 	files, err := ioutil.ReadDir(templatesDir)
+	if err != nil {
+		fmt.Println("Error reading template dir")
+	}
 	for _, file := range files {
 		filename := file.Name()
 		if strings.HasSuffix(filename, ".html") {
@@ -37,6 +40,9 @@ func PopulateTemplates() {
 		fmt.Println(err)
 	}
 	templates, err = template.ParseFiles(allFiles...)
+	if err != nil {
+		fmt.Println(err)
+	}
 	homeTemplate = templates.Lookup("home.html")
 	deletedTemplate = templates.Lookup("deleted.html")
 
@@ -58,7 +64,7 @@ func ShowAllTasksFunc(w http.ResponseWriter, r *http.Request) {
 //ShowTrashTaskFunc is used to handle the "/trash" URL which is used to show the deleted tasks
 func ShowTrashTaskFunc(w http.ResponseWriter, r *http.Request) {
 	if r.Method == "GET" {
-		context := db.GetTasks("trashed") //false when you want deleted notes
+		context := db.GetTasks("deleted") //false when you want deleted notes
 		deletedTemplate.Execute(w, context)
 	}
 }
@@ -96,7 +102,7 @@ func AddTaskFunc(w http.ResponseWriter, r *http.Request) {
 //ShowCompleteTasksFunc is used to populate the "/completed/" URL
 func ShowCompleteTasksFunc(w http.ResponseWriter, r *http.Request) {
 	if r.Method == "GET" {
-		context := db.GetTasks("complete") //false when you want finished notes
+		context := db.GetTasks("completed") //false when you want finished notes
 		completedTemplate.Execute(w, context)
 	} else {
 		http.Redirect(w, r, "/", http.StatusFound)
@@ -112,7 +118,7 @@ func EditTaskFunc(w http.ResponseWriter, r *http.Request) {
 		} else {
 			task := db.GetTaskByID(id)
 			editTemplate.Execute(w, task)
-		}	
+		}
 	} else {
 		http.Redirect(w, r, "/", http.StatusFound)
 	}
@@ -190,7 +196,7 @@ func RestoreTaskFunc(w http.ResponseWriter, r *http.Request) {
 
 //UpdateTaskFunc is used to update a task, handes "/update/" URL
 func UpdateTaskFunc(w http.ResponseWriter, r *http.Request) {
-	if r.Method == "POST"{	
+	if r.Method == "POST" {
 		r.ParseForm()
 		id, err := strconv.Atoi(r.Form.Get("id"))
 		if err != nil {

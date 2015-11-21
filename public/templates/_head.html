@@ -4,7 +4,8 @@
 
 <head>
 
-  <title>Tasks</title>
+  <title>{{if eq .Navigation "pending"}} Tasks {{ else if eq .Navigation "completed"}}Completed
+	     {{ else if eq .Navigation "deleted"}}Deleted{{end}}</title>
 
   <!-- Mobile viewport optimized -->
   <meta name="viewport" content="width=device-width, initial-scale=1.0, maximum-scale=1.0, user-scalable=no">
@@ -40,8 +41,8 @@
 	<nav class="navbar navbar-default navbar-fixed-top mainHeader">
 		<div class="container-fluid">
 			<div class="navbar-header">
-
-				<a class="navbar-brand" href="/"> Tasks</a>
+				<a class="navbar-brand" href='{{ if eq .Navigation "pending"}} / {{else}} /{{.Navigation}} {{end}}'> {{if eq .Navigation "pending"}} Tasks {{ else if eq .Navigation "completed"}}Completed
+	     {{ else if eq .Navigation "deleted"}}Deleted{{end}}</a>
 				<span id="icons">
 						<form action="/search/" method="POST">
 							<input type="text" name="query" placeholder="Search" style="border:none;border-bottom:1px solid gray; box-shadow:none;">
@@ -64,14 +65,14 @@
 					<li class="sidebar-group"><span>Tasks</span>
 						<ul class="sidebar-group-menu">
 							<li class="sidebar-item">
-								<a href="/"  ><span class="glyphicon glyphicon-tasks"></span> <span class="nav-item">Pending</span></a>
-								<!-- class="active" -->
+								<a href="/" {{ if eq .Navigation "pending"}} class="active" {{end}}  ><span class="glyphicon glyphicon-tasks"></span> <span class="nav-item">Pending</span></a>
+								
 							</li>
 							<li class="sidebar-item">
-								<a href="/completed/"><span class="glyphicon glyphicon-check"></span>  <span class="nav-item"> Completed</span></a>
+								<a href="/completed/" {{ if eq .Navigation "completed"}} class="active" {{end}}><span class="glyphicon glyphicon-check"></span>  <span class="nav-item"> Completed</span></a>
 							</li>
 							<li class="sidebar-item">
-								<a href="/deleted/"><span class="glyphicon glyphicon-trash"></span>  <span class="nav-item"> Deleted</span></a>
+								<a href="/deleted/" {{ if eq .Navigation "deleted"}} class="active" {{end}}><span class="glyphicon glyphicon-trash"></span>  <span class="nav-item"> Deleted</span></a>
 							</li>
 						</ul>
 					</li>
