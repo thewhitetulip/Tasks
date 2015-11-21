@@ -1,7 +1,7 @@
 {{template "_head.html" .}}
 
   <div class="timeline">
-    {{ if .}} {{range .Tasks}}
+    {{ if .Tasks}} {{range .Tasks}}
     <div class="note">
       <p class="noteHeading">{{.Title}}</p>
       <hr>
@@ -19,7 +19,7 @@
       <li role="presentation">
         <a role="menuitem" tabindex="-1" href="/archive/{{.Id}}">
           <span class="glyphicon glyphicon-inbox"></span> Edit</a>
-      </li>!-->
+      </li>
       <li role="presentation">
         <a role="menuitem" tabindex="-1" href="/trash/{{.Id}}">
           <span class="glyphicon glyphicon-trash"></span> Trash</a>

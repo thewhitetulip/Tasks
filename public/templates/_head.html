@@ -4,8 +4,11 @@
 
 <head>
 
-  <title>{{if eq .Navigation "pending"}} Tasks {{ else if eq .Navigation "completed"}}Completed
-	     {{ else if eq .Navigation "deleted"}}Deleted{{end}}</title>
+  <title>{{if eq .Navigation "pending"}} Tasks 
+	     {{ else if eq .Navigation "completed"}}Completed
+	     {{ else if eq .Navigation "deleted"}}Deleted
+		 {{end}}
+		 </title>
 
   <!-- Mobile viewport optimized -->
   <meta name="viewport" content="width=device-width, initial-scale=1.0, maximum-scale=1.0, user-scalable=no">
@@ -41,8 +44,15 @@
 	<nav class="navbar navbar-default navbar-fixed-top mainHeader">
 		<div class="container-fluid">
 			<div class="navbar-header">
-				<a class="navbar-brand" href='{{ if eq .Navigation "pending"}} / {{else}} /{{.Navigation}} {{end}}'> {{if eq .Navigation "pending"}} Tasks {{ else if eq .Navigation "completed"}}Completed
-	     {{ else if eq .Navigation "deleted"}}Deleted{{end}}</a>
+				{{if .Search}} <a class="navbar-brand"> Results for: {{.Search}}</a> 
+				{{else}} 
+					<a class="navbar-brand" 
+					href='{{ if eq .Navigation "pending"}} / {{else}} /{{.Navigation}} {{end}}'>
+					{{if eq .Navigation "pending"}} Tasks 
+					{{ else if eq .Navigation "completed"}}Completed
+					{{ else if eq .Navigation "deleted"}}Deleted
+					{{end}}</a>
+				{{end}}
 				<span id="icons">
 						<form action="/search/" method="POST">
 							<input type="text" name="query" placeholder="Search" style="border:none;border-bottom:1px solid gray; box-shadow:none;">
@@ -76,7 +86,6 @@
 							</li>
 						</ul>
 					</li>
-
 				</ul>
 			</div>
 		</div>

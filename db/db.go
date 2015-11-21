@@ -224,13 +224,14 @@ func UpdateTask(id int, title string, content string) error {
 }
 
 //SearchTask is used to return the search results depending on the query
-func SearchTask(query string) []types.Task {
+func SearchTask(query string) types.Context {
 	stmt := "select id, title, content, created_date from task where title like '%" + query + "%' or content like '%" + query + "%'"
 	var task []types.Task
 	var TaskID int
 	var TaskTitle string
 	var TaskContent string
 	var TaskCreated time.Time
+	var context types.Context
 
 	rows, err := database.Query(stmt, query, query)
 	if err != nil {
@@ -246,5 +247,6 @@ func SearchTask(query string) []types.Task {
 		a := types.Task{Id: TaskID, Title: TaskTitle, Content: TaskContent, Created: TaskCreated.Format(time.UnixDate)[0:20]}
 		task = append(task, a)
 	}
-	return task
+	context = types.Context{Tasks: task, Search: query}
+	return context
 }
