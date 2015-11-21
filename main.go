@@ -30,7 +30,7 @@ func main() {
 	files, err := ioutil.ReadDir("./templates")
 	for _, file := range files {
 		filename := file.Name()
-		if strings.HasSuffix(filename, ".gtpl") {
+		if strings.HasSuffix(filename, ".html") {
 			allFiles = append(allFiles, "./templates/"+filename)
 		}
 	}
@@ -39,12 +39,12 @@ func main() {
 		fmt.Println(err)
 	}
 	templates, err = template.ParseFiles(allFiles...)
-	homeTemplate = templates.Lookup("home.gtpl")
-	deletedTemplate = templates.Lookup("deleted.gtpl")
+	homeTemplate = templates.Lookup("home.html")
+	deletedTemplate = templates.Lookup("deleted.html")
 
-	editTemplate = templates.Lookup("edit.gtpl")
-	searchTemplate = templates.Lookup("search.gtpl")
-	completedTemplate = templates.Lookup("completed.gtpl")
+	editTemplate = templates.Lookup("edit.html")
+	searchTemplate = templates.Lookup("search.html")
+	completedTemplate = templates.Lookup("completed.html")
 
 	router := httprouter.New()
 	router.GET("/", ShowAllTasks)
