@@ -164,7 +164,7 @@ func RestoreTaskFunc(w http.ResponseWriter, r *http.Request) {
 		fmt.Println(err)
 	} else {
 		db.RestoreTask(id)
-		http.Redirect(w, r, "/", http.StatusFound)
+		http.Redirect(w, r, "/deleted/", http.StatusFound)
 	}
 }
 
