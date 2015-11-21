@@ -105,7 +105,7 @@ func EditTaskFunc(w http.ResponseWriter, r *http.Request) {
 	if err != nil {
 		fmt.Println(err)
 	} else {
-		task := db.GetTaskById(id)
+		task := db.GetTaskByID(id)
 		editTemplate.Execute(w, task)
 	}
 }

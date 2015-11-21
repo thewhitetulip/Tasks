@@ -1,8 +1,4 @@
 {{template "_head.html"}}
-  <!--end mainHeader -->
-  <button class=" btn-danger btn glyphicon glyphicon-plus floating-action-icon floating-action-icon-add"></button>
-
-
   <div class="timeline">
     {{ if .}} {{range .}}
     <div class="note">
@@ -10,27 +6,25 @@
       <hr>
       <p class="noteContent">{{.Content}}</p>
       <span class="notefooter">
-        <ul class="menu">
-          <!-- <li role="presentation">
-              <a role="menuitem" tabindex="-1" href="/share/{{.Id}}">
-              <span class="glyphicon glyphicon-share"></span> Share</a>
+                    <ul class="menu">
+                      <li role="presentation">
+                          <span class="glyphicon glyphicon-time"></span> {{.Created}}</li>
+      <!--  <li role="presentation">
+                          <a role="menuitem" tabindex="-1" href="/mask/{{.Id}}">
+						  <span class="glyphicon glyphicon-lock"></span> Mask</a></li> !-->
+      <li role="presentation">
+        <a role="menuitem" tabindex="-1" href="/trash/{{.Id}}">
+          <span class="glyphicon glyphicon-trash"></span> Trash</a>
       </li>
       <li role="presentation">
-        <a role="menuitem" tabindex="-1" href="/mask/{{.Id}}">
-          <span class="glyphicon glyphicon-lock"></span> Mask</a>
-      </li> !-->
+        <a role="menuitem" tabindex="-1" href="/complete/{{.Id}}">
+          <span class="glyphicon glyphicon-check"></span> Complete</a>
+      </li>
       <li role="presentation">
         <a role="menuitem" tabindex="-1" href="/edit/{{.Id}}">
           <span class="glyphicon glyphicon-pencil"></span> Edit</a>
       </li>
-      <li role="presentation">
-        <a role="menuitem" tabindex="-1" href="/archive/{{.Id}}">
-          <span class="glyphicon glyphicon-inbox"></span> Complete</a>
-      </li>
-      <!--
-                      <li role="presentation"><a role="menuitem" tabindex="-1" href="/delete/{{.Id}}">
-                           <span class="glyphicon glyphicon-trash"></span>  Delete</a></li>
--->
+
       </ul>
       </span>
     </div>

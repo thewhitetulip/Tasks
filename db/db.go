@@ -60,8 +60,8 @@ func GetTasks(status string) []types.Task {
 	return task
 }
 
-//GetTaskById function gets the tasks from the ID passed to the function
-func GetTaskById(id int) types.Task {
+//GetTaskByID function gets the tasks from the ID passed to the function
+func GetTaskByID(id int) types.Task {
 	var task types.Task
 	var TaskID int
 	var TaskTitle string
@@ -223,24 +223,25 @@ func UpdateTask(id int, title string, content string) error {
 
 //SearchTask is used to return the search results depending on the query
 func SearchTask(query string) []types.Task {
-	stmt := "select id, title, content from task where title like '%" + query + "%' or content like '%" + query + "%'"
+	stmt := "select id, title, content, created_date from task where title like '%" + query + "%' or content like '%" + query + "%'"
 	var task []types.Task
 	var TaskID int
 	var TaskTitle string
 	var TaskContent string
+	var TaskCreated time.Time
 
 	rows, err := database.Query(stmt, query, query)
 	if err != nil {
 		fmt.Println(err)
 	}
 	for rows.Next() {
-		err := rows.Scan(&TaskID, &TaskTitle, &TaskContent)
+		err := rows.Scan(&TaskID, &TaskTitle, &TaskContent, &TaskCreated)
 		if err != nil {
 			fmt.Println(err)
 		}
 		TaskTitle = strings.Replace(TaskTitle, query, "<span class='highlight'>"+query+"</span>", -1)
 		TaskContent = strings.Replace(TaskContent, query, "<span class='highlight'>"+query+"</span>", -1)
-		a := types.Task{Id: TaskID, Title: TaskTitle, Content: TaskContent}
+		a := types.Task{Id: TaskID, Title: TaskTitle, Content: TaskContent, Created: TaskCreated.Format(time.UnixDate)[0:20]}
 		task = append(task, a)
 	}
 	return task
