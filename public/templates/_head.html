@@ -7,6 +7,7 @@
   <title>{{if eq .Navigation "pending"}} Tasks 
 	     {{ else if eq .Navigation "completed"}}Completed
 	     {{ else if eq .Navigation "deleted"}}Deleted
+		 {{ else if eq .Navigation "edit"}} Edit
 		 {{end}}
 		 </title>
 
@@ -41,6 +42,7 @@
 </head>
 <body>
 	<!-- The navigation bar-->
+	<div class="notification" {{if eq .Message ""}} class="hidden" {{end}}><span id="message">{{.Message}}</span> <button class="notification-close" type="button">&times;</button></div>
 	<nav class="navbar navbar-default navbar-fixed-top mainHeader">
 		<div class="container-fluid">
 			<div class="navbar-header">
@@ -48,9 +50,10 @@
 				{{else}} 
 					<a class="navbar-brand" 
 					href='{{ if eq .Navigation "pending"}} / {{else}} /{{.Navigation}} {{end}}'>
-					{{if eq .Navigation "pending"}} Tasks 
+					{{if eq .Navigation "pending"}} Pending 
 					{{ else if eq .Navigation "completed"}}Completed
 					{{ else if eq .Navigation "deleted"}}Deleted
+					{{ else if eq .Navigation "edit"}} Edit
 					{{end}}</a>
 				{{end}}
 				<span id="icons">

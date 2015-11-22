@@ -63,7 +63,8 @@ func GetTasks(status string) types.Context {
 }
 
 //GetTaskByID function gets the tasks from the ID passed to the function
-func GetTaskByID(id int) types.Task {
+func GetTaskByID(id int) types.Context {
+	var tasks []types.Task
 	var task types.Task
 	var TaskID int
 	var TaskTitle string
@@ -82,7 +83,9 @@ func GetTaskByID(id int) types.Task {
 		}
 		task = types.Task{Id: TaskID, Title: TaskTitle, Content: TaskContent}
 	}
-	return task
+	tasks = append(tasks, task)
+	context := types.Context{Tasks: tasks, Navigation: "edit"}
+	return context
 }
 
 //TrashTask is used to delete the task
