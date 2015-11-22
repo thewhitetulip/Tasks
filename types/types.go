@@ -13,4 +13,5 @@ type Context struct {
 	Tasks      []Task
 	Navigation string
 	Search     string
+	Message    string
 }

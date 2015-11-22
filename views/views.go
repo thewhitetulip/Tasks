@@ -18,6 +18,7 @@ var completedTemplate *template.Template
 var editTemplate *template.Template
 var searchTemplate *template.Template
 var templates *template.Template
+var message string //message will store the message to be shown as notification
 var err error
 
 //PopulateTemplates is used to parse all templates present in
@@ -38,6 +39,7 @@ func PopulateTemplates() {
 
 	if err != nil {
 		fmt.Println(err)
+		os.Exit(1)
 	}
 	templates, err = template.ParseFiles(allFiles...)
 	if err != nil {
@@ -58,7 +60,14 @@ func PopulateTemplates() {
 func ShowAllTasksFunc(w http.ResponseWriter, r *http.Request) {
 	if r.Method == "GET" {
 		context := db.GetTasks("pending") //true when you want non deleted notes
+		if message != "" {
+			context.Message = message
+		}
 		homeTemplate.Execute(w, context)
+		message = ""
+	} else {
+		message = "Method not allowed"
+		http.Redirect(w, r, "/", http.StatusFound)
 	}
 }
 
@@ -66,7 +75,14 @@ func ShowAllTasksFunc(w http.ResponseWriter, r *http.Request) {
 func ShowTrashTaskFunc(w http.ResponseWriter, r *http.Request) {
 	if r.Method == "GET" {
 		context := db.GetTasks("deleted") //false when you want deleted notes
+		if message != "" {
+			context.Message = message
+			message = ""
+		}
 		deletedTemplate.Execute(w, context)
+	} else {
+		message = "Method not allowed"
+		http.Redirect(w, r, "/", http.StatusFound)
 	}
 }
 
@@ -78,6 +94,7 @@ func SearchTaskFunc(w http.ResponseWriter, r *http.Request) {
 		context := db.SearchTask(query)
 		searchTemplate.Execute(w, context)
 	} else {
+		message = "Method not allowed"
 		http.Redirect(w, r, "/", http.StatusFound)
 	}
 
@@ -91,11 +108,13 @@ func AddTaskFunc(w http.ResponseWriter, r *http.Request) {
 		content := r.Form.Get("content")
 		truth := db.AddTask(title, content)
 		if truth != nil {
-			fmt.Println(err)
+			message = "Error adding task"
 		} else {
-			http.Redirect(w, r, "/", http.StatusFound)
+			message = "Task added"
 		}
+		http.Redirect(w, r, "/", http.StatusFound)
 	} else {
+		message = "Method not allowed"
 		http.Redirect(w, r, "/", http.StatusFound)
 	}
 }
@@ -106,6 +125,7 @@ func ShowCompleteTasksFunc(w http.ResponseWriter, r *http.Request) {
 		context := db.GetTasks("completed") //false when you want finished notes
 		completedTemplate.Execute(w, context)
 	} else {
+		message = "Method not allowed"
 		http.Redirect(w, r, "/", http.StatusFound)
 	}
 }
@@ -121,6 +141,7 @@ func EditTaskFunc(w http.ResponseWriter, r *http.Request) {
 			editTemplate.Execute(w, task)
 		}
 	} else {
+		message = "Method not allowed"
 		http.Redirect(w, r, "/", http.StatusFound)
 	}
 }
@@ -132,18 +153,21 @@ func CompleteTaskFunc(w http.ResponseWriter, r *http.Request) {
 		if err != nil {
 			fmt.Println(err)
 		} else {
-			err := db.CompleteTask(id)
+			err = db.CompleteTask(id)
 			if err != nil {
-				fmt.Println(err)
+				message = "Complete task failed"
+			} else {
+				message = "Task marked complete"
 			}
 			http.Redirect(w, r, "/", http.StatusFound)
 		}
 	} else {
+		message = "Method not allowed"
 		http.Redirect(w, r, "/", http.StatusFound)
 	}
 }
 
-//DeleteTaskFunc is used to
+//DeleteTaskFunc is used to delete a task, trash = move to recycle bin, delete = permanent delete
 func DeleteTaskFunc(w http.ResponseWriter, r *http.Request) {
 	if r.Method == "GET" {
 		id := r.URL.Path[len("/delete/"):]
@@ -157,17 +181,20 @@ func DeleteTaskFunc(w http.ResponseWriter, r *http.Request) {
 			} else {
 				err = db.DeleteTask(id)
 				if err != nil {
-					fmt.Println(err)
+					message = "Error deleting task"
+				} else {
+					message = "Task deleted"
 				}
-				http.Redirect(w, r, "/deleted/", http.StatusFound)
+				http.Redirect(w, r, "/", http.StatusFound)
 			}
 		}
 	} else {
+		message = "Method not allowed"
 		http.Redirect(w, r, "/", http.StatusFound)
 	}
 }
 
-//TrashTaskFunc is used to populate the "/trash/" URL
+//TrashTaskFunc is used to populate the trash tasks
 func TrashTaskFunc(w http.ResponseWriter, r *http.Request) {
 	if r.Method == "GET" {
 		id, err := strconv.Atoi(r.URL.Path[len("/trash/"):])
@@ -176,12 +203,15 @@ func TrashTaskFunc(w http.ResponseWriter, r *http.Request) {
 		} else {
 			err = db.TrashTask(id)
 			if err != nil {
-				fmt.Println(err)
+				message = "Error trashing task"
+			} else {
+				message = "Task trashed"
 			}
 			http.Redirect(w, r, "/", http.StatusFound)
 		}
 	} else {
-		http.Redirect(w, r, "/", http.StatusFound)
+		message = "Method not allowed"
+		http.Redirect(w, r, "/trash", http.StatusFound)
 	}
 }
 
@@ -192,10 +222,16 @@ func RestoreTaskFunc(w http.ResponseWriter, r *http.Request) {
 		if err != nil {
 			fmt.Println(err)
 		} else {
-			db.RestoreTask(id)
+			err = db.RestoreTask(id)
+			if err != nil {
+				message = "Restore failed"
+			} else {
+				message = "Task restored"
+			}
 			http.Redirect(w, r, "/deleted/", http.StatusFound)
 		}
 	} else {
+		message = "Method not allowed"
 		http.Redirect(w, r, "/", http.StatusFound)
 	}
 }
@@ -212,10 +248,14 @@ func UpdateTaskFunc(w http.ResponseWriter, r *http.Request) {
 		content := r.Form.Get("content")
 		err = db.UpdateTask(id, title, content)
 		if err != nil {
-			fmt.Println(err)
+			message = "Error updating task"
+		} else {
+			message = "Task updated"
 		}
 		http.Redirect(w, r, "/", http.StatusFound)
+
 	} else {
+		message = "Method not allowed"
 		http.Redirect(w, r, "/", http.StatusFound)
 	}
 }

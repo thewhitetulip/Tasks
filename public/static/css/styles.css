@@ -44,8 +44,31 @@ textarea {
   border-radius: 35px;
   box-shadow:0 0 4px #111;
   padding-top:10px !important;
+}
 
+.notification{
+  width: -moz-fit-content;
+  position: fixed;
+  right: 10px;
+  max-width: 400px;
+  padding: 12px;
+  background-color: #FFF;
+  box-shadow: 1px 0px 9px 0px rgba(252, 103, 22, 0.4);
+  border: 1px solid #DEB3A8;
+  border-radius: 10px;
+  z-index: 1100;
+  max-height: 90px;
+  margin-top: 20px;
+}
 
+.notification-close{
+  background-color: #2037B3;
+  border-radius: 40px;
+  border:none;
+  color: #FFF;
+  align-content: center;
+  position: fixed;
+  margin-top: -20px; 
 }
 
 /*--------------------------------------

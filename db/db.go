@@ -62,7 +62,7 @@ func GetTasks(status string) types.Context {
 	return context
 }
 
-//GetTaskByID function gets the tasks from the ID passed to the function
+//GetTaskByID function gets the tasks from the ID passed to the function, used to populate EditTask
 func GetTaskByID(id int) types.Context {
 	var tasks []types.Task
 	var task types.Task
