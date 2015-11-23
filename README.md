@@ -10,7 +10,9 @@ How you install?
 ==================
 
 1. `go get github.com/thewhitetulip/Tasks`
-2. change dir to the respective folder and create a sqlite file and execute the `schema.sql` inside the file
-3. run `go build`
+1. change dir to the respective folder and create the db file: `cat schema.sql | sqlite3 tasks.db`
+1. run `go build`
+1. ./Task
+1. open [localhost:8080](http://localhost:8080)
 
 Either this or download the latest from the release tab above and enjoy!
