@@ -236,6 +236,27 @@ func RestoreTaskFunc(w http.ResponseWriter, r *http.Request) {
 	}
 }
 
+//RestoreFromCompleteFunc restores the task from complete to pending
+func RestoreFromCompleteFunc(w http.ResponseWriter, r *http.Request) {
+	if r.Method == "GET" {
+		id, err := strconv.Atoi(r.URL.Path[len("/incomplete/"):])
+		if err != nil {
+			fmt.Println(err)
+		} else {
+			err = db.RestoreTaskFromComplete(id)
+			if err != nil {
+				message = "Restore failed"
+			} else {
+				message = "Task restored"
+			}
+			http.Redirect(w, r, "/pending/", http.StatusFound)
+		}
+	} else {
+		message = "Method not allowed"
+		http.Redirect(w, r, "/", http.StatusFound)
+	}
+}
+
 //UpdateTaskFunc is used to update a task, handes "/update/" URL
 func UpdateTaskFunc(w http.ResponseWriter, r *http.Request) {
 	if r.Method == "POST" {

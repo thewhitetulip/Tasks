@@ -21,6 +21,7 @@ func main() {
 	http.HandleFunc("/edit/", views.EditTaskFunc)
 	http.HandleFunc("/completed/", views.ShowCompleteTasksFunc)
 	http.HandleFunc("/restore/", views.RestoreTaskFunc)
+	http.HandleFunc("/incomplete/", views.RestoreFromCompleteFunc)
 	http.HandleFunc("/add/", views.AddTaskFunc)
 	http.HandleFunc("/update/", views.UpdateTaskFunc)
 	http.HandleFunc("/search/", views.SearchTaskFunc)
