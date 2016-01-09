@@ -290,7 +290,7 @@ func ServeStaticFunc(w http.ResponseWriter, r *http.Request) {
 		contentType = "text/css"
 	} else if strings.HasSuffix(path, ".png") {
 		contentType = "image/png"
-	} else if strings.HasSuffix(path, ".png") {
+	} else if strings.HasSuffix(path, ".js") {
 		contentType = "application/javascript"
 	} else {
 		contentType = "plain/text"
