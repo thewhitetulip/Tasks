@@ -5,7 +5,6 @@ package main
  * License: MIT
  **/
 import (
-	"fmt"
 	"github.com/thewhitetulip/Tasks/views"
 	"log"
 	"net/http"
@@ -27,6 +26,6 @@ func main() {
 	http.HandleFunc("/search/", views.SearchTaskFunc)
 	//http.HandleFunc("/static/", ServeStaticFunc)
 	http.Handle("/static/", http.FileServer(http.Dir("public")))
-	fmt.Println("running on 8080")
+	log.Println("running server on 8080")
 	log.Fatal(http.ListenAndServe(":8080", nil))
 }

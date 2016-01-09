@@ -2,7 +2,7 @@ package views
 
 import (
 	"bufio"
-	"fmt"
+	"log"
 	"github.com/thewhitetulip/Tasks/db"
 	"io/ioutil"
 	"net/http"
@@ -28,7 +28,7 @@ func PopulateTemplates() {
 	templatesDir := "./public/templates/"
 	files, err := ioutil.ReadDir(templatesDir)
 	if err != nil {
-		fmt.Println("Error reading template dir")
+		log.Println("Error reading template dir")
 	}
 	for _, file := range files {
 		filename := file.Name()
@@ -38,12 +38,12 @@ func PopulateTemplates() {
 	}
 
 	if err != nil {
-		fmt.Println(err)
+		log.Println(err)
 		os.Exit(1)
 	}
 	templates, err = template.ParseFiles(allFiles...)
 	if err != nil {
-		fmt.Println(err)
+		log.Println(err)
 		os.Exit(1)
 	}
 	homeTemplate = templates.Lookup("home.html")
@@ -135,7 +135,7 @@ func EditTaskFunc(w http.ResponseWriter, r *http.Request) {
 	if r.Method == "GET" {
 		id, err := strconv.Atoi(r.URL.Path[len("/edit/"):])
 		if err != nil {
-			fmt.Println(err)
+			log.Println(err)
 		} else {
 			task := db.GetTaskByID(id)
 			editTemplate.Execute(w, task)
@@ -151,7 +151,7 @@ func CompleteTaskFunc(w http.ResponseWriter, r *http.Request) {
 	if r.Method == "GET" {
 		id, err := strconv.Atoi(r.URL.Path[len("/complete/"):])
 		if err != nil {
-			fmt.Println(err)
+			log.Println(err)
 		} else {
 			err = db.CompleteTask(id)
 			if err != nil {
@@ -177,7 +177,7 @@ func DeleteTaskFunc(w http.ResponseWriter, r *http.Request) {
 		} else {
 			id, err := strconv.Atoi(id)
 			if err != nil {
-				fmt.Println(err)
+				log.Println(err)
 			} else {
 				err = db.DeleteTask(id)
 				if err != nil {
@@ -199,7 +199,7 @@ func TrashTaskFunc(w http.ResponseWriter, r *http.Request) {
 	if r.Method == "GET" {
 		id, err := strconv.Atoi(r.URL.Path[len("/trash/"):])
 		if err != nil {
-			fmt.Println(err)
+			log.Println(err)
 		} else {
 			err = db.TrashTask(id)
 			if err != nil {
@@ -220,7 +220,7 @@ func RestoreTaskFunc(w http.ResponseWriter, r *http.Request) {
 	if r.Method == "GET" {
 		id, err := strconv.Atoi(r.URL.Path[len("/restore/"):])
 		if err != nil {
-			fmt.Println(err)
+			log.Println(err)
 		} else {
 			err = db.RestoreTask(id)
 			if err != nil {
@@ -241,7 +241,7 @@ func RestoreFromCompleteFunc(w http.ResponseWriter, r *http.Request) {
 	if r.Method == "GET" {
 		id, err := strconv.Atoi(r.URL.Path[len("/incomplete/"):])
 		if err != nil {
-			fmt.Println(err)
+			log.Println(err)
 		} else {
 			err = db.RestoreTaskFromComplete(id)
 			if err != nil {
@@ -263,7 +263,7 @@ func UpdateTaskFunc(w http.ResponseWriter, r *http.Request) {
 		r.ParseForm()
 		id, err := strconv.Atoi(r.Form.Get("id"))
 		if err != nil {
-			fmt.Println(err)
+			log.Println(err)
 		}
 		title := r.Form.Get("title")
 		content := r.Form.Get("content")

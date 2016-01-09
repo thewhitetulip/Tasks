@@ -2,7 +2,7 @@ package db
 
 import (
 	"database/sql"
-	"fmt"
+	"log"
 	_ "github.com/mattn/go-sqlite3" //we want to use sqlite natively
 	"github.com/thewhitetulip/Tasks/types"
 	"strings"
@@ -15,7 +15,7 @@ var err error
 func init() {
 	database, err = sql.Open("sqlite3", "./tasks.db")
 	if err != nil {
-		fmt.Println(err)
+		log.Println(err)
 	}
 }
 
@@ -45,14 +45,14 @@ func GetTasks(status string) types.Context {
 
 	rows, err := database.Query(getTasksql)
 	if err != nil {
-		fmt.Println(err)
+		log.Println(err)
 	}
 	defer rows.Close()
 	for rows.Next() {
 		err := rows.Scan(&TaskID, &TaskTitle, &TaskContent, &TaskCreated)
 		TaskContent = strings.Replace(TaskContent, "\n", "<br>", -1)
 		if err != nil {
-			fmt.Println(err)
+			log.Println(err)
 		}
 		TaskCreated = TaskCreated.Local()
 		a := types.Task{Id: TaskID, Title: TaskTitle, Content: TaskContent, Created: TaskCreated.Format(time.UnixDate)[0:20]}
@@ -73,13 +73,13 @@ func GetTaskByID(id int) types.Context {
 
 	rows, err := database.Query(getTasksql, id)
 	if err != nil {
-		fmt.Println(err)
+		log.Println(err)
 	}
 	defer rows.Close()
 	if rows.Next() {
 		err := rows.Scan(&TaskID, &TaskTitle, &TaskContent)
 		if err != nil {
-			fmt.Println(err)
+			log.Println(err)
 		}
 		task = types.Task{Id: TaskID, Title: TaskTitle, Content: TaskContent}
 	}
@@ -92,15 +92,15 @@ func GetTaskByID(id int) types.Context {
 func TrashTask(id int) error {
 	trashSQL, err := database.Prepare("update task set is_deleted='Y',last_modified_at=datetime() where id=?")
 	if err != nil {
-		fmt.Println(err)
+		log.Println(err)
 	}
 	tx, err := database.Begin()
 	if err != nil {
-		fmt.Println(err)
+		log.Println(err)
 	}
 	_, err = tx.Stmt(trashSQL).Exec(id)
 	if err != nil {
-		fmt.Println("doing rollback")
+		log.Println("doing rollback")
 		tx.Rollback()
 	} else {
 		tx.Commit()
@@ -112,15 +112,15 @@ func TrashTask(id int) error {
 func CompleteTask(id int) error {
 	stmt, err := database.Prepare("update task set is_deleted='Y', finish_date=datetime(),last_modified_at=datetime() where id=?")
 	if err != nil {
-		fmt.Println(err)
+		log.Println(err)
 	}
 	tx, err := database.Begin()
 	if err != nil {
-		fmt.Println(err)
+		log.Println(err)
 	}
 	_, err = tx.Stmt(stmt).Exec(id)
 	if err != nil {
-		fmt.Println(err)
+		log.Println(err)
 		tx.Rollback()
 	} else {
 		tx.Commit()
@@ -132,15 +132,15 @@ func CompleteTask(id int) error {
 func DeleteAll() error {
 	stmt, err := database.Prepare("delete from task where is_deleted='Y'")
 	if err != nil {
-		fmt.Println(err)
+		log.Println(err)
 	}
 	tx, err := database.Begin()
 	if err != nil {
-		fmt.Println(err)
+		log.Println(err)
 	}
 	_, err = tx.Stmt(stmt).Exec()
 	if err != nil {
-		fmt.Println("doing rollback")
+		log.Println("doing rollback")
 		tx.Rollback()
 	} else {
 		tx.Commit()
@@ -152,15 +152,15 @@ func DeleteAll() error {
 func RestoreTask(id int) error {
 	restoreSQL, err := database.Prepare("update task set is_deleted='N',last_modified_at=datetime() where id=?")
 	if err != nil {
-		fmt.Println(err)
+		log.Println(err)
 	}
 	tx, err := database.Begin()
 	if err != nil {
-		fmt.Println(err)
+		log.Println(err)
 	}
 	_, err = tx.Stmt(restoreSQL).Exec(id)
 	if err != nil {
-		fmt.Println("doing rollback")
+		log.Println("doing rollback")
 		tx.Rollback()
 	} else {
 		tx.Commit()
@@ -168,19 +168,20 @@ func RestoreTask(id int) error {
 	return err
 }
 
-//RestoreTaskFromComplete is used to restore tasks from the Trash
+
+//RestoreTask is used to restore tasks from the Trash
 func RestoreTaskFromComplete(id int) error {
-	restoreSQL, err := database.Prepare("update task set is_deleted='N',finish_date=null,last_modified_at=datetime() where id=?")
+	restoreSQL, err := database.Prepare("update task set finish_date=null,last_modified_at=datetime() where id=?")
 	if err != nil {
-		fmt.Println(err)
+		log.Println(err)
 	}
 	tx, err := database.Begin()
 	if err != nil {
-		fmt.Println(err)
+		log.Println(err)
 	}
 	_, err = tx.Stmt(restoreSQL).Exec(id)
 	if err != nil {
-		fmt.Println("doing rollback")
+		log.Println("doing rollback")
 		tx.Rollback()
 	} else {
 		tx.Commit()
@@ -192,15 +193,15 @@ func RestoreTaskFromComplete(id int) error {
 func DeleteTask(id int) error {
 	deleteSQL, err := database.Prepare("delete from task where id = ?")
 	if err != nil {
-		fmt.Println(err)
+		log.Println(err)
 	}
 	tx, err := database.Begin()
 	if err != nil {
-		fmt.Println(err)
+		log.Println(err)
 	}
 	_, err = tx.Stmt(deleteSQL).Exec(id)
 	if err != nil {
-		fmt.Println(err)
+		log.Println(err)
 		tx.Rollback()
 	} else {
 		tx.Commit()
@@ -212,12 +213,12 @@ func DeleteTask(id int) error {
 func AddTask(title, content string) error {
 	restoreSQL, err := database.Prepare("insert into task(title, content, created_date, last_modified_at) values(?,?,datetime(), datetime())")
 	if err != nil {
-		fmt.Println(err)
+		log.Println(err)
 	}
 	tx, err := database.Begin()
 	_, err = tx.Stmt(restoreSQL).Exec(title, content)
 	if err != nil {
-		fmt.Println(err)
+		log.Println(err)
 		tx.Rollback()
 	} else {
 		tx.Commit()
@@ -229,19 +230,19 @@ func AddTask(title, content string) error {
 func UpdateTask(id int, title string, content string) error {
 	SQL, err := database.Prepare("update task set title=?, content=? where id=?")
 	if err != nil {
-		fmt.Println(err)
+		log.Println(err)
 	}
 	tx, err := database.Begin()
 
 	if err != nil {
-		fmt.Println(err)
+		log.Println(err)
 	}
 	_, err = tx.Stmt(SQL).Exec(title, content, id)
 	if err != nil {
-		fmt.Println(err)
+		log.Println(err)
 		tx.Rollback()
 	} else {
-		fmt.Println(tx.Commit())
+		log.Println(tx.Commit())
 	}
 	return err
 }
@@ -258,12 +259,12 @@ func SearchTask(query string) types.Context {
 
 	rows, err := database.Query(stmt, query, query)
 	if err != nil {
-		fmt.Println(err)
+		log.Println(err)
 	}
 	for rows.Next() {
 		err := rows.Scan(&TaskID, &TaskTitle, &TaskContent, &TaskCreated)
 		if err != nil {
-			fmt.Println(err)
+			log.Println(err)
 		}
 		TaskTitle = strings.Replace(TaskTitle, query, "<span class='highlight'>"+query+"</span>", -1)
 		TaskContent = strings.Replace(TaskContent, query, "<span class='highlight'>"+query+"</span>", -1)
