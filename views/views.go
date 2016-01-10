@@ -2,9 +2,9 @@ package views
 
 import (
 	"bufio"
-	"log"
 	"github.com/thewhitetulip/Tasks/db"
 	"io/ioutil"
+	"log"
 	"net/http"
 	"os"
 	"strconv"

@@ -2,9 +2,9 @@ package db
 
 import (
 	"database/sql"
-	"log"
 	_ "github.com/mattn/go-sqlite3" //we want to use sqlite natively
 	"github.com/thewhitetulip/Tasks/types"
+	"log"
 	"strings"
 	"time"
 )
@@ -167,7 +167,6 @@ func RestoreTask(id int) error {
 	}
 	return err
 }
-
 
 //RestoreTask is used to restore tasks from the Trash
 func RestoreTaskFromComplete(id int) error {
