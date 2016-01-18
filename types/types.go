@@ -14,4 +14,5 @@ type Context struct {
 	Navigation string
 	Search     string
 	Message    string
+	CSRFToken  string
 }

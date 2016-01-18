@@ -9,6 +9,7 @@ import (
 	"os"
 	"strconv"
 	"strings"
+	"time"
 	"text/template"
 )
 
@@ -63,8 +64,12 @@ func ShowAllTasksFunc(w http.ResponseWriter, r *http.Request) {
 		if message != "" {
 			context.Message = message
 		}
-		homeTemplate.Execute(w, context)
+		context.CSRFToken = "abcde"
 		message = ""
+		expiration := time.Now().Add(365 * 24 * time.Hour)
+		cookie	:=	http.Cookie{Name: "csrftoken",Value:"abcd",Expires:expiration}
+		http.SetCookie(w, &cookie)
+		homeTemplate.Execute(w, context)
 	} else {
 		message = "Method not allowed"
 		http.Redirect(w, r, "/", http.StatusFound)
@@ -104,15 +109,22 @@ func SearchTaskFunc(w http.ResponseWriter, r *http.Request) {
 func AddTaskFunc(w http.ResponseWriter, r *http.Request) {
 	if r.Method == "POST" { // Will work only for GET requests, will redirect to home
 		r.ParseForm()
-		title := r.Form.Get("title")
-		content := r.Form.Get("content")
-		truth := db.AddTask(title, content)
-		if truth != nil {
-			message = "Error adding task"
-		} else {
-			message = "Task added"
+		title := template.HTMLEscapeString(r.Form.Get("title"))
+		content := template.HTMLEscapeString(r.Form.Get("content"))
+		formToken := template.HTMLEscapeString(r.Form.Get("CSRFToken"))
+		cookie,	_	:=	r.Cookie("csrftoken")
+		log.Println(cookie)
+		log.Println(formToken)
+		if formToken == cookie.Value and title != nil and content!=nil{
+			truth := db.AddTask(title, content)
+			if truth != nil {
+				message = "Error adding task"
+			} else {
+				message = "Task added"
+			}
+			http.Redirect(w, r, "/", http.StatusFound)
 		}
-		http.Redirect(w, r, "/", http.StatusFound)
+
 	} else {
 		message = "Method not allowed"
 		http.Redirect(w, r, "/", http.StatusFound)
