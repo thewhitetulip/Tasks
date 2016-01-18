@@ -9,8 +9,9 @@ import (
 	"os"
 	"strconv"
 	"strings"
-	"time"
 	"text/template"
+	"time"
+	"io"
 )
 
 var homeTemplate *template.Template
@@ -64,10 +65,10 @@ func ShowAllTasksFunc(w http.ResponseWriter, r *http.Request) {
 		if message != "" {
 			context.Message = message
 		}
-		context.CSRFToken = "abcde"
+		context.CSRFToken = "abcd"
 		message = ""
 		expiration := time.Now().Add(365 * 24 * time.Hour)
-		cookie	:=	http.Cookie{Name: "csrftoken",Value:"abcd",Expires:expiration}
+		cookie := http.Cookie{Name: "csrftoken", Value: "abcd", Expires: expiration}
 		http.SetCookie(w, &cookie)
 		homeTemplate.Execute(w, context)
 	} else {
@@ -107,22 +108,44 @@ func SearchTaskFunc(w http.ResponseWriter, r *http.Request) {
 
 //AddTaskFunc is used to handle the addition of new task, "/add" URL
 func AddTaskFunc(w http.ResponseWriter, r *http.Request) {
-	if r.Method == "POST" { // Will work only for GET requests, will redirect to home
+	if r.Method == "POST" { // Will work only for POST requests, will redirect to home
 		r.ParseForm()
+		file, handler, err := r.FormFile("uploadfile")
+		if err != nil {
+			log.Println(err)
+			return
+		} 
 		title := template.HTMLEscapeString(r.Form.Get("title"))
 		content := template.HTMLEscapeString(r.Form.Get("content"))
 		formToken := template.HTMLEscapeString(r.Form.Get("CSRFToken"))
-		cookie,	_	:=	r.Cookie("csrftoken")
-		log.Println(cookie)
-		log.Println(formToken)
-		if formToken == cookie.Value and title != nil and content!=nil{
+		
+		cookie, _ := r.Cookie("csrftoken")
+		if formToken == cookie.Value {
+			if handler != nil {
+				r.ParseMultipartForm(32 << 20) //defined maximum size of file
+				defer file.Close()
+				f, err := os.OpenFile("./files/"+handler.Filename, os.O_WRONLY|os.O_CREATE, 0666)
+				if err != nil {
+					log.Println(err)
+					return
+				}
+				defer f.Close()
+				io.Copy(f, file)
+				filelink := "<br> <a href=./files/"+handler.Filename+">"+ handler.Filename+"</a>"
+				content =  content + filelink
+			}
+			
 			truth := db.AddTask(title, content)
 			if truth != nil {
 				message = "Error adding task"
+				log.Println("error adding task to db")
 			} else {
 				message = "Task added"
+				log.Println("added task to db")
 			}
 			http.Redirect(w, r, "/", http.StatusFound)
+		} else {
+			log.Fatal("CSRF mismatch")
 		}
 
 	} else {
