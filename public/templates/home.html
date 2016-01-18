@@ -16,6 +16,7 @@
             <div class="form-group">
               <!-- <label for="note-title" class="control-label">Title:</label> -->
               <input type="text" name="title" class="form-control" id="add-note-title" placeholder="Title" style="border:none;border-bottom:1px solid gray; box-shadow:none;">
+              <input type="hidden" name="CSRFToken" value={{.CSRFToken}}>
             </div>
             <div class="form-group">
               <!-- <label for="note-content" class="control-label">Content:</label> -->
@@ -43,18 +44,18 @@
                           <span class="glyphicon glyphicon-time"></span> {{.Created}}</li>
         <li role="presentation">
                           <a role="menuitem" tabindex="-1" href="/mask/{{.Id}}">
-						  <span class="glyphicon glyphicon-lock"></span> Mask</a></li> 
+						  <span class="glyphicon glyphicon-lock"></span></a></li> 
       <li role="presentation">
         <a role="menuitem" tabindex="-1" href="/trash/{{.Id}}">
-          <span class="glyphicon glyphicon-trash"></span> Trash</a>
+          <span class="glyphicon glyphicon-trash"></span></a>
       </li>
       <li role="presentation">
         <a role="menuitem" tabindex="-1" href="/complete/{{.Id}}">
-          <span class="glyphicon glyphicon-check"></span> Complete</a>
+          <span class="glyphicon glyphicon-check"></span></a>
       </li>
       <li role="presentation">
         <a role="menuitem" tabindex="-1" href="/edit/{{.Id}}">
-          <span class="glyphicon glyphicon-pencil"></span> Edit</a>
+          <span class="glyphicon glyphicon-pencil"></span></a>
       </li>
 
       </ul>
@@ -67,7 +68,7 @@
     </div>
     {{end}}
   </div>
-	{{template "footer.gtpl"}}
+	{{template "_footer.html" .}}
 
 </body>
 

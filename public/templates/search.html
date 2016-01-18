@@ -2,8 +2,7 @@
   <div class="timeline">
     {{ if .Tasks}} {{range .Tasks}}
     <div class="note">
-      <p class="noteHeading">{{.Title}}</p>
-      <hr>
+      <p class="noteHeading">{{.Title}}</p> <span class="toggle glyphicon glyphicon-resize-full"></span>
       <p class="noteContent">{{.Content}}</p>
       <span class="notefooter">
                     <ul class="menu">
@@ -14,15 +13,15 @@
 						  <span class="glyphicon glyphicon-lock"></span> Mask</a></li> !-->
       <li role="presentation">
         <a role="menuitem" tabindex="-1" href="/trash/{{.Id}}">
-          <span class="glyphicon glyphicon-trash"></span> Trash</a>
+          <span class="glyphicon glyphicon-trash"></span></a>
       </li>
       <li role="presentation">
         <a role="menuitem" tabindex="-1" href="/complete/{{.Id}}">
-          <span class="glyphicon glyphicon-check"></span> Complete</a>
+          <span class="glyphicon glyphicon-check"></span></a>
       </li>
       <li role="presentation">
         <a role="menuitem" tabindex="-1" href="/edit/{{.Id}}">
-          <span class="glyphicon glyphicon-pencil"></span> Edit</a>
+          <span class="glyphicon glyphicon-pencil"></span></a>
       </li>
 
       </ul>

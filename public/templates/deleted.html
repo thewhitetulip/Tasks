@@ -9,8 +9,7 @@
 <div class="timeline">
   {{ if .Tasks}} {{range .Tasks}}
   <div class="note">
-    <p class="noteHeading">{{.Title}}</p>
-    <hr>
+    <p class="noteHeading">{{.Title}}</p> <span class="toggle glyphicon glyphicon-resize-full"></span>
     <p class="noteContent">{{.Content}}</p>
     <span class="notefooter">
       <ul class="menu">
@@ -28,11 +27,11 @@
     </li>!-->
     <li role="presentation">
       <a role="menuitem" tabindex="-1" href="/delete/{{.Id}}">
-        <span class="glyphicon glyphicon-trash"></span> Delete</a>
+        <span class="glyphicon glyphicon-trash"></span></a>
     </li>
     <li role="presentation">
       <a role="menuitem" tabindex="-1" href="/restore/{{.Id}}">
-        <span class="glyphicon glyphicon-inbox"></span> Restore</a>
+        <span class="glyphicon glyphicon-inbox"></span></a>
     </li>
     </ul>
     </span>
