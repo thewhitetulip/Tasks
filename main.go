@@ -6,11 +6,13 @@ package main
  **/
 import (
 	"github.com/thewhitetulip/Tasks/views"
+	"github.com/thewhitetulip/Tasks/config"
 	"log"
 	"net/http"
 )
 
 func main() {
+	values := config.ReadConfig("config.json")
 	views.PopulateTemplates()
 	http.HandleFunc("/", views.ShowAllTasksFunc)
 	http.HandleFunc("/complete/", views.CompleteTaskFunc)
@@ -26,6 +28,6 @@ func main() {
 	http.HandleFunc("/search/", views.SearchTaskFunc)
 	//http.HandleFunc("/static/", ServeStaticFunc)
 	http.Handle("/static/", http.FileServer(http.Dir("public")))
-	log.Println("running server on 8080")
-	log.Fatal(http.ListenAndServe(":8080", nil))
+	log.Println("running server on ", values.ServerPort)
+	log.Fatal(http.ListenAndServe(values.ServerPort, nil))
 }
