@@ -8,7 +8,7 @@ import (
 
 //Stores the main configuration for the application
 type Configuration struct {
-	ServerPort     string
+	ServerPort string
 }
 
 var err error

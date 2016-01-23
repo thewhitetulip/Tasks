@@ -5,8 +5,8 @@ package main
  * License: MIT
  **/
 import (
-	"github.com/thewhitetulip/Tasks/views"
 	"github.com/thewhitetulip/Tasks/config"
+	"github.com/thewhitetulip/Tasks/views"
 	"log"
 	"net/http"
 )
