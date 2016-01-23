@@ -2,10 +2,11 @@ package types
 
 //Task is the struct used to identify tasks
 type Task struct {
-	Id      int
-	Title   string
-	Content string
-	Created string
+	Id       int
+	Title    string
+	Content  string
+	Created  string
+	Priority string
 }
 
 //Context is the struct passed to templates

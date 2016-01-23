@@ -7,6 +7,7 @@
       <p class="noteContent">{{.Content}}</p>
       <span class="notefooter">
                     <ul class="menu">
+                      <li role="presentation">Priority: {{.Priority}}</li>
                       <li role="presentation">
                           <a role="menuitem" tabindex="-1" href="/incomplete/{{.Id}}">
                           <span class="glyphicon glyphicon-eye-close"></span></a>
@@ -35,7 +36,7 @@
     </div>
     {{end}}
   </div>
-	{{template "_footer.gtpl"}}
+	{{template "_footer.html"}}
 
 </body>
 

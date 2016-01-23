@@ -3,6 +3,7 @@ package views
 import (
 	"bufio"
 	"github.com/thewhitetulip/Tasks/db"
+	"io"
 	"io/ioutil"
 	"log"
 	"net/http"
@@ -11,7 +12,6 @@ import (
 	"strings"
 	"text/template"
 	"time"
-	"io"
 )
 
 var homeTemplate *template.Template
@@ -113,12 +113,22 @@ func AddTaskFunc(w http.ResponseWriter, r *http.Request) {
 		file, handler, err := r.FormFile("uploadfile")
 		if err != nil {
 			log.Println(err)
-			return
-		} 
+		}
+
+		taskPriority, priorityErr := strconv.Atoi(r.FormValue("priority"))
+		if priorityErr != nil {
+			log.Print("Someone trying to hack")
+		}
+		priorityList := []int{1, 2, 3}
+		for _, priority := range priorityList {
+			if taskPriority != priority {
+				log.Println("someone trying to hack")
+			}
+		}
 		title := template.HTMLEscapeString(r.Form.Get("title"))
 		content := template.HTMLEscapeString(r.Form.Get("content"))
 		formToken := template.HTMLEscapeString(r.Form.Get("CSRFToken"))
-		
+
 		cookie, _ := r.Cookie("csrftoken")
 		if formToken == cookie.Value {
 			if handler != nil {
@@ -131,11 +141,11 @@ func AddTaskFunc(w http.ResponseWriter, r *http.Request) {
 				}
 				defer f.Close()
 				io.Copy(f, file)
-				filelink := "<br> <a href=./files/"+handler.Filename+">"+ handler.Filename+"</a>"
-				content =  content + filelink
+				filelink := "<br> <a href=/files/" + handler.Filename + ">" + handler.Filename + "</a>"
+				content = content + filelink
 			}
-			
-			truth := db.AddTask(title, content)
+
+			truth := db.AddTask(title, content, taskPriority)
 			if truth != nil {
 				message = "Error adding task"
 				log.Println("error adding task to db")

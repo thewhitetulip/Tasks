@@ -14,14 +14,20 @@
         <div class="modal-body">
           <form enctype="multipart/form-data" action="/add/" method="POST">
             <div class="form-group">
-              <!-- <label for="note-title" class="control-label">Title:</label> -->
+              
               <input type="text" name="title" class="form-control" id="add-note-title" placeholder="Title" style="border:none;border-bottom:1px solid gray; box-shadow:none;">
               <input type="hidden" name="CSRFToken" value={{.CSRFToken}}>
             </div>
             <div class="form-group">
-              <input	type="file"	name="uploadfile"	/>
-              <!-- <label for="note-content" class="control-label">Content:</label> -->
+              
               <textarea class="form-control" name="content" id="add-note-content" placeholder="Content" rows="10" style="border:none;border-bottom:1px solid gray; box-shadow:none;"></textarea>
+              File: <input	type="file"	name="uploadfile"	/> <br>
+              Priority: <select name="priority">
+                <option>---</option>
+                <option value="3">High</option>
+                <option value="2">Medium</option>
+                <option value="1">Low</option>
+              </select>
             </div>
             
         </div>
@@ -41,11 +47,12 @@
 
       <p class="noteContent">{{.Content}}</p>
       <span class="notefooter">
-                    <ul class="menu">
-                      <li role="presentation">
-                          <span class="glyphicon glyphicon-time"></span> {{.Created}}</li>
+        <ul class="menu">
+          <li role="presentation">Priority: {{.Priority}}</li>
+          <li role="presentation">
+              <span class="glyphicon glyphicon-time"></span> {{.Created}}</li>
         <li role="presentation">
-                          <a role="menuitem" tabindex="-1" href="/mask/{{.Id}}">
+              <a role="menuitem" tabindex="-1" href="/mask/{{.Id}}">
 						  <span class="glyphicon glyphicon-lock"></span></a></li> 
       <li role="presentation">
         <a role="menuitem" tabindex="-1" href="/trash/{{.Id}}">

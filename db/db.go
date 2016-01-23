@@ -33,14 +33,16 @@ func GetTasks(status string) types.Context {
 	var TaskTitle string
 	var TaskContent string
 	var TaskCreated time.Time
+	var TaskPriority string
 	var getTasksql string
 
+	basicSQL := "select id, title, content, created_date, priority from task "
 	if status == "pending" {
-		getTasksql = "select id, title, content, created_date from task where finish_date is null and is_deleted='N' order by created_date asc"
+		getTasksql = basicSQL + " where finish_date is null and is_deleted='N' order by priority desc, created_date asc"
 	} else if status == "deleted" {
-		getTasksql = "select id, title, content, created_date from task where is_deleted='Y' order by created_date asc"
+		getTasksql = basicSQL + " where is_deleted='Y' order by priority desc, created_date asc"
 	} else if status == "completed" {
-		getTasksql = "select id, title, content, created_date from task where finish_date is not null order by created_date asc"
+		getTasksql = basicSQL + " where finish_date is not null order by priority desc, created_date asc"
 	}
 
 	rows, err := database.Query(getTasksql)
@@ -49,13 +51,13 @@ func GetTasks(status string) types.Context {
 	}
 	defer rows.Close()
 	for rows.Next() {
-		err := rows.Scan(&TaskID, &TaskTitle, &TaskContent, &TaskCreated)
+		err := rows.Scan(&TaskID, &TaskTitle, &TaskContent, &TaskCreated, &TaskPriority)
 		TaskContent = strings.Replace(TaskContent, "\n", "<br>", -1)
 		if err != nil {
 			log.Println(err)
 		}
 		TaskCreated = TaskCreated.Local()
-		a := types.Task{Id: TaskID, Title: TaskTitle, Content: TaskContent, Created: TaskCreated.Format(time.UnixDate)[0:20]}
+		a := types.Task{Id: TaskID, Title: TaskTitle, Content: TaskContent, Created: TaskCreated.Format(time.UnixDate)[0:20], Priority: TaskPriority}
 		task = append(task, a)
 	}
 	context = types.Context{Tasks: task, Navigation: status}
@@ -66,10 +68,8 @@ func GetTasks(status string) types.Context {
 func GetTaskByID(id int) types.Context {
 	var tasks []types.Task
 	var task types.Task
-	var TaskID int
-	var TaskTitle string
-	var TaskContent string
-	getTasksql := "select id, title, content from task where id=?"
+
+	getTasksql := "select id, title, content, priority from task where id=?"
 
 	rows, err := database.Query(getTasksql, id)
 	if err != nil {
@@ -77,11 +77,11 @@ func GetTaskByID(id int) types.Context {
 	}
 	defer rows.Close()
 	if rows.Next() {
-		err := rows.Scan(&TaskID, &TaskTitle, &TaskContent)
+		err := rows.Scan(&task.Id, &task.Title, &task.Content, &task.Priority)
 		if err != nil {
 			log.Println(err)
+			//send email to respective people
 		}
-		task = types.Task{Id: TaskID, Title: TaskTitle, Content: TaskContent}
 	}
 	tasks = append(tasks, task)
 	context := types.Context{Tasks: tasks, Navigation: "edit"}
@@ -209,13 +209,13 @@ func DeleteTask(id int) error {
 }
 
 //AddTask is used to add the task in the database
-func AddTask(title, content string) error {
-	restoreSQL, err := database.Prepare("insert into task(title, content, created_date, last_modified_at) values(?,?,datetime(), datetime())")
+func AddTask(title, content string, taskPriority int) error {
+	restoreSQL, err := database.Prepare("insert into task(title, content, priority, created_date, last_modified_at) values(?,?,datetime(), datetime())")
 	if err != nil {
 		log.Println(err)
 	}
 	tx, err := database.Begin()
-	_, err = tx.Stmt(restoreSQL).Exec(title, content)
+	_, err = tx.Stmt(restoreSQL).Exec(title, content, taskPriority)
 	if err != nil {
 		log.Println(err)
 		tx.Rollback()

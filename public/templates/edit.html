@@ -15,6 +15,12 @@
             rows="10" style="border:none;border-bottom:1px solid gray; box-shadow:none;">{{.Content}}</textarea>
 
             <input type="text" name="id" value="{{.Id}}" class="hidden" />
+            Priority: <select name="priority">
+                <option>---</option>
+                <option {{if eq .Priority "3"}} selected="true" {{end}} value="high">High</option>
+                <option {{if eq .Priority "2"}} selected="true" {{end}} value="medium">Medium</option>
+                <option {{if eq .Priority "1"}} selected="true" {{end}} value="low">Low</option>
+              </select>
           </div>
       </div>
       <div class="modal-footer">
@@ -25,7 +31,7 @@
     </div>
   </div>
   {{end}}
-  {{template "_footer.gtpl"}}
+  {{template "_footer.html"}}
 
 </body>
 
