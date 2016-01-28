@@ -210,7 +210,7 @@ func DeleteTask(id int) error {
 
 //AddTask is used to add the task in the database
 func AddTask(title, content string, taskPriority int) error {
-	restoreSQL, err := database.Prepare("insert into task(title, content, priority, created_date, last_modified_at) values(?,?,datetime(), datetime())")
+	restoreSQL, err := database.Prepare("insert into task(title, content, priority, created_date, last_modified_at) values(?,?,?,datetime(), datetime())")
 	if err != nil {
 		log.Println(err)
 	}
