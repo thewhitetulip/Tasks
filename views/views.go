@@ -12,6 +12,7 @@ import (
 	"strings"
 	"text/template"
 	"time"
+
 )
 
 var homeTemplate *template.Template
@@ -113,6 +114,7 @@ func AddTaskFunc(w http.ResponseWriter, r *http.Request) {
 		file, handler, err := r.FormFile("uploadfile")
 		if err != nil {
 			log.Println(err)
+<<<<<<< HEAD
 		}
 
 		taskPriority, priorityErr := strconv.Atoi(r.FormValue("priority"))
@@ -129,6 +131,14 @@ func AddTaskFunc(w http.ResponseWriter, r *http.Request) {
 		content := template.HTMLEscapeString(r.Form.Get("content"))
 		formToken := template.HTMLEscapeString(r.Form.Get("CSRFToken"))
 
+=======
+			return
+		} 
+		title := template.HTMLEscapeString(r.Form.Get("title"))
+		content := template.HTMLEscapeString(r.Form.Get("content"))
+		formToken := template.HTMLEscapeString(r.Form.Get("CSRFToken"))
+		
+>>>>>>> 474ffbc0ea29e8ccacc707893a07534a4afed961
 		cookie, _ := r.Cookie("csrftoken")
 		if formToken == cookie.Value {
 			if handler != nil {
@@ -141,11 +151,19 @@ func AddTaskFunc(w http.ResponseWriter, r *http.Request) {
 				}
 				defer f.Close()
 				io.Copy(f, file)
+<<<<<<< HEAD
 				filelink := "<br> <a href=/files/" + handler.Filename + ">" + handler.Filename + "</a>"
 				content = content + filelink
 			}
 
 			truth := db.AddTask(title, content, taskPriority)
+=======
+				filelink := "<br> <a href=./files/"+handler.Filename+">"+ handler.Filename+"</a>"
+				content =  content + filelink
+			}
+			
+			truth := db.AddTask(title, content)
+>>>>>>> 474ffbc0ea29e8ccacc707893a07534a4afed961
 			if truth != nil {
 				message = "Error adding task"
 				log.Println("error adding task to db")
