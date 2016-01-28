@@ -4,6 +4,7 @@ import (
 	"database/sql"
 	_ "github.com/mattn/go-sqlite3" //we want to use sqlite natively
 	"github.com/thewhitetulip/Tasks/types"
+	md "github.com/shurcooL/github_flavored_markdown"
 	"log"
 	"strings"
 	"time"
@@ -52,7 +53,8 @@ func GetTasks(status string) types.Context {
 	defer rows.Close()
 	for rows.Next() {
 		err := rows.Scan(&TaskID, &TaskTitle, &TaskContent, &TaskCreated, &TaskPriority)
-		TaskContent = strings.Replace(TaskContent, "\n", "<br>", -1)
+		TaskContent = string(md.Markdown([]byte(TaskContent)))
+		// TaskContent = strings.Replace(TaskContent, "\n", "<br>", -1)
 		if err != nil {
 			log.Println(err)
 		}
@@ -267,6 +269,7 @@ func SearchTask(query string) types.Context {
 		}
 		TaskTitle = strings.Replace(TaskTitle, query, "<span class='highlight'>"+query+"</span>", -1)
 		TaskContent = strings.Replace(TaskContent, query, "<span class='highlight'>"+query+"</span>", -1)
+		TaskContent = string(md.Markdown([]byte(TaskContent)))
 		a := types.Task{Id: TaskID, Title: TaskTitle, Content: TaskContent, Created: TaskCreated.Format(time.UnixDate)[0:20]}
 		task = append(task, a)
 	}

@@ -114,31 +114,28 @@ func AddTaskFunc(w http.ResponseWriter, r *http.Request) {
 		file, handler, err := r.FormFile("uploadfile")
 		if err != nil {
 			log.Println(err)
-<<<<<<< HEAD
 		}
 
 		taskPriority, priorityErr := strconv.Atoi(r.FormValue("priority"))
 		if priorityErr != nil {
-			log.Print("Someone trying to hack")
+			log.Print(priorityErr)
 		}
 		priorityList := []int{1, 2, 3}
+		found := false
 		for _, priority := range priorityList {
-			if taskPriority != priority {
-				log.Println("someone trying to hack")
+			if taskPriority == priority {
+				found = true
 			}
+		}
+		//If someone gives us incorrect priority number, we give the priority
+		//to that task as 1 i.e. Low
+		if found {
+			taskPriority = 1
 		}
 		title := template.HTMLEscapeString(r.Form.Get("title"))
 		content := template.HTMLEscapeString(r.Form.Get("content"))
 		formToken := template.HTMLEscapeString(r.Form.Get("CSRFToken"))
 
-=======
-			return
-		} 
-		title := template.HTMLEscapeString(r.Form.Get("title"))
-		content := template.HTMLEscapeString(r.Form.Get("content"))
-		formToken := template.HTMLEscapeString(r.Form.Get("CSRFToken"))
-		
->>>>>>> 474ffbc0ea29e8ccacc707893a07534a4afed961
 		cookie, _ := r.Cookie("csrftoken")
 		if formToken == cookie.Value {
 			if handler != nil {
@@ -151,19 +148,13 @@ func AddTaskFunc(w http.ResponseWriter, r *http.Request) {
 				}
 				defer f.Close()
 				io.Copy(f, file)
-<<<<<<< HEAD
+
 				filelink := "<br> <a href=/files/" + handler.Filename + ">" + handler.Filename + "</a>"
 				content = content + filelink
 			}
 
 			truth := db.AddTask(title, content, taskPriority)
-=======
-				filelink := "<br> <a href=./files/"+handler.Filename+">"+ handler.Filename+"</a>"
-				content =  content + filelink
-			}
-			
-			truth := db.AddTask(title, content)
->>>>>>> 474ffbc0ea29e8ccacc707893a07534a4afed961
+
 			if truth != nil {
 				message = "Error adding task"
 				log.Println("error adding task to db")
