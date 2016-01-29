@@ -13,7 +13,9 @@ Notes:	 omninotesweb
 /*--------------------------------------
 Layout
 -------------------------------------- */
-
+ul{
+    list-style-type: none;
+}
 
 .center{
   text-align:center;
