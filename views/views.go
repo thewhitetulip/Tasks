@@ -2,6 +2,8 @@ package views
 
 import (
 	"bufio"
+	"crypto/md5"
+	"fmt"
 	"github.com/thewhitetulip/Tasks/db"
 	"io"
 	"io/ioutil"
@@ -12,7 +14,6 @@ import (
 	"strings"
 	"text/template"
 	"time"
-
 )
 
 var homeTemplate *template.Template
@@ -31,7 +32,8 @@ func PopulateTemplates() {
 	templatesDir := "./public/templates/"
 	files, err := ioutil.ReadDir(templatesDir)
 	if err != nil {
-		log.Println("Error reading template dir")
+		log.Println(err)
+		os.Exit(1) // No point in running app if templates aren't read
 	}
 	for _, file := range files {
 		filename := file.Name()
@@ -78,6 +80,20 @@ func ShowAllTasksFunc(w http.ResponseWriter, r *http.Request) {
 	}
 }
 
+// UploadedFileHandler is used to handle the uploaded file related requests
+func UploadedFileHandler(w http.ResponseWriter, r *http.Request) {
+	if r.Method == "GET" {
+		log.Println("into the handler")
+		token := r.URL.Path[len("/files/"):]
+
+		//file, err := db.GetFileName(token)
+		//if err != nil {
+		log.Println("serving file ./files/" + token)
+		http.ServeFile(w, r, "./files/"+token)
+		//}
+	}
+}
+
 //ShowTrashTaskFunc is used to handle the "/trash" URL which is used to show the deleted tasks
 func ShowTrashTaskFunc(w http.ResponseWriter, r *http.Request) {
 	if r.Method == "GET" {
@@ -105,9 +121,8 @@ func SearchTaskFunc(w http.ResponseWriter, r *http.Request) {
 		http.Redirect(w, r, "/", http.StatusFound)
 	}
 
+	//AddTaskFunc is used to handle the addition of new task, "/add" URL
 }
-
-//AddTaskFunc is used to handle the addition of new task, "/add" URL
 func AddTaskFunc(w http.ResponseWriter, r *http.Request) {
 	if r.Method == "POST" { // Will work only for POST requests, will redirect to home
 		r.ParseForm()
@@ -129,7 +144,7 @@ func AddTaskFunc(w http.ResponseWriter, r *http.Request) {
 		}
 		//If someone gives us incorrect priority number, we give the priority
 		//to that task as 1 i.e. Low
-		if found {
+		if !found {
 			taskPriority = 1
 		}
 		title := template.HTMLEscapeString(r.Form.Get("title"))
@@ -141,7 +156,11 @@ func AddTaskFunc(w http.ResponseWriter, r *http.Request) {
 			if handler != nil {
 				r.ParseMultipartForm(32 << 20) //defined maximum size of file
 				defer file.Close()
-				f, err := os.OpenFile("./files/"+handler.Filename, os.O_WRONLY|os.O_CREATE, 0666)
+				randomFileName := md5.New()
+				io.WriteString(randomFileName, strconv.FormatInt(time.Now().Unix(), 10))
+				io.WriteString(randomFileName, handler.Filename)
+				token := fmt.Sprintf("%x", randomFileName.Sum(nil))
+				f, err := os.OpenFile("./files/"+token, os.O_WRONLY|os.O_CREATE, 0666)
 				if err != nil {
 					log.Println(err)
 					return
@@ -149,13 +168,19 @@ func AddTaskFunc(w http.ResponseWriter, r *http.Request) {
 				defer f.Close()
 				io.Copy(f, file)
 
-				filelink := "<br> <a href=/files/" + handler.Filename + ">" + handler.Filename + "</a>"
+				filelink := "<br> <a href=/files/" + token + ">" + handler.Filename + "</a>"
 				content = content + filelink
+
+				fileTruth := db.AddFile(handler.Filename, token)
+				if fileTruth != nil {
+					message = "Error adding filename in db"
+					log.Println("error adding task to db")
+				}
 			}
 
-			truth := db.AddTask(title, content, taskPriority)
+			taskTruth := db.AddTask(title, content, taskPriority)
 
-			if truth != nil {
+			if taskTruth != nil {
 				message = "Error adding task"
 				log.Println("error adding task to db")
 			} else {

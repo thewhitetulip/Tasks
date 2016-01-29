@@ -17,6 +17,7 @@ func main() {
 	http.HandleFunc("/", views.ShowAllTasksFunc)
 	http.HandleFunc("/complete/", views.CompleteTaskFunc)
 	http.HandleFunc("/delete/", views.DeleteTaskFunc)
+	http.HandleFunc("/files/", views.UploadedFileHandler)
 	http.HandleFunc("/deleted/", views.ShowTrashTaskFunc)
 	http.HandleFunc("/trash/", views.TrashTaskFunc)
 	http.HandleFunc("/edit/", views.EditTaskFunc)
