@@ -8,6 +8,7 @@ Features:
 2. Search tasks, the query is highlighted in the search results page
 3. We use github flavoured markdown, which enables us for using a task list, advanced syntax highlighting and much more
 4. Supports file upload, randomizes the file name, stores the user given filename in a db and works on the randomized file name for security reasons.
+5. Priorities are assigned, High = 3, medium = 2 and low = 1, sorting is done on priority descending and created date ascending
 
 How you install?
 ==================
@@ -16,10 +17,24 @@ How you install?
 1. change dir to the respective folder and create the db file: `cat schema.sql | sqlite3 tasks.db`
 1. run `go build`
 1. `./Task`
-1. open [localhost:8080](http://localhost:8080)
+1. open [localhost:8081](http://localhost:8081)
 
-Either this or download the latest from the release tab above and enjoy!
+You can change the port in the [config] (https://github.com/thewhitetulip/Tasks/blob/master/config.json) file
 
+#Screenshots
+The Home Page
+
+![Home Page] (https://github.com/thewhitetulip/Tasks/blob/master/screenshots/FrontEnd.png)
+
+Add Task dialog
+
+![Add Task] (https://github.com/thewhitetulip/Tasks/blob/master/screenshots/FrontEnd-Add%20task.png)
+
+Navigation drawer
+
+![Navigation Drawer] (https://github.com/thewhitetulip/Tasks/blob/master/screenshots/FrontEnd%20Navigation%20Drawer.png)
+
+#License
 
 The MIT License (MIT)
 
