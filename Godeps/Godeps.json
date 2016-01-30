@@ -11,6 +11,5 @@
          {  
 	       "ImportPath"	: "github.com/shurcooL/github_flavored_markdown"
            }
-            ...
         ]
 }
