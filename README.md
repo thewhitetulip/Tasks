@@ -1,8 +1,11 @@
 # Tasks
 
-Tasks is a simplistic golang webapp to manage tasks, I built this tool to manage tasks which I wanted to do, there is a good kanban style boards, but I felt they were a bit too much for my taste. Also I wanted to learn the golang webapp.
+Tasks is a simplistic Go webapp to manage tasks, I built this tool to manage tasks which I wanted to do, there are many good kanban style boards, but I felt they were a bit too heavyweight for my taste. Also I wanted to learn the Go webapp development.
 
-Features:
+##### Book
+I am learning writing webapps with Go as I build this application, I took to writing an introductory book about [building webapps in Go] (https://github.com/thewhitetulip/web-dev-golang-anti-textbook) because I faced a lot of problems while learning how to write webapps in Go, it, the book strives to teach by practical examples.
+
+##Features
 
 1. Add, update, delete task
 2. Search tasks, the query is highlighted in the search results page
