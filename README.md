@@ -3,9 +3,11 @@
 Tasks is a simplistic golang webapp to manage tasks, I built this tool to manage tasks which I wanted to do, there is a good kanban style boards, but I felt they were a bit too much for my taste. Also I wanted to learn the golang webapp.
 
 Features:
-1. Add, update, delete note
-2. Search notes, the query is highlighted in the search results page
+
+1. Add, update, delete task
+2. Search tasks, the query is highlighted in the search results page
 3. We use github flavoured markdown, which enables us for using a task list, advanced syntax highlighting and much more
+4. Supports file upload, randomizes the file name, stores the user given filename in a db and works on the randomized file name for security reasons.
 
 How you install?
 ==================
