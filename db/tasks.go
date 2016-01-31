@@ -2,13 +2,12 @@ package db
 
 import (
 	"database/sql"
-	"log"
-	"strings"
-	"time"
-
 	_ "github.com/mattn/go-sqlite3" //we want to use sqlite natively
 	md "github.com/shurcooL/github_flavored_markdown"
 	"github.com/thewhitetulip/Tasks/types"
+	"log"
+	"strings"
+	"time"
 )
 
 var database Database
@@ -162,6 +161,7 @@ func UpdateTask(id int, title string, content string) error {
 	return err
 }
 
+//taskQuery encapsulates running multiple queries which don't do much things
 func taskQuery(sql string, args ...interface{}) error {
 	SQL := database.prepare(sql)
 	tx := database.begin()
@@ -170,7 +170,7 @@ func taskQuery(sql string, args ...interface{}) error {
 		log.Println(err)
 		tx.Rollback()
 	} else {
-		log.Println(tx.Commit())
+		tx.Commit()
 	}
 	return err
 }

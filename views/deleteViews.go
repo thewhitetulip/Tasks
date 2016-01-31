@@ -7,7 +7,6 @@ import (
 	"strconv"
 )
 
-
 //TrashTaskFunc is used to populate the trash tasks
 func TrashTaskFunc(w http.ResponseWriter, r *http.Request) {
 	if r.Method == "GET" {
@@ -50,7 +49,6 @@ func RestoreTaskFunc(w http.ResponseWriter, r *http.Request) {
 	}
 }
 
-
 //EditTaskFunc is used to edit tasks, handles "/edit/" URL
 func EditTaskFunc(w http.ResponseWriter, r *http.Request) {
 	if r.Method == "GET" {
@@ -66,7 +64,6 @@ func EditTaskFunc(w http.ResponseWriter, r *http.Request) {
 		http.Redirect(w, r, "/", http.StatusFound)
 	}
 }
-
 
 //DeleteTaskFunc is used to delete a task, trash = move to recycle bin, delete = permanent delete
 func DeleteTaskFunc(w http.ResponseWriter, r *http.Request) {
@@ -94,7 +91,6 @@ func DeleteTaskFunc(w http.ResponseWriter, r *http.Request) {
 		http.Redirect(w, r, "/", http.StatusFound)
 	}
 }
-
 
 //RestoreFromCompleteFunc restores the task from complete to pending
 func RestoreFromCompleteFunc(w http.ResponseWriter, r *http.Request) {

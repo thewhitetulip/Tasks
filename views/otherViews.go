@@ -11,7 +11,6 @@ import (
 	"text/template"
 )
 
-
 //PopulateTemplates is used to parse all templates present in
 //the templates folder
 func PopulateTemplates() {
@@ -80,7 +79,6 @@ func SearchTaskFunc(w http.ResponseWriter, r *http.Request) {
 		http.Redirect(w, r, "/", http.StatusFound)
 	}
 }
-
 
 //UpdateTaskFunc is used to update a task, handes "/update/" URL
 func UpdateTaskFunc(w http.ResponseWriter, r *http.Request) {

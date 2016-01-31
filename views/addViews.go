@@ -1,18 +1,16 @@
 package views
 
-
 import (
-	"net/http"
-	"log"
-	"strconv"
-	"os"
-	"time"
-	"fmt"
-	"text/template"
 	"crypto/md5"
+	"fmt"
 	"github.com/thewhitetulip/Tasks/db"
 	"io"
-	
+	"log"
+	"net/http"
+	"os"
+	"strconv"
+	"text/template"
+	"time"
 )
 
 // UploadedFileHandler is used to handle the uploaded file related requests
