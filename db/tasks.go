@@ -116,112 +116,56 @@ func GetTaskByID(id int) types.Context {
 
 //TrashTask is used to delete the task
 func TrashTask(id int) error {
-	trashSQL := database.prepare("update task set is_deleted='Y',last_modified_at=datetime() where id=?")
-	tx := database.begin()
-
-	_, err = tx.Stmt(trashSQL).Exec(id)
-	if err != nil {
-		log.Println("doing rollback")
-		tx.Rollback()
-	} else {
-		tx.Commit()
-	}
+	err := taskQuery("update task set is_deleted='Y',last_modified_at=datetime() where id=?", id)
 	return err
 }
 
 //CompleteTask  is used to mark tasks as complete
 func CompleteTask(id int) error {
-	stmt := database.prepare("update task set is_deleted='Y', finish_date=datetime(),last_modified_at=datetime() where id=?")
-	tx := database.begin()
-	_, err = tx.Stmt(stmt).Exec(id)
-	if err != nil {
-		log.Println(err)
-		tx.Rollback()
-	} else {
-		tx.Commit()
-	}
+	err := taskQuery("update task set is_deleted='Y', finish_date=datetime(),last_modified_at=datetime() where id=?", id)
 	return err
 }
 
 //DeleteAll is used to empty the trash
 func DeleteAll() error {
-	stmt := database.prepare("delete from task where is_deleted='Y'")
-
-	tx := database.begin()
-
-	_, err = tx.Stmt(stmt).Exec()
-	if err != nil {
-		log.Println("doing rollback")
-		tx.Rollback()
-	} else {
-		tx.Commit()
-	}
+	err := taskQuery("delete from task where is_deleted='Y'")
 	return err
 }
 
 //RestoreTask is used to restore tasks from the Trash
 func RestoreTask(id int) error {
-	restoreSQL := database.prepare("update task set is_deleted='N',last_modified_at=datetime() where id=?")
-
-	tx := database.begin()
-	_, err = tx.Stmt(restoreSQL).Exec(id)
-	if err != nil {
-		log.Println("doing rollback")
-		tx.Rollback()
-	} else {
-		tx.Commit()
-	}
+	err := taskQuery("update task set is_deleted='N',last_modified_at=datetime() where id=?", id)
 	return err
 }
 
 //RestoreTaskFromComplete is used to restore tasks from the Trash
 func RestoreTaskFromComplete(id int) error {
-	restoreSQL := database.prepare("update task set finish_date=null,last_modified_at=datetime() where id=?")
-	tx := database.begin()
-	_, err = tx.Stmt(restoreSQL).Exec(id)
-	if err != nil {
-		log.Println("doing rollback")
-		tx.Rollback()
-	} else {
-		tx.Commit()
-	}
+	err := taskQuery("update task set finish_date=null,last_modified_at=datetime() where id=?", id)
 	return err
 }
 
 //DeleteTask is used to delete the task from the database
 func DeleteTask(id int) error {
-	deleteSQL := database.prepare("delete from task where id = ?")
-	tx := database.begin()
-	_, err = tx.Stmt(deleteSQL).Exec(id)
-	if err != nil {
-		log.Println(err)
-		tx.Rollback()
-	} else {
-		tx.Commit()
-	}
+	err := taskQuery("delete from task where id = ?", id)
 	return err
 }
 
 //AddTask is used to add the task in the database
 func AddTask(title, content string, taskPriority int) error {
-	restoreSQL := database.prepare("insert into task(title, content, priority, created_date, last_modified_at) values(?,?,?,datetime(), datetime())")
-
-	tx := database.begin()
-	_, err = tx.Stmt(restoreSQL).Exec(title, content, taskPriority)
-	if err != nil {
-		log.Println(err)
-		tx.Rollback()
-	} else {
-		tx.Commit()
-	}
+	err := taskQuery("insert into task(title, content, priority, created_date, last_modified_at) values(?,?,?,datetime(), datetime())", title, content, taskPriority)
 	return err
 }
 
 //UpdateTask is used to update the tasks in the database
 func UpdateTask(id int, title string, content string) error {
+	err := taskQuery("update task set title=?, content=? where id=?", title, content)
+	return err
+}
+
+func taskQuery(sql string, args ...interface{}) error {
 	SQL := database.prepare("update task set title=?, content=? where id=?")
 	tx := database.begin()
-	_, err = tx.Stmt(SQL).Exec(title, content, id)
+	_, err = tx.Stmt(SQL).Exec(args)
 	if err != nil {
 		log.Println(err)
 		tx.Rollback()
