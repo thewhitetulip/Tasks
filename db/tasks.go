@@ -2,7 +2,7 @@ package db
 
 import (
 	"database/sql"
-	"fmt"
+	"log"
 	"strings"
 	"time"
 
@@ -21,7 +21,7 @@ type Database struct {
 func (db Database) begin() (tx *sql.Tx) {
 	tx, err := db.db.Begin()
 	if err != nil {
-		fmt.Println(err)
+		log.Println(err)
 	}
 	return tx
 }
@@ -29,7 +29,7 @@ func (db Database) begin() (tx *sql.Tx) {
 func (db Database) prepare(q string) (stmt *sql.Stmt) {
 	stmt, err := db.db.Prepare(q)
 	if err != nil {
-		fmt.Println(err)
+		log.Println(err)
 	}
 	return stmt
 }
@@ -37,7 +37,7 @@ func (db Database) prepare(q string) (stmt *sql.Stmt) {
 func (db Database) query(q string, args ...interface{}) (rows *sql.Rows) {
 	rows, err := db.db.Query(q, args)
 	if err != nil {
-		fmt.Println(err)
+		log.Println(err)
 	}
 	return rows
 }
@@ -46,7 +46,7 @@ func init() {
 	database = Database{}
 	database.db, err = sql.Open("sqlite3", "./tasks.db")
 	if err != nil {
-		fmt.Println(err)
+		log.Println(err)
 	}
 }
 
@@ -80,7 +80,7 @@ func GetTasks(status string) types.Context {
 		err := rows.Scan(&TaskID, &TaskTitle, &TaskContent, &TaskCreated)
 		TaskContent = strings.Replace(TaskContent, "\n", "<br>", -1)
 		if err != nil {
-			fmt.Println(err)
+			log.Println(err)
 		}
 		TaskCreated = TaskCreated.Local()
 		a := types.Task{Id: TaskID, Title: TaskTitle, Content: TaskContent, Created: TaskCreated.Format(time.UnixDate)[0:20]}
@@ -104,7 +104,7 @@ func GetTaskByID(id int) types.Context {
 	if rows.Next() {
 		err := rows.Scan(&TaskID, &TaskTitle, &TaskContent)
 		if err != nil {
-			fmt.Println(err)
+			log.Println(err)
 		}
 		task = types.Task{Id: TaskID, Title: TaskTitle, Content: TaskContent}
 	}
@@ -119,7 +119,7 @@ func TrashTask(id int) error {
 	tx := database.begin()
 	_, err = tx.Stmt(trashSQL).Exec(id)
 	if err != nil {
-		fmt.Println("doing rollback")
+		log.Println("doing rollback")
 		tx.Rollback()
 	} else {
 		tx.Commit()
@@ -133,7 +133,7 @@ func CompleteTask(id int) error {
 	tx := database.begin()
 	_, err = tx.Stmt(stmt).Exec(id)
 	if err != nil {
-		fmt.Println(err)
+		log.Println(err)
 		tx.Rollback()
 	} else {
 		tx.Commit()
@@ -147,7 +147,7 @@ func DeleteAll() error {
 	tx := database.begin()
 	_, err = tx.Stmt(stmt).Exec()
 	if err != nil {
-		fmt.Println("doing rollback")
+		log.Println("doing rollback")
 		tx.Rollback()
 	} else {
 		tx.Commit()
@@ -161,7 +161,7 @@ func RestoreTask(id int) error {
 	tx := database.begin()
 	_, err = tx.Stmt(restoreSQL).Exec(id)
 	if err != nil {
-		fmt.Println("doing rollback")
+		log.Println("doing rollback")
 		tx.Rollback()
 	} else {
 		tx.Commit()
@@ -174,11 +174,11 @@ func DeleteTask(id int) error {
 	deleteSQL := database.prepare("delete from task where id = ?")
 	tx := database.begin()
 	if err != nil {
-		fmt.Println(err)
+		log.Println(err)
 	}
 	_, err = tx.Stmt(deleteSQL).Exec(id)
 	if err != nil {
-		fmt.Println(err)
+		log.Println(err)
 		tx.Rollback()
 	} else {
 		tx.Commit()
@@ -192,7 +192,7 @@ func AddTask(title, content string) error {
 	tx := database.begin()
 	_, err = tx.Stmt(restoreSQL).Exec(title, content)
 	if err != nil {
-		fmt.Println(err)
+		log.Println(err)
 		tx.Rollback()
 	} else {
 		tx.Commit()
@@ -206,10 +206,10 @@ func UpdateTask(id int, title string, content string) error {
 	tx := database.begin()
 	_, err = tx.Stmt(SQL).Exec(title, content, id)
 	if err != nil {
-		fmt.Println(err)
+		log.Println(err)
 		tx.Rollback()
 	} else {
-		fmt.Println(tx.Commit())
+		log.Println(tx.Commit())
 	}
 	return err
 }
@@ -229,7 +229,7 @@ func SearchTask(query string) types.Context {
 	for rows.Next() {
 		err := rows.Scan(&TaskID, &TaskTitle, &TaskContent, &TaskCreated)
 		if err != nil {
-			fmt.Println(err)
+			log.Println(err)
 		}
 		TaskTitle = strings.Replace(TaskTitle, query, "<span class='highlight'>"+query+"</span>", -1)
 		TaskContent = strings.Replace(TaskContent, query, "<span class='highlight'>"+query+"</span>", -1)
