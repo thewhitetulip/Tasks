@@ -36,7 +36,7 @@ func (db Database) prepare(q string) (stmt *sql.Stmt) {
 }
 
 func (db Database) query(q string, args ...interface{}) (rows *sql.Rows) {
-	rows, err := db.db.Query(q, args)
+	rows, err := db.db.Query(q, args...)
 	if err != nil {
 		log.Println(err)
 	}
@@ -165,7 +165,7 @@ func UpdateTask(id int, title string, content string) error {
 func taskQuery(sql string, args ...interface{}) error {
 	SQL := database.prepare("update task set title=?, content=? where id=?")
 	tx := database.begin()
-	_, err = tx.Stmt(SQL).Exec(args)
+	_, err = tx.Stmt(SQL).Exec(args...)
 	if err != nil {
 		log.Println(err)
 		tx.Rollback()
