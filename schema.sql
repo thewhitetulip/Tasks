@@ -8,3 +8,4 @@ last_modified_at timestamp,
 finish_date timestamp
 , priority int);
 
+CREATE TABLE files(name varchar(1000) not null, autoName varchar(255) not null);
