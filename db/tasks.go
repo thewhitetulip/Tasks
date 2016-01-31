@@ -163,7 +163,7 @@ func UpdateTask(id int, title string, content string) error {
 }
 
 func taskQuery(sql string, args ...interface{}) error {
-	SQL := database.prepare("update task set title=?, content=? where id=?")
+	SQL := database.prepare(sql)
 	tx := database.begin()
 	_, err = tx.Stmt(SQL).Exec(args...)
 	if err != nil {
