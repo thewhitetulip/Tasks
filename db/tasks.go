@@ -168,7 +168,7 @@ func AddTask(title, content string, taskPriority int) error {
 
 //UpdateTask is used to update the tasks in the database
 func UpdateTask(id int, title string, content string) error {
-	err := taskQuery("update task set title=?, content=? where id=?", title, content)
+	err := taskQuery("update task set title=?, content=? where id=?", title, content, id)
 	return err
 }
 
