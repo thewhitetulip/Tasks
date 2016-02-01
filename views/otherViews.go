@@ -1,7 +1,6 @@
 package views
 
 import (
-	"github.com/thewhitetulip/Tasks/db"
 	"io/ioutil"
 	"log"
 	"net/http"
@@ -9,6 +8,8 @@ import (
 	"strconv"
 	"strings"
 	"text/template"
+
+	"github.com/thewhitetulip/Tasks/db"
 )
 
 //PopulateTemplates is used to parse all templates present in

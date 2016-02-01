@@ -2,12 +2,13 @@ package db
 
 import (
 	"database/sql"
-	_ "github.com/mattn/go-sqlite3" //we want to use sqlite natively
-	md "github.com/shurcooL/github_flavored_markdown"
-	"github.com/thewhitetulip/Tasks/types"
 	"log"
 	"strings"
 	"time"
+
+	_ "github.com/mattn/go-sqlite3" //we want to use sqlite natively
+	md "github.com/shurcooL/github_flavored_markdown"
+	"github.com/thewhitetulip/Tasks/types"
 )
 
 var database Database
@@ -22,6 +23,7 @@ func (db Database) begin() (tx *sql.Tx) {
 	tx, err := db.db.Begin()
 	if err != nil {
 		log.Println(err)
+		return nil
 	}
 	return tx
 }
@@ -30,6 +32,7 @@ func (db Database) prepare(q string) (stmt *sql.Stmt) {
 	stmt, err := db.db.Prepare(q)
 	if err != nil {
 		log.Println(err)
+		return nil
 	}
 	return stmt
 }
@@ -38,6 +41,7 @@ func (db Database) query(q string, args ...interface{}) (rows *sql.Rows) {
 	rows, err := db.db.Query(q, args...)
 	if err != nil {
 		log.Println(err)
+		return nil
 	}
 	return rows
 }
@@ -45,7 +49,7 @@ func (db Database) query(q string, args ...interface{}) (rows *sql.Rows) {
 func init() {
 	database.db, err = sql.Open("sqlite3", "./tasks.db")
 	if err != nil {
-		log.Println(err)
+		log.Fatal(err)
 	}
 }
 
@@ -56,7 +60,7 @@ func Close() {
 
 //GetTasks retrieves all the tasks depending on the
 //status pending or trashed or completed
-func GetTasks(status string) types.Context {
+func GetTasks(status string) (types.Context, error) {
 	var task []types.Task
 	var context types.Context
 	var TaskID int
@@ -89,11 +93,11 @@ func GetTasks(status string) types.Context {
 		task = append(task, a)
 	}
 	context = types.Context{Tasks: task, Navigation: status}
-	return context
+	return context, nil
 }
 
 //GetTaskByID function gets the tasks from the ID passed to the function, used to populate EditTask
-func GetTaskByID(id int) types.Context {
+func GetTaskByID(id int) (types.Context, error) {
 	var tasks []types.Task
 	var task types.Task
 
@@ -110,7 +114,7 @@ func GetTaskByID(id int) types.Context {
 	}
 	tasks = append(tasks, task)
 	context := types.Context{Tasks: tasks, Navigation: "edit"}
-	return context
+	return context, nil
 }
 
 //TrashTask is used to delete the task

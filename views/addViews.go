@@ -3,7 +3,6 @@ package views
 import (
 	"crypto/md5"
 	"fmt"
-	"github.com/thewhitetulip/Tasks/db"
 	"io"
 	"log"
 	"net/http"
@@ -11,12 +10,13 @@ import (
 	"strconv"
 	"text/template"
 	"time"
+
+	"github.com/thewhitetulip/Tasks/db"
 )
 
 // UploadedFileHandler is used to handle the uploaded file related requests
 func UploadedFileHandler(w http.ResponseWriter, r *http.Request) {
 	if r.Method == "GET" {
-		log.Println("into the handler")
 		token := r.URL.Path[len("/files/"):]
 
 		//file, err := db.GetFileName(token)
@@ -34,11 +34,15 @@ func AddTaskFunc(w http.ResponseWriter, r *http.Request) {
 		file, handler, err := r.FormFile("uploadfile")
 		if err != nil {
 			log.Println(err)
+			message = "Error uploading file"
+			http.Redirect(w, r, "/", http.StatusInternalServerError)
 		}
 
 		taskPriority, priorityErr := strconv.Atoi(r.FormValue("priority"))
 		if priorityErr != nil {
 			log.Print(priorityErr)
+			message = "Bad task priority"
+			http.Redirect(w, r, "/", http.StatusInternalServerError)
 		}
 		priorityList := []int{1, 2, 3}
 		found := false
@@ -88,13 +92,16 @@ func AddTaskFunc(w http.ResponseWriter, r *http.Request) {
 			if taskTruth != nil {
 				message = "Error adding task"
 				log.Println("error adding task to db")
+				http.Redirect(w, r, "/", http.StatusInternalServerError)
 			} else {
 				message = "Task added"
 				log.Println("added task to db")
 			}
 			http.Redirect(w, r, "/", http.StatusFound)
 		} else {
-			log.Fatal("CSRF mismatch")
+			log.Println("CSRF mismatch")
+			message = "Server Error"
+			http.Redirect(w, r, "/", http.StatusInternalServerError)
 		}
 
 	} else {

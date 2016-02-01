@@ -2,12 +2,13 @@ package views
 
 import (
 	"bufio"
-	"github.com/thewhitetulip/Tasks/db"
 	"net/http"
 	"os"
 	"strings"
 	"text/template"
 	"time"
+
+	"github.com/thewhitetulip/Tasks/db"
 )
 
 var homeTemplate *template.Template
@@ -23,7 +24,10 @@ var err error
 //TODO add http404 error
 func ShowAllTasksFunc(w http.ResponseWriter, r *http.Request) {
 	if r.Method == "GET" {
-		context := db.GetTasks("pending") //true when you want non deleted notes
+		context, err := db.GetTasks("pending")
+		if err != nil {
+			http.Redirect(w, r, "/", http.StatusInternalServerError)
+		}
 		if message != "" {
 			context.Message = message
 		}
@@ -42,7 +46,10 @@ func ShowAllTasksFunc(w http.ResponseWriter, r *http.Request) {
 //ShowTrashTaskFunc is used to handle the "/trash" URL which is used to show the deleted tasks
 func ShowTrashTaskFunc(w http.ResponseWriter, r *http.Request) {
 	if r.Method == "GET" {
-		context := db.GetTasks("deleted") //false when you want deleted notes
+		context, err := db.GetTasks("deleted")
+		if err != nil {
+			http.Redirect(w, r, "/trash", http.StatusInternalServerError)
+		}
 		if message != "" {
 			context.Message = message
 			message = ""
@@ -57,7 +64,10 @@ func ShowTrashTaskFunc(w http.ResponseWriter, r *http.Request) {
 //ShowCompleteTasksFunc is used to populate the "/completed/" URL
 func ShowCompleteTasksFunc(w http.ResponseWriter, r *http.Request) {
 	if r.Method == "GET" {
-		context := db.GetTasks("completed") //false when you want finished notes
+		context, err := db.GetTasks("completed")
+		if err != nil {
+			http.Redirect(w, r, "/completed", http.StatusInternalServerError)
+		}
 		completedTemplate.Execute(w, context)
 	} else {
 		message = "Method not allowed"

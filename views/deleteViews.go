@@ -1,10 +1,11 @@
 package views
 
 import (
-	"github.com/thewhitetulip/Tasks/db"
 	"log"
 	"net/http"
 	"strconv"
+
+	"github.com/thewhitetulip/Tasks/db"
 )
 
 //TrashTaskFunc is used to populate the trash tasks
@@ -13,6 +14,7 @@ func TrashTaskFunc(w http.ResponseWriter, r *http.Request) {
 		id, err := strconv.Atoi(r.URL.Path[len("/trash/"):])
 		if err != nil {
 			log.Println(err)
+			http.Redirect(w, r, "/trash", http.StatusBadRequest)
 		} else {
 			err = db.TrashTask(id)
 			if err != nil {
@@ -20,7 +22,7 @@ func TrashTaskFunc(w http.ResponseWriter, r *http.Request) {
 			} else {
 				message = "Task trashed"
 			}
-			http.Redirect(w, r, "/", http.StatusFound)
+			http.Redirect(w, r, "/trash", http.StatusFound)
 		}
 	} else {
 		message = "Method not allowed"
@@ -34,6 +36,7 @@ func RestoreTaskFunc(w http.ResponseWriter, r *http.Request) {
 		id, err := strconv.Atoi(r.URL.Path[len("/restore/"):])
 		if err != nil {
 			log.Println(err)
+			http.Redirect(w, r, "/deleted", http.StatusBadRequest)
 		} else {
 			err = db.RestoreTask(id)
 			if err != nil {
@@ -55,8 +58,12 @@ func EditTaskFunc(w http.ResponseWriter, r *http.Request) {
 		id, err := strconv.Atoi(r.URL.Path[len("/edit/"):])
 		if err != nil {
 			log.Println(err)
+			http.Redirect(w, r, "/", http.StatusBadRequest)
 		} else {
-			task := db.GetTaskByID(id)
+			task, err := db.GetTaskByID(id)
+			if err != nil {
+				task.Message = "Error fetching Tasks"
+			}
 			editTemplate.Execute(w, task)
 		}
 	} else {
@@ -70,12 +77,17 @@ func DeleteTaskFunc(w http.ResponseWriter, r *http.Request) {
 	if r.Method == "GET" {
 		id := r.URL.Path[len("/delete/"):]
 		if id == "all" {
-			db.DeleteAll()
+			err := db.DeleteAll()
+			if err != nil {
+				message = "Error deleting tasks"
+				http.Redirect(w, r, "/", http.StatusInternalServerError)
+			}
 			http.Redirect(w, r, "/", http.StatusFound)
 		} else {
 			id, err := strconv.Atoi(id)
 			if err != nil {
 				log.Println(err)
+				http.Redirect(w, r, "/", http.StatusBadRequest)
 			} else {
 				err = db.DeleteTask(id)
 				if err != nil {
@@ -98,6 +110,7 @@ func RestoreFromCompleteFunc(w http.ResponseWriter, r *http.Request) {
 		id, err := strconv.Atoi(r.URL.Path[len("/incomplete/"):])
 		if err != nil {
 			log.Println(err)
+			http.Redirect(w, r, "/completed", http.StatusBadRequest)
 		} else {
 			err = db.RestoreTaskFromComplete(id)
 			if err != nil {
@@ -105,10 +118,10 @@ func RestoreFromCompleteFunc(w http.ResponseWriter, r *http.Request) {
 			} else {
 				message = "Task restored"
 			}
-			http.Redirect(w, r, "/pending/", http.StatusFound)
+			http.Redirect(w, r, "/completed", http.StatusFound)
 		}
 	} else {
 		message = "Method not allowed"
-		http.Redirect(w, r, "/", http.StatusFound)
+		http.Redirect(w, r, "/completed", http.StatusFound)
 	}
 }
