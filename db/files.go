@@ -1,5 +1,8 @@
 package db
 
+/*
+stores the functions related to file IO
+*/
 import (
 	"log"
 )

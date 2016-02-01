@@ -1,3 +1,10 @@
+/*
+Configuration package is used to read the configuration file
+config.json which stores the server port for current implementation
+    {
+        "ServerPort": ":8081"
+    }
+*/
 package config
 
 import (

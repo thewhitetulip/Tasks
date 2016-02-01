@@ -1,5 +1,8 @@
 package views
 
+/*
+Holds the insert task related view handlers, includes the one for file upload
+*/
 import (
 	"crypto/md5"
 	"fmt"

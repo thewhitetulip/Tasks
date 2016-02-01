@@ -1,5 +1,9 @@
 package types
 
+/*
+Package types is used to store the context struct which
+is passed while templates are executed.
+*/
 //Task is the struct used to identify tasks
 type Task struct {
 	Id       int

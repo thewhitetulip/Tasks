@@ -1,5 +1,12 @@
 package db
 
+/*
+Stores the database functions related to tasks like
+GetTaskByID(id int)
+GetTasks(status string)
+DeleteAll()
+*/
+
 import (
 	"database/sql"
 	"log"

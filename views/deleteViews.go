@@ -1,5 +1,9 @@
 package views
 
+/*
+Holds the delete related view handlers
+*/
+
 import (
 	"log"
 	"net/http"
