@@ -4,17 +4,29 @@ import (
 	"log"
 	"net/http"
 	"strconv"
+	"strings"
 
 	"github.com/thewhitetulip/Tasks/db"
 )
 
 //TrashTaskFunc is used to populate the trash tasks
 func TrashTaskFunc(w http.ResponseWriter, r *http.Request) {
+	//for best UX we want the user to be returned to the page making
+	//the delete transaction, we use the r.Referer() function to get the link
+	var redirectUrl string
+	redirect := strings.Split(r.Referer(), "/")
+	index := len(redirect) - 1
+	if len(redirect) == 4 {
+		redirectUrl = "/"
+	} else {
+		redirectUrl = redirect[index]
+	}
+
 	if r.Method == "GET" {
 		id, err := strconv.Atoi(r.URL.Path[len("/trash/"):])
 		if err != nil {
-			log.Println(err)
-			http.Redirect(w, r, "/trash", http.StatusBadRequest)
+			log.Println("TrashTaskFunc", err)
+			http.Redirect(w, r, redirectUrl, http.StatusBadRequest)
 		} else {
 			err = db.TrashTask(id)
 			if err != nil {
@@ -22,11 +34,11 @@ func TrashTaskFunc(w http.ResponseWriter, r *http.Request) {
 			} else {
 				message = "Task trashed"
 			}
-			http.Redirect(w, r, "/trash", http.StatusFound)
+			http.Redirect(w, r, redirectUrl, http.StatusFound)
 		}
 	} else {
 		message = "Method not allowed"
-		http.Redirect(w, r, "/trash", http.StatusFound)
+		http.Redirect(w, r, redirectUrl, http.StatusFound)
 	}
 }
 
@@ -95,7 +107,7 @@ func DeleteTaskFunc(w http.ResponseWriter, r *http.Request) {
 				} else {
 					message = "Task deleted"
 				}
-				http.Redirect(w, r, "/", http.StatusFound)
+				http.Redirect(w, r, "/deleted", http.StatusFound)
 			}
 		}
 	} else {

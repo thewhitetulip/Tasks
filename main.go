@@ -17,9 +17,11 @@ func main() {
 	views.PopulateTemplates()
 	http.HandleFunc("/", views.ShowAllTasksFunc)
 	http.HandleFunc("/complete/", views.CompleteTaskFunc)
+	//delete permanently deletes from db
 	http.HandleFunc("/delete/", views.DeleteTaskFunc)
 	http.HandleFunc("/files/", views.UploadedFileHandler)
 	http.HandleFunc("/deleted/", views.ShowTrashTaskFunc)
+	//trash moves to recycle bin
 	http.HandleFunc("/trash/", views.TrashTaskFunc)
 	http.HandleFunc("/edit/", views.EditTaskFunc)
 	http.HandleFunc("/completed/", views.ShowCompleteTasksFunc)
