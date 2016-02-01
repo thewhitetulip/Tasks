@@ -1,10 +1,9 @@
 package views
 
+/*Holds the fetch related view handlers*/
+
 import (
-	"bufio"
 	"net/http"
-	"os"
-	"strings"
 	"text/template"
 	"time"
 
@@ -72,33 +71,5 @@ func ShowCompleteTasksFunc(w http.ResponseWriter, r *http.Request) {
 	} else {
 		message = "Method not allowed"
 		http.Redirect(w, r, "/", http.StatusFound)
-	}
-}
-
-//ServeStaticFunc is used to serve static files
-//TODO: replace this with the http.FileServer
-func ServeStaticFunc(w http.ResponseWriter, r *http.Request) {
-	path := "./public" + r.URL.Path
-	var contentType string
-	if strings.HasSuffix(path, ".css") {
-		contentType = "text/css"
-	} else if strings.HasSuffix(path, ".png") {
-		contentType = "image/png"
-	} else if strings.HasSuffix(path, ".js") {
-		contentType = "application/javascript"
-	} else {
-		contentType = "plain/text"
-	}
-
-	f, err := os.Open(path)
-
-	if err == nil {
-		defer f.Close()
-		w.Header().Add("Content Type", contentType)
-
-		br := bufio.NewReader(f)
-		br.WriteTo(w)
-	} else {
-		w.WriteHeader(404)
 	}
 }
