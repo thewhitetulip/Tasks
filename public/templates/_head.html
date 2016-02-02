@@ -8,6 +8,7 @@
 	     {{ else if eq .Navigation "completed"}}Completed
 	     {{ else if eq .Navigation "deleted"}}Deleted
 		 {{ else if eq .Navigation "edit"}} Edit
+         {{else }} {{.Navigation}}
 		 {{end}}
 		 </title>
 
@@ -49,11 +50,17 @@
 				{{if .Search}} <a class="navbar-brand"> Results for: {{.Search}}</a> 
 				{{else}} 
 					<a class="navbar-brand" 
-					href='{{ if eq .Navigation "pending"}} / {{else}} /{{.Navigation}} {{end}}'>
+					href='{{ if eq .Navigation "pending"}} / 
+                    {{else if eq .Navigation "completed"}} /{{.Navigation}}
+                    {{else if eq .Navigation "deleted"}} /{{.Navigation}}
+                    {{else if eq .Navigation "edit"}} /{{.Navigation}}
+                    {{else}} /category/{{.Navigation}}
+                     {{end}}'>
 					{{if eq .Navigation "pending"}} Pending 
 					{{ else if eq .Navigation "completed"}}Completed
 					{{ else if eq .Navigation "deleted"}}Deleted
 					{{ else if eq .Navigation "edit"}} Edit
+                    {{else }} {{.Navigation}}
 					{{end}}</a>
 				{{end}}
 				<span id="icons">
@@ -77,16 +84,38 @@
 				<ul class="sidebar-menu">
 					<li class="sidebar-group"><span>Tasks</span>
 						<ul class="sidebar-group-menu">
-							<li class="sidebar-item">
+							
+                            <li class="sidebar-item">
 								<a href="/" {{ if eq .Navigation "pending"}} class="active" {{end}}  ><span class="glyphicon glyphicon-tasks"></span> <span class="nav-item">Pending</span></a>
 								
 							</li>
-							<li class="sidebar-item">
+							
+                            <li class="sidebar-item">
 								<a href="/completed/" {{ if eq .Navigation "completed"}} class="active" {{end}}><span class="glyphicon glyphicon-check"></span>  <span class="nav-item"> Completed</span></a>
 							</li>
-							<li class="sidebar-item">
+							
+                            <li class="sidebar-item">
 								<a href="/deleted/" {{ if eq .Navigation "deleted"}} class="active" {{end}}><span class="glyphicon glyphicon-trash"></span>  <span class="nav-item"> Deleted</span></a>
 							</li>
+                            
+                            <hr>
+                            
+                            <li class="sidebar-item">
+			                 <h5> Categories</h5> 
+                             <!--<button title="New category" id="toggleCategoryForm" data-placement="left" data-toggle="tooltip" class="btn glyphicon glyphicon-plus" style="font-size:small; margin-left:120px;"></button>-->
+                             <span id="categoryForm">
+                                 <form action="/add-category/" method="POST">
+							         <input type="text" name="category" width="50px" style="border:none;border-bottom:1px solid gray; box-shadow:none;">
+							         <input type="submit" text="submit" class="btn btn-default" width="50px" height="30px"/>
+						         </form>
+                             </span>
+		                    </li>
+                            
+                            {{ range .Categories }}
+                            <li class="sidebar-item">
+								<a href="/category/{{.}}" > <span class="glyphicon glyphicon-stop"></span>  <span class="nav-item"> {{.}}</span></a>
+							</li>
+                            {{end}}
 						</ul>
 					</li>
 				</ul>

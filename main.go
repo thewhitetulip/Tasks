@@ -16,6 +16,8 @@ func main() {
 	values := config.ReadConfig("config.json")
 	views.PopulateTemplates()
 	http.HandleFunc("/", views.ShowAllTasksFunc)
+	http.HandleFunc("/add-category/", views.AddCategoryFunc)
+	http.HandleFunc("/category/", views.ShowCategoryFunc)
 	http.HandleFunc("/complete/", views.CompleteTaskFunc)
 	//delete permanently deletes from db
 	http.HandleFunc("/delete/", views.DeleteTaskFunc)

@@ -27,6 +27,13 @@
 		            <input type="radio" name="priority" value="2" /> Medium
 		            <input type="radio" name="priority" value="1" /> Low
             </div>
+            
+            <select name="category">
+                <option>---</option>
+                {{range .Categories}}
+                    <option value="{{.}}" > {{.}} </option> 
+                {{end}}
+            </select>
         </div>
         <div class="modal-footer">
           <button type="button" class="btn btn-default" data-dismiss="modal">Close</button>

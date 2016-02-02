@@ -61,6 +61,8 @@ func AddTaskFunc(w http.ResponseWriter, r *http.Request) {
 		if !found {
 			taskPriority = 1
 		}
+
+		category := r.FormValue("category")
 		title := template.HTMLEscapeString(r.Form.Get("title"))
 		content := template.HTMLEscapeString(r.Form.Get("content"))
 		formToken := template.HTMLEscapeString(r.Form.Get("CSRFToken"))
@@ -93,7 +95,7 @@ func AddTaskFunc(w http.ResponseWriter, r *http.Request) {
 				}
 			}
 
-			taskTruth := db.AddTask(title, content, taskPriority)
+			taskTruth := db.AddTask(title, content, category, taskPriority)
 
 			if taskTruth != nil {
 				message = "Error adding task"
@@ -113,5 +115,21 @@ func AddTaskFunc(w http.ResponseWriter, r *http.Request) {
 	} else {
 		message = "Method not allowed"
 		http.Redirect(w, r, "/", http.StatusFound)
+	}
+}
+
+//AddCategoryFunc used to add new categories to the database
+func AddCategoryFunc(w http.ResponseWriter, r *http.Request) {
+	r.ParseForm()
+	category := r.Form.Get("category")
+	if category != "" {
+		err := db.AddCategory(category)
+		if err != nil {
+			message = "Error adding category"
+			http.Redirect(w, r, "/", http.StatusBadRequest)
+		} else {
+			message = "Added category"
+			http.Redirect(w, r, "/", http.StatusFound)
+		}
 	}
 }

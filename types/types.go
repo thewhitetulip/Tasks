@@ -20,4 +20,5 @@ type Context struct {
 	Search     string
 	Message    string
 	CSRFToken  string
+	Categories []string
 }

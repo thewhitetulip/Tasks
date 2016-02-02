@@ -67,7 +67,7 @@ func Close() {
 
 //GetTasks retrieves all the tasks depending on the
 //status pending or trashed or completed
-func GetTasks(status string) (types.Context, error) {
+func GetTasks(status, category string) (types.Context, error) {
 	var task []types.Task
 	var context types.Context
 	var TaskID int
@@ -76,9 +76,10 @@ func GetTasks(status string) (types.Context, error) {
 	var TaskCreated time.Time
 	var TaskPriority string
 	var getTasksql string
+	var rows *sql.Rows
 
-	basicSQL := "select id, title, content, created_date, priority from task "
-	if status == "pending" {
+	basicSQL := "select id, title, content, created_date, priority from task t"
+	if status == "pending" && category == "" {
 		getTasksql = basicSQL + " where finish_date is null and is_deleted='N' order by priority desc, created_date asc"
 	} else if status == "deleted" {
 		getTasksql = basicSQL + " where is_deleted='Y' order by priority desc, created_date asc"
@@ -86,7 +87,16 @@ func GetTasks(status string) (types.Context, error) {
 		getTasksql = basicSQL + " where finish_date is not null order by priority desc, created_date asc"
 	}
 
-	rows := database.query(getTasksql)
+	if category != "" {
+		status = category
+		getTasksql = "select t.id, title, content, created_date, priority from task t, category c where c.id = t.cat_id and name = ?"
+		rows, err = database.db.Query(getTasksql, category)
+		if err != nil {
+			log.Println("something went wrong while getting query")
+		}
+	} else {
+		rows = database.query(getTasksql)
+	}
 	defer rows.Close()
 	for rows.Next() {
 		err := rows.Scan(&TaskID, &TaskTitle, &TaskContent, &TaskCreated, &TaskPriority)
@@ -161,8 +171,14 @@ func DeleteTask(id int) error {
 }
 
 //AddTask is used to add the task in the database
-func AddTask(title, content string, taskPriority int) error {
-	err := taskQuery("insert into task(title, content, priority, created_date, last_modified_at) values(?,?,?,datetime(), datetime())", title, content, taskPriority)
+func AddTask(title, content, category string, taskPriority int) error {
+	var err error
+	if category == "" {
+		err = taskQuery("insert into task(title, content, priority, created_date, last_modified_at) values(?,?,?,datetime(), datetime())", title, content, taskPriority)
+	} else {
+		categoryID := GetCategoryById(category)
+		err = taskQuery("insert into task(title, content, priority, created_date, last_modified_at, cat_id) values(?,?,?,datetime(), datetime(), ?)", title, content, taskPriority, categoryID)
+	}
 	return err
 }
 

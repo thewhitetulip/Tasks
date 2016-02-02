@@ -40,3 +40,43 @@ func GetFileName(token string) (string, error) {
 
 	return fileName, nil
 }
+
+//GetCategories will return the list of categories to be
+//rendered in the template
+func GetCategories() []string {
+	stmt := "select name from category"
+	rows := database.query(stmt)
+	var categories []string
+	var category string
+
+	for rows.Next() {
+		err := rows.Scan(&category)
+		if err != nil {
+			log.Println(err)
+		}
+		categories = append(categories, category)
+	}
+	return categories
+}
+
+//AddCategory is used to add the task in the database
+func AddCategory(category string) error {
+	err := taskQuery("insert into category(name) values(?)", category)
+	return err
+}
+
+// GetCategoryById will return the ID of that category passed as args
+// used while inserting tasks into the table
+func GetCategoryById(category string) int {
+	stmt := "select id from category where name=?"
+	rows := database.query(stmt, category)
+	var categoryID int
+
+	for rows.Next() {
+		err := rows.Scan(&categoryID)
+		if err != nil {
+			log.Println(err)
+		}
+	}
+	return categoryID
+}

@@ -23,7 +23,8 @@ var err error
 //TODO add http404 error
 func ShowAllTasksFunc(w http.ResponseWriter, r *http.Request) {
 	if r.Method == "GET" {
-		context, err := db.GetTasks("pending")
+		context, err := db.GetTasks("pending", "")
+		categories := db.GetCategories()
 		if err != nil {
 			http.Redirect(w, r, "/", http.StatusInternalServerError)
 		}
@@ -31,6 +32,7 @@ func ShowAllTasksFunc(w http.ResponseWriter, r *http.Request) {
 			context.Message = message
 		}
 		context.CSRFToken = "abcd"
+		context.Categories = categories
 		message = ""
 		expiration := time.Now().Add(365 * 24 * time.Hour)
 		cookie := http.Cookie{Name: "csrftoken", Value: "abcd", Expires: expiration}
@@ -45,7 +47,7 @@ func ShowAllTasksFunc(w http.ResponseWriter, r *http.Request) {
 //ShowTrashTaskFunc is used to handle the "/trash" URL which is used to show the deleted tasks
 func ShowTrashTaskFunc(w http.ResponseWriter, r *http.Request) {
 	if r.Method == "GET" {
-		context, err := db.GetTasks("deleted")
+		context, err := db.GetTasks("deleted", "")
 		if err != nil {
 			http.Redirect(w, r, "/trash", http.StatusInternalServerError)
 		}
@@ -63,11 +65,38 @@ func ShowTrashTaskFunc(w http.ResponseWriter, r *http.Request) {
 //ShowCompleteTasksFunc is used to populate the "/completed/" URL
 func ShowCompleteTasksFunc(w http.ResponseWriter, r *http.Request) {
 	if r.Method == "GET" {
-		context, err := db.GetTasks("completed")
+		context, err := db.GetTasks("completed", "")
 		if err != nil {
 			http.Redirect(w, r, "/completed", http.StatusInternalServerError)
 		}
 		completedTemplate.Execute(w, context)
+	} else {
+		message = "Method not allowed"
+		http.Redirect(w, r, "/", http.StatusFound)
+	}
+}
+
+//ShowCategoryFunc will populate the /category/<id> URL which shows all the tasks related
+// to that particular category
+func ShowCategoryFunc(w http.ResponseWriter, r *http.Request) {
+	if r.Method == "GET" {
+		category := r.URL.Path[len("/category/"):]
+		context, err := db.GetTasks("", category)
+		categories := db.GetCategories()
+
+		if err != nil {
+			http.Redirect(w, r, "/", http.StatusInternalServerError)
+		}
+		if message != "" {
+			context.Message = message
+		}
+		context.CSRFToken = "abcd"
+		context.Categories = categories
+		message = ""
+		expiration := time.Now().Add(365 * 24 * time.Hour)
+		cookie := http.Cookie{Name: "csrftoken", Value: "abcd", Expires: expiration}
+		http.SetCookie(w, &cookie)
+		homeTemplate.Execute(w, context)
 	} else {
 		message = "Method not allowed"
 		http.Redirect(w, r, "/", http.StatusFound)
