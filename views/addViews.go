@@ -35,13 +35,15 @@ func AddTaskFunc(w http.ResponseWriter, r *http.Request) {
 	if r.Method == "POST" { // Will work only for POST requests, will redirect to home
 		r.ParseForm()
 		file, handler, err := r.FormFile("uploadfile")
-		if err != nil {
+		if err != nil && handler != nil {
+			//Case executed when file is uploaded and yet an error occurs
 			log.Println(err)
 			message = "Error uploading file"
 			http.Redirect(w, r, "/", http.StatusInternalServerError)
 		}
 
 		taskPriority, priorityErr := strconv.Atoi(r.FormValue("priority"))
+
 		if priorityErr != nil {
 			log.Print(priorityErr)
 			message = "Bad task priority"
@@ -66,6 +68,7 @@ func AddTaskFunc(w http.ResponseWriter, r *http.Request) {
 		cookie, _ := r.Cookie("csrftoken")
 		if formToken == cookie.Value {
 			if handler != nil {
+				// this will be executed whenever a file is uploaded
 				r.ParseMultipartForm(32 << 20) //defined maximum size of file
 				defer file.Close()
 				randomFileName := md5.New()
@@ -99,8 +102,8 @@ func AddTaskFunc(w http.ResponseWriter, r *http.Request) {
 			} else {
 				message = "Task added"
 				log.Println("added task to db")
+				http.Redirect(w, r, "/", http.StatusFound)
 			}
-			http.Redirect(w, r, "/", http.StatusFound)
 		} else {
 			log.Println("CSRF mismatch")
 			message = "Server Error"
