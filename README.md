@@ -12,6 +12,7 @@ I am learning writing webapps with Go as I build this application, I took to wri
 3. We use github flavoured markdown, which enables us for using a task list, advanced syntax highlighting and much more
 4. Supports file upload, randomizes the file name, stores the user given filename in a db and works on the randomized file name for security reasons.
 5. Priorities are assigned, High = 3, medium = 2 and low = 1, sorting is done on priority descending and created date ascending
+6. Categories are supported, you can add tasks to different categories. 
 
 How you install?
 ==================
