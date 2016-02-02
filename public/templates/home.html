@@ -22,14 +22,11 @@
 
               <textarea class="form-control" name="content" id="add-note-content" placeholder="Content" rows="10" style="border:none;border-bottom:1px solid gray; box-shadow:none;"></textarea>
               File: <input	type="file"	name="uploadfile"	/> <br>
-              Priority: <select name="priority">
-                <option>---</option>
-                <option value="3">High</option>
-                <option value="2">Medium</option>
-                <option value="1">Low</option>
-              </select>
+              Priority: 
+              		<input type="radio" name="priority" value="3" /> High
+		            <input type="radio" name="priority" value="2" /> Medium
+		            <input type="radio" name="priority" value="1" /> Low
             </div>
-            
         </div>
         <div class="modal-footer">
           <button type="button" class="btn btn-default" data-dismiss="modal">Close</button>

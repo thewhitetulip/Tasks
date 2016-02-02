@@ -15,11 +15,10 @@
             rows="10" style="border:none;border-bottom:1px solid gray; box-shadow:none;">{{.Content}}</textarea>
 
             <input type="text" name="id" value="{{.Id}}" class="hidden" />
-            Priority: <select name="priority">
-                <option>---</option>
-                <option {{if eq .Priority "3"}} selected="true" {{end}} value="high">High</option>
-                <option {{if eq .Priority "2"}} selected="true" {{end}} value="medium">Medium</option>
-                <option {{if eq .Priority "1"}} selected="true" {{end}} value="low">Low</option>
+            Priority: 
+                <input type="radio" name="priority" value="3" {{if eq .Priority "3"}} checked="checked" {{end}} /> High
+                <input type="radio" name="priority" value="2" {{if eq .Priority "2"}} checked="checked" {{end}} /> Medium
+                <input type="radio" name="priority" value="1" {{if eq .Priority "1"}} checked="checked" {{end}} /> Low 
               </select>
           </div>
       </div>
