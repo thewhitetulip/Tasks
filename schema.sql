@@ -6,6 +6,8 @@ is_deleted char(1) default 'N',
 created_date timestamp,
 last_modified_at timestamp,
 finish_date timestamp
-, priority int);
+, priority integer, cat_id references category(id));
 
 CREATE TABLE files(name varchar(1000) not null, autoName varchar(255) not null);
+
+CREATE TABLE category( id integer primary key autoincrement ,name varchar(1000) not null);
