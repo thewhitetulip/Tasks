@@ -20,7 +20,7 @@ import (
 //the templates folder
 func PopulateTemplates() {
 	var allFiles []string
-	templatesDir := "./public/templates/"
+	templatesDir := "./templates/"
 	files, err := ioutil.ReadDir(templatesDir)
 	if err != nil {
 		log.Println(err)
