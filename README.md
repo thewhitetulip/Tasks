@@ -2,8 +2,16 @@
 
 Tasks is a simplistic Go webapp to manage tasks, I built this tool to manage tasks which I wanted to do, there are many good kanban style boards, but I felt they were a bit too heavyweight for my taste. Also I wanted to learn the Go webapp development.
 
-##### Book
-I am learning writing webapps with Go as I build this application, I took to writing an introductory book about [building webapps in Go] (https://github.com/thewhitetulip/web-dev-golang-anti-textbook) because I faced a lot of problems while learning how to write webapps in Go, it, the book strives to teach by practical examples.
+How to use?
+==================
+
+1. `go get github.com/thewhitetulip/Tasks`
+1. change dir to the respective folder and create the db file: `cat schema.sql | sqlite3 tasks.db`
+1. run `go build`
+1. `./Tasks`
+1. open [localhost:8081](http://localhost:8081)
+
+You can change the port in the [config] (https://github.com/thewhitetulip/Tasks/blob/master/config.json) file
 
 ##Features
 
@@ -14,16 +22,8 @@ I am learning writing webapps with Go as I build this application, I took to wri
 5. Priorities are assigned, High = 3, medium = 2 and low = 1, sorting is done on priority descending and created date ascending
 6. Categories are supported, you can add tasks to different categories. 
 
-How you install?
-==================
-
-1. `go get github.com/thewhitetulip/Tasks`
-1. change dir to the respective folder and create the db file: `cat schema.sql | sqlite3 tasks.db`
-1. run `go build`
-1. `./Task`
-1. open [localhost:8081](http://localhost:8081)
-
-You can change the port in the [config] (https://github.com/thewhitetulip/Tasks/blob/master/config.json) file
+##### Book
+I am learning writing webapps with Go as I build this application, I took to writing an introductory book about [building webapps in Go] (https://github.com/thewhitetulip/web-dev-golang-anti-textbook) because I faced a lot of problems while learning how to write webapps in Go, it, the book strives to teach by practical examples. You are welcome to contribute to the book.
 
 #Screenshots
 The Home Page
