@@ -54,23 +54,22 @@ textarea {
   right: 10px;
   max-width: 400px;
   padding: 12px;
-  background-color: #FFF;
-  box-shadow: 1px 0px 9px 0px rgba(252, 103, 22, 0.4);
-  border: 1px solid #DEB3A8;
+  background-color: #F2FCFF;
+  box-shadow: 1px 0px 9px 0px rgba(27, 123, 216, 0.4);
+  border: 1px solid #5596CE;
+  border-radius: 10px;
   border-radius: 10px;
   z-index: 1100;
   max-height: 90px;
   margin-top: 20px;
+  min-width: 200px;
 }
 
-.notification-close{
-  background-color: #2037B3;
-  border-radius: 40px;
-  border:none;
-  color: #FFF;
-  align-content: center;
-  position: fixed;
-  margin-top: -20px; 
+#btnMessage {
+    padding: 1px 12px;
+    height: 30px;
+    text-align: center;
+    float: right;
 }
 
 /*--------------------------------------

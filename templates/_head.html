@@ -43,7 +43,7 @@
 </head>
 <body>
 	<!-- The navigation bar-->
-	<div class="notification" {{if eq .Message ""}} class="hidden" {{end}}><span id="message">{{.Message}}</span> <button class="notification-close" type="button">&times;</button></div>
+	<div class="notification hidden" {{if eq .Message ""}} class="hidden" {{end}}><span id="message"><p>{{.Message}} <button id="btnMessage" class="btn btn-default">OK</button></p>  </span> </div>
 	<nav class="navbar navbar-default navbar-fixed-top mainHeader">
 		<div class="container-fluid">
 			<div class="navbar-header">
@@ -101,19 +101,22 @@
                             <hr>
                             
                             <li class="sidebar-item">
+                                {{$nav := .Navigation}}
 			                 <h5> Categories</h5> 
                              <!--<button title="New category" id="toggleCategoryForm" data-placement="left" data-toggle="tooltip" class="btn glyphicon glyphicon-plus" style="font-size:small; margin-left:120px;"></button>-->
                              <span id="categoryForm">
                                  <form action="/add-category/" method="POST">
-							         <input type="text" name="category" width="50px" style="border:none;border-bottom:1px solid gray; box-shadow:none;">
-							         <input type="submit" text="submit" class="btn btn-default" width="50px" height="30px"/>
+                                 <span> 
+							         <input type="text" name="category" width="50px">
+							         <input type="submit" text="submit" class="btn btn-primary" value="Submit"/>
+                                 </span>
 						         </form>
                              </span>
 		                    </li>
                             
-                            {{ range .Categories }}
+                            {{ range $index, $cat := .Categories }}
                             <li class="sidebar-item">
-								<a href="/category/{{.}}" > <span class="glyphicon glyphicon-stop"></span>  <span class="nav-item"> {{.}}</span></a>
+								<a href="/category/{{$cat}}" {{ if eq  $cat $nav }} class="active" {{end}}> <span class="glyphicon glyphicon-stop"></span>  <span class="nav-item"> {{$cat}}</span></a>
 							</li>
                             {{end}}
 						</ul>
