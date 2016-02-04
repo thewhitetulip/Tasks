@@ -68,26 +68,6 @@ func RestoreTaskFunc(w http.ResponseWriter, r *http.Request) {
 	}
 }
 
-//EditTaskFunc is used to edit tasks, handles "/edit/" URL
-func EditTaskFunc(w http.ResponseWriter, r *http.Request) {
-	if r.Method == "GET" {
-		id, err := strconv.Atoi(r.URL.Path[len("/edit/"):])
-		if err != nil {
-			log.Println(err)
-			http.Redirect(w, r, "/", http.StatusBadRequest)
-		} else {
-			task, err := db.GetTaskByID(id)
-			if err != nil {
-				task.Message = "Error fetching Tasks"
-			}
-			editTemplate.Execute(w, task)
-		}
-	} else {
-		message = "Method not allowed"
-		http.Redirect(w, r, "/", http.StatusFound)
-	}
-}
-
 //DeleteTaskFunc is used to delete a task, trash = move to recycle bin, delete = permanent delete
 func DeleteTaskFunc(w http.ResponseWriter, r *http.Request) {
 	if r.Method == "GET" {
