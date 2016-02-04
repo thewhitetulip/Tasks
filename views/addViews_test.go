@@ -5,6 +5,7 @@ import (
 	"io/ioutil"
 	"net/http"
 	"net/http/httptest"
+	"net/url"
 	"os"
 	"testing"
 )
@@ -31,5 +32,22 @@ func TestUploadedFileHandler(t *testing.T) {
 
 	if !bytes.Equal(actualContent, expectedContent) {
 		t.Errorf("Actual content (%s) did not match expected content (%s)", actualContent, expectedContent)
+	}
+}
+
+//TestAddEmptyCategory tests that if the category field is empty it should do nothing
+func TestAddEmptyCategory(t *testing.T) {
+	ts := httptest.NewServer(http.HandlerFunc(AddCategoryFunc))
+	defer ts.Close()
+	req, err := http.NewRequest("POST", ts.URL, nil)
+	req.Form, _ = url.ParseQuery("category=")
+	if err != nil {
+		t.Errorf("Error occured while constracting request:%s", err)
+	}
+	w := httptest.NewRecorder()
+	AddCategoryFunc(w, req)
+	body := w.Body.String()
+	if len(body) != 0 {
+		t.Error("Body should be empty. Instead contained data: ", body)
 	}
 }
