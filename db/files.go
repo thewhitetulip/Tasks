@@ -5,6 +5,8 @@ stores the functions related to file IO
 */
 import (
 	"log"
+
+	"github.com/thewhitetulip/Tasks/types"
 )
 
 // AddFile is used to add the md5 of a file name which is uploaded to our application
@@ -43,14 +45,14 @@ func GetFileName(token string) (string, error) {
 
 //GetCategories will return the list of categories to be
 //rendered in the template
-func GetCategories() []string {
-	stmt := "select name from category"
+func GetCategories() []types.CategoryCount {
+	stmt := "select c.name, count(*) from  category c left outer join task t  where c.id = t.cat_id   group by name    union     select name, 0  from category where name not in (select distinct name from task t join category c on t.cat_id = c.id)"
 	rows := database.query(stmt)
-	var categories []string
-	var category string
+	var categories []types.CategoryCount
+	var category types.CategoryCount
 
 	for rows.Next() {
-		err := rows.Scan(&category)
+		err := rows.Scan(&category.Name, &category.Count)
 		if err != nil {
 			log.Println(err)
 		}

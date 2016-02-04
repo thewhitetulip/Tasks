@@ -21,5 +21,14 @@ type Context struct {
 	Search     string
 	Message    string
 	CSRFToken  string
-	Categories []string
+	Categories []CategoryCount
+}
+
+//CategoryCount is the struct used to populate the sidebar
+//which contains the category name and the count of the tasks
+//in each category
+
+type CategoryCount struct {
+	Name  string
+	Count int
 }

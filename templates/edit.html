@@ -24,8 +24,8 @@
            Category:
             <select name="category">
                 <option>---</option>
-                {{range $cat :=   $categories}}
-                    <option value="{{$cat}}" {{if eq $cat $task.Category}} selected="true"  {{end}}> {{$cat}} </option> 
+                {{range $index, $cat :=   $categories}}
+                    <option value="{{$cat.Name}}" {{if eq $cat.Name $task.Category}} selected="true"  {{end}}> {{$cat.Name}} </option> 
                 {{end}}
             </select>
       </div>

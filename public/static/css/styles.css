@@ -17,6 +17,12 @@ ul{
     list-style-type: none;
 }
 
+.badge{
+  background-color: #7D8EF0;
+  margin-right:10px;
+  float:right;
+}
+
 .center{
   text-align:center;
 }

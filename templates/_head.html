@@ -116,7 +116,7 @@
                             
                             {{ range $index, $cat := .Categories }}
                             <li class="sidebar-item">
-								<a href="/category/{{$cat}}" {{ if eq  $cat $nav }} class="active" {{end}}> <span class="glyphicon glyphicon-stop"></span>  <span class="nav-item"> {{$cat}}</span></a>
+								<a href="/category/{{$cat.Name}}" {{ if eq  $cat.Name $nav }} class="active" {{end}}> <span class="glyphicon glyphicon-stop"></span>  <span class="nav-item"> {{$cat.Name}}</span> <span class="badge pull-right">{{$cat.Count}}</span></a>
 							</li>
                             {{end}}
 						</ul>
