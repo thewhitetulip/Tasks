@@ -28,10 +28,11 @@
 		            <input type="radio" name="priority" value="1" /> Low
             </div>
             Category:
-            <select name="category">
+            <select name="category" class="dropdown">
                 <option>---</option>
-                {{range .Categories}}
-                    <option value="{{.}}" > {{.}} </option> 
+                {{$categories := .Categories}}
+                {{range $cat := $categories}}
+                    <option value="{{$cat.Name}}" > {{$cat.Name}} </option> 
                 {{end}}
             </select>
         </div>
