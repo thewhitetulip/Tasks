@@ -5,7 +5,6 @@ import (
 	"io/ioutil"
 	"net/http"
 	"net/http/httptest"
-	"net/url"
 	"os"
 	"testing"
 )
@@ -40,7 +39,9 @@ func TestAddEmptyCategory(t *testing.T) {
 	ts := httptest.NewServer(http.HandlerFunc(AddCategoryFunc))
 	defer ts.Close()
 	req, err := http.NewRequest("POST", ts.URL, nil)
-	req.Form, _ = url.ParseQuery("category=")
+	req.Form = make(map[string][]string, 0)
+	req.Form.Add("category", "")
+	// req.Form, _ = url.ParseQuery("category=")
 	if err != nil {
 		t.Errorf("Error occured while constracting request:%s", err)
 	}
