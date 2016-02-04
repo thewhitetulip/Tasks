@@ -133,3 +133,26 @@ func AddCategoryFunc(w http.ResponseWriter, r *http.Request) {
 		}
 	}
 }
+
+//EditTaskFunc is used to edit tasks, handles "/edit/" URL
+func EditTaskFunc(w http.ResponseWriter, r *http.Request) {
+	if r.Method == "GET" {
+		id, err := strconv.Atoi(r.URL.Path[len("/edit/"):])
+		if err != nil {
+			log.Println(err)
+			http.Redirect(w, r, "/", http.StatusBadRequest)
+		} else {
+			task, err := db.GetTaskByID(id)
+			categories := db.GetCategories()
+			task.Categories = categories
+
+			if err != nil {
+				task.Message = "Error fetching Tasks"
+			}
+			editTemplate.Execute(w, task)
+		}
+	} else {
+		message = "Method not allowed"
+		http.Redirect(w, r, "/", http.StatusFound)
+	}
+}

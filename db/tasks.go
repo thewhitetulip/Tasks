@@ -118,12 +118,12 @@ func GetTaskByID(id int) (types.Context, error) {
 	var tasks []types.Task
 	var task types.Task
 
-	getTasksql := "select id, title, content, priority from task where id=?"
+	getTasksql := "select t.id, t.title, t.content, t.priority, c.name from task t left outer join category c  where c.id = t.cat_id and t.id=?"
 
 	rows := database.query(getTasksql, id)
 	defer rows.Close()
 	if rows.Next() {
-		err := rows.Scan(&task.Id, &task.Title, &task.Content, &task.Priority)
+		err := rows.Scan(&task.Id, &task.Title, &task.Content, &task.Priority, &task.Category)
 		if err != nil {
 			log.Println(err)
 			//send email to respective people

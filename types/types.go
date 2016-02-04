@@ -11,6 +11,7 @@ type Task struct {
 	Content  string
 	Created  string
 	Priority string
+	Category string
 }
 
 //Context is the struct passed to templates
