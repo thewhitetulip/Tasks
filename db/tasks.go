@@ -89,7 +89,7 @@ func GetTasks(status, category string) (types.Context, error) {
 
 	if category != "" {
 		status = category
-		getTasksql = "select t.id, title, content, created_date, priority from task t, category c where c.id = t.cat_id and name = ?"
+		getTasksql = "select t.id, title, content, created_date, priority from task t, category c where c.id = t.cat_id and name = ?  and  is_deleted!='Y'  order by priority desc, created_date asc, finish_date asc"
 		rows, err = database.db.Query(getTasksql, category)
 		if err != nil {
 			log.Println("something went wrong while getting query")
@@ -202,9 +202,9 @@ func GetCategoryIdByName(category string) int {
 }
 
 //UpdateTask is used to update the tasks in the database
-func UpdateTask(id int, title, content, category string) error {
+func UpdateTask(id int, title, content, category string, priority int) error {
 	categoryID := GetCategoryIdByName(category)
-	err := taskQuery("update task set title=?, content=?, cat_id=? where id=?", title, content, categoryID, id)
+	err := taskQuery("update task set title=?, content=?, cat_id=?, priority = ? where id=?", title, content, categoryID, priority, id)
 	return err
 }
 
