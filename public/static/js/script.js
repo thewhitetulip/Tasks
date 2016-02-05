@@ -22,12 +22,12 @@ $(document).ready(function(){
     $('#addNoteModal').modal('show');
   });
   
-  if ($('#message').html()==''){
+  if ($('#actlMsg').html()==' <button id="btnMessage" class="btn btn-default">OK</button>'){
      $('.notification').addClass('hidden');
   } else {
     $('.notification').fadeOut(9000);
   }
-  $('.notification-close').click(function(){$('.notification').fadeOut("slow")})
+  $('.btnMessage').click(function(){$('.notification').fadeOut()})
 
    /*$( document ).keypress(
      function(event){

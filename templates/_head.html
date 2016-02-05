@@ -43,7 +43,7 @@
 </head>
 <body>
 	<!-- The navigation bar-->
-	<div class="notification hidden" {{if eq .Message ""}} class="hidden" {{end}}><span id="message"><p>{{.Message}} <button id="btnMessage" class="btn btn-default">OK</button></p>  </span> </div>
+	<div class="notification" {{if eq .Message ""}} class="hidden" {{end}}><span id="message"><p id="actlMsg">{{.Message}} <button id="btnMessage" class="btn btn-default">OK</button></p>  </span> </div>
 	<nav class="navbar navbar-default navbar-fixed-top mainHeader">
 		<div class="container-fluid">
 			<div class="navbar-header">
@@ -116,7 +116,8 @@
                             
                             {{ range $index, $cat := .Categories }}
                             <li class="sidebar-item">
-								<a href="/category/{{$cat.Name}}" {{ if eq  $cat.Name $nav }} class="active" {{end}}> <span class="glyphicon glyphicon-stop"></span>  <span class="nav-item"> {{$cat.Name}}</span> <span class="badge pull-right">{{$cat.Count}}</span></a>
+                                    <a href="/category/{{$cat.Name}}" {{ if eq  $cat.Name $nav }} class="active" {{end}}> 
+                                    <span class="nav-item"> {{$cat.Name}}</span> <span class="badge pull-right">{{$cat.Count}}</span></a>
 							</li>
                             {{end}}
 						</ul>
