@@ -182,9 +182,29 @@ func AddTask(title, content, category string, taskPriority int) error {
 	return err
 }
 
+//GetCategoryIdByName will return the category ID for the category, used in the edit task
+//function where we need to be able to update the categoryID of the task
+func GetCategoryIdByName(category string) int {
+	var categoryID int
+	getTasksql := "select id from category where name=?"
+
+	rows := database.query(getTasksql, category)
+	defer rows.Close()
+	if rows.Next() {
+		err := rows.Scan(&categoryID)
+		if err != nil {
+			log.Println(err)
+			//send email to respective people
+		}
+	}
+
+	return categoryID
+}
+
 //UpdateTask is used to update the tasks in the database
-func UpdateTask(id int, title string, content string) error {
-	err := taskQuery("update task set title=?, content=? where id=?", title, content, id)
+func UpdateTask(id int, title, content, category string) error {
+	categoryID := GetCategoryIdByName(category)
+	err := taskQuery("update task set title=?, content=?, cat_id=? where id=?", title, content, categoryID, id)
 	return err
 }
 

@@ -93,9 +93,10 @@ func UpdateTaskFunc(w http.ResponseWriter, r *http.Request) {
 		if err != nil {
 			log.Println(err)
 		}
+		category := r.Form.Get("category")
 		title := r.Form.Get("title")
 		content := r.Form.Get("content")
-		err = db.UpdateTask(id, title, content)
+		err = db.UpdateTask(id, title, content, category)
 		if err != nil {
 			message = "Error updating task"
 		} else {
