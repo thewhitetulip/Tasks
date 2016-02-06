@@ -47,7 +47,7 @@
             <div class="navbar-header">
                 {{if .Search}} <a class="navbar-brand"> Results for: {{.Search}}</a> {{else}} {{ if eq .Navigation "pending"}}
                 {{ $url:="" }} {{else if eq .Navigation "completed"}} {{ $url := "" }} {{else if eq .Navigation "deleted"}}
-                /{{$url := ""}} {{else if eq .Navigation "edit"}} /{{$url := ""}} {{else}} {{$url := "/category"}}{{end}}
+                {{$url := ""}} {{else if eq .Navigation "edit"}} {{$url := ""}} {{else}} {{$url := "/category"}}{{end}}
 
                 <p class="navbar-brand" href="{{$url}}/{{.Navigation}}">
                     {{if eq .Navigation "pending"}} Pending {{ else if eq .Navigation "completed"}}Completed {{ else if eq .Navigation "deleted"}}Deleted
@@ -56,23 +56,23 @@
 
                 <form action="/upd-category/{{.Navigation}}" method="POST" class="hidden" id="EditForm">
                     <input type="text" name="catname" placeholder="new cat name" style="border:none;border-bottom:1px solid gray; box-shadow:none;">
-                    <input type="submit" value="submit" class="btn btn-default" />
+                    <input type="submit" value="Submit" class="btn btn-default" />
                 </form>
 
                 <form action="/search/" method="POST" class="hidden" id="SearchForm">
                     <input type="text" name="query" placeholder="Search" style="border:none;border-bottom:1px solid gray; box-shadow:none;">
-                    <input type="submit" value="submit" class="btn btn-default" />
+                    <input type="submit" value="Submit" class="btn btn-default" />
                 </form>
 
                 <span id="icons">
-					{{if eq .Navigation "pending"}}  
+                    <button  data-original-title="Search" data-placement="bottom" data-toggle="tooltip" title=""  id="searchFormBtn" class="btn btn-action glyphicon glyphicon-search"  type="button"></button>
+					{{if eq .Navigation "pending"}}                      
 					{{ else if eq .Navigation "completed"}}
 					{{ else if eq .Navigation "deleted"}}
 					{{ else if eq .Navigation "edit"}} 
                     {{else }}
                    <a href="/del-category/{{.Navigation}}"> <button  data-original-title="Delete Category" data-placement="bottom" data-toggle="tooltip" title="" class="btn btn-action glyphicon glyphicon-trash"  type="button"></button></a>
-                   <button  data-original-title="Edit Category" data-placement="bottom" data-toggle="tooltip" id="editCatFrmBtn" title="" class="btn btn-action glyphicon glyphicon-edit"  type="button"></button>
-                   <button  data-original-title="Search" data-placement="bottom" data-toggle="tooltip" title=""  id="searchFormBtn" class="btn btn-action glyphicon glyphicon-search"  type="button"></button>
+                   <button  data-original-title="Edit Category" data-placement="bottom" data-toggle="tooltip" id="editCatFrmBtn" title="" class="btn btn-action glyphicon glyphicon-pencil"  type="button"></button>
                     {{end}}
                 </span>
             </div>

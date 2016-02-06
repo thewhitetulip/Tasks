@@ -30,6 +30,10 @@ $(document).ready(function(){
      $('#SearchForm').toggleClass('hidden') 
   });
   
+  $('#toggleAddFileGrp').click(function(){
+     $('#file-group').toggleClass('hidden');
+     $('#toggleAddFileGrp').addClass('hidden') ;
+  });  
   
   if ($('#actlMsg').html()==' <button id="btnMessage" class="btn btn-default">OK</button>'){
      $('.notification').addClass('hidden');

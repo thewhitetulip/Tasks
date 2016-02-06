@@ -21,8 +21,10 @@
                     <div class="form-group">
 
                         <textarea class="form-control" name="content" id="add-note-content" placeholder="Content" rows="10" style="border:none;border-bottom:1px solid gray; box-shadow:none;"></textarea>
-                        File:
-                        <input type="file" name="uploadfile" />
+                        <a id="toggleAddFileGrp">Add File</a>
+                        <span id="file-group" class="hidden">
+                            File: <input type="file" name="uploadfile" />
+                        </span>
                         <br> Priority:
                         <input type="radio" name="priority" value="3" /> High
                         <input type="radio" name="priority" value="2" /> Medium
@@ -39,7 +41,7 @@
             </div>
             <div class="modal-footer">
                 <button type="button" class="btn btn-default" data-dismiss="modal">Close</button>
-                <input type="submit" text="submit" class="btn btn-default" />
+                <input type="submit" value="Submit" class="btn btn-default" />
             </div>
             </form>
         </div>
