@@ -176,7 +176,7 @@ func AddTask(title, content, category string, taskPriority int) error {
 	if category == "" {
 		err = taskQuery("insert into task(title, content, priority, created_date, last_modified_at) values(?,?,?,datetime(), datetime())", title, content, taskPriority)
 	} else {
-		categoryID := GetCategoryById(category)
+		categoryID := GetCategoryByName(category)
 		err = taskQuery("insert into task(title, content, priority, created_date, last_modified_at, cat_id) values(?,?,?,datetime(), datetime(), ?)", title, content, taskPriority, categoryID)
 	}
 	return err

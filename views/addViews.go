@@ -11,6 +11,7 @@ import (
 	"net/http"
 	"os"
 	"strconv"
+	"strings"
 	"text/template"
 	"time"
 
@@ -122,7 +123,7 @@ func AddTaskFunc(w http.ResponseWriter, r *http.Request) {
 func AddCategoryFunc(w http.ResponseWriter, r *http.Request) {
 	r.ParseForm()
 	category := r.Form.Get("category")
-	if category != "" {
+	if strings.Trim(category, " ") != "" {
 		err := db.AddCategory(category)
 		if err != nil {
 			message = "Error adding category"

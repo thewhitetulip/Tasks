@@ -121,3 +121,18 @@ func RestoreFromCompleteFunc(w http.ResponseWriter, r *http.Request) {
 		http.Redirect(w, r, "/completed", http.StatusFound)
 	}
 }
+
+//DeleteCategoryFunc will delete any category
+func DeleteCategoryFunc(w http.ResponseWriter, r *http.Request) {
+	if r.Method == "GET" {
+		categoryName := r.URL.Path[len("/del-category/"):]
+		err := db.DeleteCategoryByName(categoryName)
+		if err != nil {
+			message = "error deleting category"
+		} else {
+			message = "Category " + categoryName + " deleted"
+		}
+
+		http.Redirect(w, r, "/", http.StatusFound)
+	}
+}

@@ -113,3 +113,25 @@ func UpdateTaskFunc(w http.ResponseWriter, r *http.Request) {
 		http.Redirect(w, r, "/", http.StatusFound)
 	}
 }
+
+//UpdateCategoryFunc is used to update a task, handes "/upd-category/" URL
+func UpdateCategoryFunc(w http.ResponseWriter, r *http.Request) {
+	if r.Method == "POST" {
+		var redirectURL string
+		r.ParseForm()
+		oldName := r.URL.Path[len("/upd-category/"):]
+		newName := r.Form.Get("catname")
+
+		err := db.UpdateCategoryByName(oldName, newName)
+		if err != nil {
+			message = "error updating category"
+			log.Println("not updated category " + oldName)
+			redirectURL = "/category/" + oldName
+		} else {
+			message = "cat " + oldName + " -> " + newName
+			redirectURL = "/category/" + newName
+		}
+		log.Println("redirecting to " + redirectURL)
+		http.Redirect(w, r, redirectURL, http.StatusFound)
+	}
+}

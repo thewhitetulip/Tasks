@@ -1,7 +1,7 @@
 package db
 
 /*
-stores the functions related to file IO
+stores the functions related to file IO and category
 */
 import (
 	"log"
@@ -67,9 +67,9 @@ func AddCategory(category string) error {
 	return err
 }
 
-// GetCategoryById will return the ID of that category passed as args
+// GetCategoryByName will return the ID of that category passed as args
 // used while inserting tasks into the table
-func GetCategoryById(category string) int {
+func GetCategoryByName(category string) int {
 	stmt := "select id from category where name=?"
 	rows := database.query(stmt, category)
 	var categoryID int
@@ -81,4 +81,29 @@ func GetCategoryById(category string) int {
 		}
 	}
 	return categoryID
+}
+
+//DeleteCategoryByName will be used to delete a category from the category page
+func DeleteCategoryByName(category string) error {
+	//first we delete entries from task and then from category
+	categoryID := GetCategoryByName(category)
+	query := "update task set cat_id = null where id =?"
+	err := taskQuery(query, categoryID)
+	if err == nil {
+		err = taskQuery("delete from category where id=?", categoryID)
+		if err != nil {
+			return err
+		}
+	}
+	return err
+}
+
+//UpdateCategoryByName will be used to delete a category from the category page
+func UpdateCategoryByName(oldName, newName string) error {
+	query := "update category set name = ? where name=?"
+	log.Println(query)
+	err := taskQuery(query, newName, oldName)
+
+	return err
+
 }

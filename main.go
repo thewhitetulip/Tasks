@@ -17,6 +17,8 @@ func main() {
 	views.PopulateTemplates()
 	http.HandleFunc("/", views.ShowAllTasksFunc)
 	http.HandleFunc("/add-category/", views.AddCategoryFunc)
+	http.HandleFunc("/del-category/", views.DeleteCategoryFunc)
+	http.HandleFunc("/upd-category/", views.UpdateCategoryFunc)
 	http.HandleFunc("/category/", views.ShowCategoryFunc)
 	http.HandleFunc("/complete/", views.CompleteTaskFunc)
 	//delete permanently deletes from db
