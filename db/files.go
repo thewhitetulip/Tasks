@@ -46,7 +46,7 @@ func GetFileName(token string) (string, error) {
 //GetCategories will return the list of categories to be
 //rendered in the template
 func GetCategories() []types.CategoryCount {
-	stmt := "select c.name, count(*) from  category c left outer join task t  where c.id = t.cat_id   group by name    union     select name, 0  from category where name not in (select distinct name from task t join category c on t.cat_id = c.id)"
+	stmt := "select c.name, count(*) from  category c left outer join task t  where c.id = t.cat_id and t.is_deleted='N' and t.finish_date is null   group by name    union     select name, 0  from category where name not in (select distinct name from task t join category c on t.cat_id = c.id)"
 	rows := database.query(stmt)
 	var categories []types.CategoryCount
 	var category types.CategoryCount

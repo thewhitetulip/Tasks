@@ -89,7 +89,7 @@ func GetTasks(status, category string) (types.Context, error) {
 
 	if category != "" {
 		status = category
-		getTasksql = "select t.id, title, content, created_date, priority from task t, category c where c.id = t.cat_id and name = ?  and  is_deleted!='Y'  order by priority desc, created_date asc, finish_date asc"
+		getTasksql = "select t.id, title, content, created_date, priority from task t, category c where c.id = t.cat_id and name = ?  and  t.is_deleted!='Y' and t.finish_date is null  order by priority desc, created_date asc, finish_date asc"
 		rows, err = database.db.Query(getTasksql, category)
 		if err != nil {
 			log.Println("something went wrong while getting query")

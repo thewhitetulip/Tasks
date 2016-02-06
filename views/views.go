@@ -48,6 +48,8 @@ func ShowAllTasksFunc(w http.ResponseWriter, r *http.Request) {
 func ShowTrashTaskFunc(w http.ResponseWriter, r *http.Request) {
 	if r.Method == "GET" {
 		context, err := db.GetTasks("deleted", "")
+		categories := db.GetCategories()
+		context.Categories = categories
 		if err != nil {
 			http.Redirect(w, r, "/trash", http.StatusInternalServerError)
 		}
@@ -66,6 +68,8 @@ func ShowTrashTaskFunc(w http.ResponseWriter, r *http.Request) {
 func ShowCompleteTasksFunc(w http.ResponseWriter, r *http.Request) {
 	if r.Method == "GET" {
 		context, err := db.GetTasks("completed", "")
+		categories := db.GetCategories()
+		context.Categories = categories
 		if err != nil {
 			http.Redirect(w, r, "/completed", http.StatusInternalServerError)
 		}
