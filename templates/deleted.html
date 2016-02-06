@@ -2,47 +2,47 @@
 <!--end mainHeader -->
 {{if .}}
 <a href="/delete/all">
-  <button class="btn-danger btn glyphicon glyphicon-trash floating-action-icon"></button>
+    <button class="btn-danger btn glyphicon glyphicon-trash floating-action-icon"></button>
 </a>
 {{end}}
 
 <div class="timeline">
-  {{ if .Tasks}} {{range .Tasks}}
-  <div class="note">
-    <p class="noteHeading">{{.Title}}</p> <span class="toggle glyphicon glyphicon-resize-full"></span>
-    <span class="noteContent">{{.Content}}</span>
-    <span class="notefooter">
+    {{ if .Tasks}} {{range .Tasks}}
+    <div class="note">
+        <p class="noteHeading">{{.Title}}</p> <span class="toggle glyphicon glyphicon-resize-full"></span>
+        <span class="noteContent">{{.Content}}</span>
+        <span class="notefooter">
       <ul class="menu">
         <!-- <li role="presentation">
             <a role="menuitem" tabindex="-1" href="/share/{{.Id}}">
             <span class="glyphicon glyphicon-share"></span> Share</a>
-    </li>
-    <li role="presentation">
-      <a role="menuitem" tabindex="-1" href="/mask/{{.Id}}">
-        <span class="glyphicon glyphicon-lock"></span> Mask</a>
-    </li>
-    <li role="presentation">
-      <a role="menuitem" tabindex="-1" href="/archive/{{.Id}}">
-        <span class="glyphicon glyphicon-inbox"></span> Edit</a>
-    </li>!-->
-    <li role="presentation">Priority: {{.Priority}}</li>
-    <li role="presentation">
-      <a role="menuitem" tabindex="-1" href="/delete/{{.Id}}">
-        <span class="glyphicon glyphicon-trash"></span></a>
-    </li>
-    <li role="presentation">
-      <a role="menuitem" tabindex="-1" href="/restore/{{.Id}}">
-        <span class="glyphicon glyphicon-inbox"></span></a>
-    </li>
-    </ul>
-    </span>
-  </div>
-  {{end}} {{else}}
-  <div class="note">
-      <p class="noteHeading">No Tasks here</p>
-      <p class="notefooter">Go to home page <a href="/">here</a> </p>
+        </li>
+        <li role="presentation">
+            <a role="menuitem" tabindex="-1" href="/mask/{{.Id}}">
+                <span class="glyphicon glyphicon-lock"></span> Mask</a>
+        </li>
+        <li role="presentation">
+            <a role="menuitem" tabindex="-1" href="/archive/{{.Id}}">
+                <span class="glyphicon glyphicon-inbox"></span> Edit</a>
+        </li>!-->
+        <li role="presentation">Priority: {{.Priority}}</li>
+        <li role="presentation">
+            <a role="menuitem" tabindex="-1" href="/delete/{{.Id}}">
+                <span class="glyphicon glyphicon-trash"></span></a>
+        </li>
+        <li role="presentation">
+            <a role="menuitem" tabindex="-1" href="/restore/{{.Id}}">
+                <span class="glyphicon glyphicon-inbox"></span></a>
+        </li>
+        </ul>
+        </span>
     </div>
-  {{end}}
+    {{end}} {{else}}
+    <div class="note">
+        <p class="noteHeading">No Tasks here</p>
+        <p class="notefooter">Go to home page <a href="/">here</a> </p>
+    </div>
+    {{end}}
 </div>
 {{template "footer.html"}}
 

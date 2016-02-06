@@ -1,43 +1,39 @@
 {{template "_head.html" .}}
-  <div class="timeline">
+<div class="timeline">
     <div class="modal-content">
-      <div class="modal-header">
-        <h4 class="modal-title" id="newNoteLabel"><span class="glyphicon glyphicon-pencil"></span>  Edit Task</h4>
-      </div>     
-      {{ $categories := .Categories }}
-      {{range $index, $task := .Tasks}}
-      <div class="modal-body">
-        <form action="/update/" method="POST">
-          <div class="form-group">
-            <input type="text" name="title" value="{{ $task.Title}}" class="form-control" id="add-note-title" placeholder="Title" style="border:none;border-bottom:1px solid gray; box-shadow:none;">
-          </div>
-          <div class="form-group">
-						<textarea class="form-control" name="content" id="add-note-content" placeholder="Content" 
-            rows="10" style="border:none;border-bottom:1px solid gray; box-shadow:none;">{{ $task.Content}}</textarea>
+        <div class="modal-header">
+            <h4 class="modal-title" id="newNoteLabel"><span class="glyphicon glyphicon-pencil"></span>  Edit Task</h4>
+        </div>
+        {{ $categories := .Categories }} {{range $index, $task := .Tasks}}
+        <div class="modal-body">
+            <form action="/update/" method="POST">
+                <div class="form-group">
+                    <input type="text" name="title" value="{{ $task.Title}}" class="form-control" id="add-note-title" placeholder="Title" style="border:none;border-bottom:1px solid gray; box-shadow:none;">
+                </div>
+                <div class="form-group">
+                    <textarea class="form-control" name="content" id="add-note-content" placeholder="Content" rows="10" style="border:none;border-bottom:1px solid gray; box-shadow:none;">{{ $task.Content}}</textarea>
 
-            <input type="text" name="id" value="{{.Id}}" class="hidden" />
-            Priority: 
-                <input type="radio" name="priority" value="3" {{if eq .Priority "3"}} checked="checked" {{end}} /> High
-                <input type="radio" name="priority" value="2" {{if eq .Priority "2"}} checked="checked" {{end}} /> Medium
-                <input type="radio" name="priority" value="1" {{if eq .Priority "1"}} checked="checked" {{end}} /> Low 
-          </div>
-           Category:
-            <select name="category">
-                <option>---</option>
-                {{range $index, $cat :=   $categories}}
-                    <option value="{{$cat.Name}}" {{if eq $cat.Name $task.Category}} selected="true"  {{end}}> {{$cat.Name}} </option> 
-                {{end}}
-            </select>
-      </div>
-      <div class="modal-footer">
-        <button type="button" class="btn btn-default" data-dismiss="modal">Close</button>
-        <input type="submit" text="submit" class="btn btn-default" />
-      </div>
-      </form>
+                    <input type="text" name="id" value="{{.Id}}" class="hidden" /> Priority:
+                    <input type="radio" name="priority" value="3" {{if eq .Priority "3"}} checked="checked" {{end}} /> High
+                    <input type="radio" name="priority" value="2" {{if eq .Priority "2"}} checked="checked" {{end}} /> Medium
+                    <input type="radio" name="priority" value="1" {{if eq .Priority "1"}} checked="checked" {{end}} /> Low
+                </div>
+                Category:
+                <select name="category">
+                    <option>---</option>
+                    {{range $index, $cat := $categories}}
+                    <option value="{{$cat.Name}}" {{if eq $cat.Name $task.Category}} selected="true" {{end}}> {{$cat.Name}} </option>
+                    {{end}}
+                </select>
+        </div>
+        <div class="modal-footer">
+            <button type="button" class="btn btn-default" data-dismiss="modal">Close</button>
+            <input type="submit" text="submit" class="btn btn-default" />
+        </div>
+        </form>
     </div>
-  </div>
-  {{end}}
-  {{template "_footer.html"}}
+</div>
+{{end}} {{template "_footer.html"}}
 
 </body>
 

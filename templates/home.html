@@ -1,89 +1,93 @@
 {{template "_head.html" .}}
 
-  <!--end mainHeader -->
-  <button class=" btn-danger btn glyphicon glyphicon-plus floating-action-icon floating-action-icon-add"></button>
+<!--end mainHeader -->
+<button class=" btn-danger btn glyphicon glyphicon-plus floating-action-icon floating-action-icon-add"></button>
 
-  <!-- Add note modal -->
-  <div class="modal fade " id="addNoteModal" tabindex="-1" role="dialog" aria-labelledby="newNoteLabel" aria-hidden="true">
+<!-- Add note modal -->
+<div class="modal fade " id="addNoteModal" tabindex="-1" role="dialog" aria-labelledby="newNoteLabel" aria-hidden="true">
     <div class="modal-dialog">
-      <div class="modal-content">
-        <div class="modal-header">
-          <button type="button" class="close" data-dismiss="modal" aria-label="Close"><span aria-hidden="true">&times;</span></button>
-          <h4 class="modal-title" id="newNoteLabel"><span class="glyphicon glyphicon-pencil"></span>  New Task</h4>
-        </div>
-        <div class="modal-body">
-          <form enctype="multipart/form-data" action="/add/" method="POST">
-            <div class="form-group">
-              
-              <input type="text" name="title" class="form-control" id="add-note-title" placeholder="Title" style="border:none;border-bottom:1px solid gray; box-shadow:none;">
-              <input type="hidden" name="CSRFToken" value={{.CSRFToken}}>
+        <div class="modal-content">
+            <div class="modal-header">
+                <button type="button" class="close" data-dismiss="modal" aria-label="Close"><span aria-hidden="true">&times;</span></button>
+                <h4 class="modal-title" id="newNoteLabel"><span class="glyphicon glyphicon-pencil"></span>  New Task</h4>
             </div>
-            <div class="form-group">
+            <div class="modal-body">
+                <form enctype="multipart/form-data" action="/add/" method="POST">
+                    <div class="form-group">
 
-              <textarea class="form-control" name="content" id="add-note-content" placeholder="Content" rows="10" style="border:none;border-bottom:1px solid gray; box-shadow:none;"></textarea>
-              File: <input	type="file"	name="uploadfile"	/> <br>
-              Priority: 
-              		<input type="radio" name="priority" value="3" /> High
-		            <input type="radio" name="priority" value="2" /> Medium
-		            <input type="radio" name="priority" value="1" /> Low
+                        <input type="text" name="title" class="form-control" id="add-note-title" placeholder="Title" style="border:none;border-bottom:1px solid gray; box-shadow:none;">
+                        <input type="hidden" name="CSRFToken" value={{.CSRFToken}}>
+                    </div>
+                    <div class="form-group">
+
+                        <textarea class="form-control" name="content" id="add-note-content" placeholder="Content" rows="10" style="border:none;border-bottom:1px solid gray; box-shadow:none;"></textarea>
+                        File:
+                        <input type="file" name="uploadfile" />
+                        <br> Priority:
+                        <input type="radio" name="priority" value="3" /> High
+                        <input type="radio" name="priority" value="2" /> Medium
+                        <input type="radio" name="priority" value="1" /> Low
+                    </div>
+                    Category:
+                    <select name="category" class="dropdown">
+                        <option>---</option>
+                        {{$navigation := .Navigation}} {{$categories := .Categories}} {{range $cat := $categories}}
+                        <option value="{{$cat.Name}}" {{if eq $cat.Name $navigation }} checked="checked" {{end}}> {{$cat.Name}} </option>
+                        {{end}}
+                    </select>
             </div>
-            Category:
-            <select name="category" class="dropdown">
-                <option>---</option>
-                {{$categories := .Categories}}
-                {{range $cat := $categories}}
-                    <option value="{{$cat.Name}}" > {{$cat.Name}} </option> 
-                {{end}}
-            </select>
+            <div class="modal-footer">
+                <button type="button" class="btn btn-default" data-dismiss="modal">Close</button>
+                <input type="submit" text="submit" class="btn btn-default" />
+            </div>
+            </form>
         </div>
-        <div class="modal-footer">
-          <button type="button" class="btn btn-default" data-dismiss="modal">Close</button>
-          <input type="submit" text="submit" class="btn btn-default" />
-        </div>
-        </form>
-      </div>
     </div>
-  </div>
+</div>
 
-  <div class="timeline">
+<div class="timeline">
     {{ if .Tasks}} {{range $key, $value := .Tasks}}
     <div class="note">
-      <p class="noteHeading">{{ $value.Title}}</p> <span class="toggle glyphicon glyphicon-resize-full"></span>
+        <p class="noteHeading">{{ $value.Title}}</p> <span class="toggle glyphicon glyphicon-resize-full"></span>
 
-      <span class="noteContent">{{$value.Content}}</span>
-      <span class="notefooter">
+        <span class="noteContent">{{$value.Content}}</span>
+        <span class="notefooter">
         <ul class="menu">
           <li role="presentation">Priority: {{$value.Priority}}</li>
           <li role="presentation">
               <span class="glyphicon glyphicon-time"></span> {{$value.Created}}</li>
         <li role="presentation">
 
-              <a role="menuitem" tabindex="-1" href="/mask/{{.Id}}">
-						  <span class="glyphicon glyphicon-lock"></span></a></li> 
-      <li role="presentation">
-        <a role="menuitem" tabindex="-1" href="/trash/{{.Id}}">
-          <span class="glyphicon glyphicon-trash"></span></a>
-      </li>
-      <li role="presentation">
-        <a role="menuitem" tabindex="-1" href="/complete/{{.Id}}">
-          <span class="glyphicon glyphicon-check"></span></a>
-      </li>
-      <li role="presentation">
-        <a role="menuitem" tabindex="-1" href="/edit/{{.Id}}">
-          <span class="glyphicon glyphicon-pencil"></span></a>
-      </li>
+            <a role="menuitem" tabindex="-1" href="/mask/{{.Id}}">
+                <span class="glyphicon glyphicon-lock"></span></a>
+        </li>
+        <li role="presentation">
+            <a role="menuitem" tabindex="-1" href="/trash/{{.Id}}">
+                <span class="glyphicon glyphicon-trash"></span></a>
+        </li>
+        <li role="presentation">
+            <a role="menuitem" tabindex="-1" href="/complete/{{.Id}}">
+                <span class="glyphicon glyphicon-check"></span></a>
+        </li>
+        <li role="presentation">
+            <a role="menuitem" tabindex="-1" href="/edit/{{.Id}}">
+                <span class="glyphicon glyphicon-pencil"></span></a>
+        </li>
 
-      </ul>
-      </span>
+        </ul>
+        </span>
     </div>
     {{end}} {{else}}
     <div class="note">
-      <p class="noteHeading">No Tasks here</p>
-      <p class="notefooter">Create new task<button class="floating-action-icon-add" style="border:none;border-bottom:1px solid gray; box-shadow:none;"> here </button> </p>
+        <p class="noteHeading">No Tasks here</p>
+        <p class="notefooter">Create new task
+            <button class="floating-action-icon-add" style="border:none;border-bottom:1px solid gray; box-shadow:none;">
+            here </button>
+        </p>
     </div>
     {{end}}
-  </div>
-	{{template "_footer.html" .}}
+</div>
+{{template "_footer.html" .}}
 
 </body>
 
