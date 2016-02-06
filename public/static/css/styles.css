@@ -102,6 +102,8 @@ Navbar
 #icons{
   text-align:right;
   height: 50%;
+  line-height: 52px;
+  float:right;
   margin-top: 10px;
 }
 

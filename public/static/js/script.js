@@ -22,6 +22,15 @@ $(document).ready(function(){
     $('#addNoteModal').modal('show');
   });
   
+  $('#editCatFrmBtn').click(function(){
+     $('#EditForm').toggleClass('hidden') 
+  });
+  
+  $('#searchFormBtn').click(function(){
+     $('#SearchForm').toggleClass('hidden') 
+  });
+  
+  
   if ($('#actlMsg').html()==' <button id="btnMessage" class="btn btn-default">OK</button>'){
      $('.notification').addClass('hidden');
   } else {
