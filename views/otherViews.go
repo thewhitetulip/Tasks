@@ -14,6 +14,7 @@ import (
 	"text/template"
 
 	"github.com/thewhitetulip/Tasks/db"
+	"github.com/thewhitetulip/Tasks/utils"
 )
 
 //PopulateTemplates is used to parse all templates present in
@@ -54,6 +55,7 @@ func PopulateTemplates() {
 //CompleteTaskFunc is used to show the complete tasks, handles "/completed/" url
 func CompleteTaskFunc(w http.ResponseWriter, r *http.Request) {
 	if r.Method == "GET" {
+		redirectURL := utils.GetRedirectUrl(r.Referer())
 		id, err := strconv.Atoi(r.URL.Path[len("/complete/"):])
 		if err != nil {
 			log.Println(err)
@@ -64,7 +66,7 @@ func CompleteTaskFunc(w http.ResponseWriter, r *http.Request) {
 			} else {
 				message = "Task marked complete"
 			}
-			http.Redirect(w, r, "/", http.StatusFound)
+			http.Redirect(w, r, redirectURL, http.StatusFound)
 		}
 	} else {
 		message = "Method not allowed"

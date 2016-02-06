@@ -16,6 +16,7 @@ import (
 	"time"
 
 	"github.com/thewhitetulip/Tasks/db"
+	"github.com/thewhitetulip/Tasks/utils"
 )
 
 // UploadedFileHandler is used to handle the uploaded file related requests
@@ -143,9 +144,11 @@ func EditTaskFunc(w http.ResponseWriter, r *http.Request) {
 			log.Println(err)
 			http.Redirect(w, r, "/", http.StatusBadRequest)
 		} else {
+			redirectUrl := utils.GetRedirectUrl(r.Referer())
 			task, err := db.GetTaskByID(id)
 			categories := db.GetCategories()
 			task.Categories = categories
+			task.Referer = redirectUrl
 
 			if err != nil {
 				task.Message = "Error fetching Tasks"

@@ -12,6 +12,7 @@ type Task struct {
 	Created  string
 	Priority string
 	Category string
+	Referer  string
 }
 
 //Context is the struct passed to templates
@@ -22,6 +23,7 @@ type Context struct {
 	Message    string
 	CSRFToken  string
 	Categories []CategoryCount
+	Referer    string
 }
 
 //CategoryCount is the struct used to populate the sidebar
