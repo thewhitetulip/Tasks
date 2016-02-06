@@ -4,125 +4,131 @@
 
 <head>
 
-  <title>{{if eq .Navigation "pending"}} Tasks 
-	     {{ else if eq .Navigation "completed"}}Completed
-	     {{ else if eq .Navigation "deleted"}}Deleted
-		 {{ else if eq .Navigation "edit"}} Edit
-         {{else }} {{.Navigation}}
-		 {{end}}
-		 </title>
+    <title>{{if eq .Navigation "pending"}} Tasks {{ else if eq .Navigation "completed"}}Completed {{ else if eq .Navigation "deleted"}}Deleted
+        {{ else if eq .Navigation "edit"}} Edit {{else }} {{.Navigation}} {{end}}
+    </title>
 
-  <!-- Mobile viewport optimized -->
-  <meta name="viewport" content="width=device-width, initial-scale=1.0, maximum-scale=1.0, user-scalable=no">
+    <!-- Mobile viewport optimized -->
+    <meta name="viewport" content="width=device-width, initial-scale=1.0, maximum-scale=1.0, user-scalable=no">
 
-  <!-- Bootstrap CSS -->
-  <link href="/static/css/bootstrap.min.css" rel="stylesheet">
-  <link href="/static/css/bootstrap-glyphicons.css" rel="stylesheet">
+    <!-- Bootstrap CSS -->
+    <link href="/static/css/bootstrap.min.css" rel="stylesheet">
+    <link href="/static/css/bootstrap-glyphicons.css" rel="stylesheet">
 
-  <!-- Custom CSS -->
-  <link href="/static/css/styles.css" rel="stylesheet">
-  <link href="/static/css/sidebar.css" rel="stylesheet">
-  <link href="/static/css/sidebar-bootstrap.css" rel="stylesheet">
-  <link href="/static/css/font-awesome.min.css" rel="stylesheet">
+    <!-- Custom CSS -->
+    <link href="/static/css/styles.css" rel="stylesheet">
+    <link href="/static/css/sidebar.css" rel="stylesheet">
+    <link href="/static/css/sidebar-bootstrap.css" rel="stylesheet">
+    <link href="/static/css/font-awesome.min.css" rel="stylesheet">
 
-  <!-- Include Modernizr in the head, before any other Javascript -->
-  <script src="/static/js/modernizr-2.6.2.min.js"></script>
-  <!-- All Javascript at the bottom of the page for faster page loading -->
-  <script src="/static/js/jquery.min.js"></script>
-  <!-- If no online access, fallback to our hardcoded version of jQuery
+    <!-- Include Modernizr in the head, before any other Javascript -->
+    <!--<script src="/static/js/modernizr-2.6.2.min.js"></script>-->
+    <!-- All Javascript at the bottom of the page for faster page loading -->
+    <script src="/static/js/jquery.min.js"></script>
+    <!-- If no online access, fallback to our hardcoded version of jQuery
 		<script>window.jQuery || document.write('<script src="/static/js/jquery-1.8.2.min.js"><\/script>')</script>
 		-->
-  <!-- Bootstrap JS -->
-  <script src="/static/js/bootstrap.min.js"></script>
+    <!-- Bootstrap JS -->
+    <script src="/static/js/bootstrap.min.js"></script>
 
-  <!-- Custom JS -->
-  <script src="/static/js/script.js"></script>
-  <script src="/static/js/hammer.min.js"></script>
-  <script src="/static/js/sidebar.js"></script>
+    <!-- Custom JS -->
+    <script src="/static/js/script.js"></script>
+    <script src="/static/js/hammer.min.js"></script>
+    <script src="/static/js/sidebar.js"></script>
 
 </head>
+
 <body>
-	<!-- The navigation bar-->
-	<div class="notification" {{if eq .Message ""}} class="hidden" {{end}}><span id="message"><p id="actlMsg">{{.Message}} <button id="btnMessage" class="btn btn-default">OK</button></p>  </span> </div>
-	<nav class="navbar navbar-default navbar-fixed-top mainHeader">
-		<div class="container-fluid">
-			<div class="navbar-header">
-				{{if .Search}} <a class="navbar-brand"> Results for: {{.Search}}</a> 
-				{{else}} 
-					<a class="navbar-brand" 
-					href='{{ if eq .Navigation "pending"}} / 
-                    {{else if eq .Navigation "completed"}} /{{.Navigation}}
-                    {{else if eq .Navigation "deleted"}} /{{.Navigation}}
-                    {{else if eq .Navigation "edit"}} /{{.Navigation}}
-                    {{else}} /category/{{.Navigation}}
-                     {{end}}'>
-					{{if eq .Navigation "pending"}} Pending 
-					{{ else if eq .Navigation "completed"}}Completed
-					{{ else if eq .Navigation "deleted"}}Deleted
-					{{ else if eq .Navigation "edit"}} Edit
-                    {{else }} {{.Navigation}}
-					{{end}}</a>
-				{{end}}
-				<span id="icons">
-						<form action="/search/" method="POST">
-							<input type="text" name="query" placeholder="Search" style="border:none;border-bottom:1px solid gray; box-shadow:none;">
-							<input type="submit" text="submit" class="btn btn-default"/>
-						</form>
-					</span>
-			</div>
-		</div>
-	</nav>
-	<!-- SIDEBAR -->
-	<div data-sidebar="true" class="sidebar-trigger">
+    <!-- The navigation bar-->
+    <div class='notification {{if eq .Message ""}} hidden  {{end}}'><span id="message"><p id="actlMsg">{{.Message}} <button id="btnMessage" class="btn btn-default">OK</button></p>  </span>        </div>
+    <nav class="navbar navbar-default navbar-fixed-top mainHeader">
+        <div class="container-fluid">
+            {{$url := ""}}
+            <div class="navbar-header">
+                {{if .Search}} <a class="navbar-brand"> Results for: {{.Search}}</a> {{else}} {{ if eq .Navigation "pending"}}
+                {{ $url:="" }} {{else if eq .Navigation "completed"}} {{ $url := "" }} {{else if eq .Navigation "deleted"}}
+                /{{$url := ""}} {{else if eq .Navigation "edit"}} /{{$url := ""}} {{else}} {{$url := "/category"}}{{end}}
 
-		<a class="sidebar-toggle" href="">
-			<span class="glyphicon glyphicon-align-justify"></span>
-		</a>
+                <p class="navbar-brand" href="{{$url}}/{{.Navigation}}">
+                    {{if eq .Navigation "pending"}} Pending {{ else if eq .Navigation "completed"}}Completed {{ else if eq .Navigation "deleted"}}Deleted
+                    {{ else if eq .Navigation "edit"}} Edit {{else }} {{.Navigation}} {{end}} {{end}}
+                </p>
 
-		<div class="sidebar-wrapper sidebar-default">
-			<div class="sidebar-scroller">
-				<ul class="sidebar-menu">
-					<li class="sidebar-group"><span>Tasks</span>
-						<ul class="sidebar-group-menu">
-							
+                <form action="/upd-category/{{.Navigation}}" method="POST" class="hidden" id="EditForm">
+                    <input type="text" name="catname" placeholder="new cat name" style="border:none;border-bottom:1px solid gray; box-shadow:none;">
+                    <input type="submit" value="submit" class="btn btn-default" />
+                </form>
+
+                <form action="/search/" method="POST" class="hidden" id="SearchForm">
+                    <input type="text" name="query" placeholder="Search" style="border:none;border-bottom:1px solid gray; box-shadow:none;">
+                    <input type="submit" value="submit" class="btn btn-default" />
+                </form>
+
+                <span id="icons">
+					{{if eq .Navigation "pending"}}  
+					{{ else if eq .Navigation "completed"}}
+					{{ else if eq .Navigation "deleted"}}
+					{{ else if eq .Navigation "edit"}} 
+                    {{else }}
+                   <a href="/del-category/{{.Navigation}}"> <button  data-original-title="Delete Category" data-placement="bottom" data-toggle="tooltip" title="" class="btn btn-action glyphicon glyphicon-trash"  type="button"></button></a>
+                   <button  data-original-title="Edit Category" data-placement="bottom" data-toggle="tooltip" id="editCatFrmBtn" title="" class="btn btn-action glyphicon glyphicon-edit"  type="button"></button>
+                   <button  data-original-title="Search" data-placement="bottom" data-toggle="tooltip" title=""  id="searchFormBtn" class="btn btn-action glyphicon glyphicon-search"  type="button"></button>
+                    {{end}}
+                </span>
+            </div>
+        </div>
+    </nav>
+    <!-- SIDEBAR -->
+    <div data-sidebar="true" class="sidebar-trigger">
+
+        <a class="sidebar-toggle" href="">
+            <span class="glyphicon glyphicon-align-justify"></span>
+        </a>
+
+        <div class="sidebar-wrapper sidebar-default">
+            <div class="sidebar-scroller">
+                <ul class="sidebar-menu">
+                    <li class="sidebar-group"><span>Tasks</span>
+                        <ul class="sidebar-group-menu">
+
                             <li class="sidebar-item">
-								<a href="/" {{ if eq .Navigation "pending"}} class="active" {{end}}  ><span class="glyphicon glyphicon-tasks"></span> <span class="nav-item">Pending</span></a>
-								
-							</li>
-							
+                                <a href="/" {{ if eq .Navigation "pending"}} class="active" {{end}}><span class="glyphicon glyphicon-tasks"></span> <span class="nav-item">Pending</span></a>
+
+                            </li>
+
                             <li class="sidebar-item">
-								<a href="/completed/" {{ if eq .Navigation "completed"}} class="active" {{end}}><span class="glyphicon glyphicon-check"></span>  <span class="nav-item"> Completed</span></a>
-							</li>
-							
+                                <a href="/completed/" {{ if eq .Navigation "completed"}} class="active" {{end}}><span class="glyphicon glyphicon-check"></span>  <span class="nav-item"> Completed</span></a>
+                            </li>
+
                             <li class="sidebar-item">
-								<a href="/deleted/" {{ if eq .Navigation "deleted"}} class="active" {{end}}><span class="glyphicon glyphicon-trash"></span>  <span class="nav-item"> Deleted</span></a>
-							</li>
-                            
+                                <a href="/deleted/" {{ if eq .Navigation "deleted"}} class="active" {{end}}><span class="glyphicon glyphicon-trash"></span>  <span class="nav-item"> Deleted</span></a>
+                            </li>
+
                             <hr>
-                            
+
                             <li class="sidebar-item">
                                 {{$nav := .Navigation}}
-			                 <h5> Categories</h5> 
-                             <!--<button title="New category" id="toggleCategoryForm" data-placement="left" data-toggle="tooltip" class="btn glyphicon glyphicon-plus" style="font-size:small; margin-left:120px;"></button>-->
-                             <span id="categoryForm">
+                                <h5> Categories</h5>
+                                <!--<button title="New category" id="toggleCategoryForm" data-placement="left" data-toggle="tooltip" class="btn glyphicon glyphicon-plus" style="font-size:small; margin-left:120px;"></button>-->
+                                <span id="categoryForm">
                                  <form action="/add-category/" method="POST">
                                  <span> 
 							         <input type="text" name="category" width="50px">
 							         <input type="submit" text="submit" class="btn btn-primary" value="Submit"/>
                                  </span>
-						         </form>
-                             </span>
-		                    </li>
-                            
+                                </form>
+                                </span>
+                            </li>
+
                             {{ range $index, $cat := .Categories }}
                             <li class="sidebar-item">
-                                    <a href="/category/{{$cat.Name}}" {{ if eq  $cat.Name $nav }} class="active" {{end}}> 
+                                <a href="/category/{{$cat.Name}}" {{ if eq $cat.Name $nav }} class="active" {{end}}>
                                     <span class="nav-item"> {{$cat.Name}}</span> <span class="badge pull-right">{{$cat.Count}}</span></a>
-							</li>
+                            </li>
                             {{end}}
-						</ul>
-					</li>
-				</ul>
-			</div>
-		</div>
-	</div>
+                        </ul>
+                    </li>
+                </ul>
+            </div>
+        </div>
+    </div>

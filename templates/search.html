@@ -1,6 +1,7 @@
 {{template "_head.html" .}}
 <div class="timeline">
-    {{ if .Tasks}} {{range .Tasks}}
+    {{ if .Tasks}} 
+    {{range .Tasks}}
     <div class="note">
         <p class="noteHeading">{{.Title}}</p> <span class="toggle glyphicon glyphicon-resize-full"></span>
         <span class="noteContent">{{.Content}}</span>

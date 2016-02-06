@@ -31,7 +31,8 @@
                     Category:
                     <select name="category" class="dropdown">
                         <option>---</option>
-                        {{$navigation := .Navigation}} {{$categories := .Categories}} {{range $cat := $categories}}
+                        {{$navigation := .Navigation}} {{$categories := .Categories}}
+                        {{range $cat := $categories}}
                         <option value="{{$cat.Name}}" {{if eq $cat.Name $navigation }} checked="checked" {{end}}> {{$cat.Name}} </option>
                         {{end}}
                     </select>
