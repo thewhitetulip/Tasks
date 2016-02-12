@@ -35,13 +35,13 @@
                         <option>---</option>
                         {{$navigation := .Navigation}} {{$categories := .Categories}}
                         {{range $cat := $categories}}
-                        <option value="{{$cat.Name}}" {{if eq $cat.Name $navigation }} checked="checked" {{end}}> {{$cat.Name}} </option>
+                        <option value="{{$cat.Name}}" {{if eq $cat.Name $navigation }} selected="true" {{end}}> {{$cat.Name}} </option>
                         {{end}}
                     </select>
             </div>
             <div class="modal-footer">
                 <button type="button" class="btn btn-default" data-dismiss="modal">Close</button>
-                <input type="submit" value="Submit" class="btn btn-default" />
+                <input type="submit" value="Submit" class="btn btn-default" id="addNoteBtn" />
             </div>
             </form>
         </div>
@@ -50,7 +50,7 @@
 
 <div class="timeline">
     {{ if .Tasks}} {{range $key, $value := .Tasks}}
-    <div class="note">
+    <div class="note" id ="{{$value.Id}}">
         <p class="noteHeading">{{ $value.Title}}</p> <span class="toggle glyphicon glyphicon-resize-full"></span>
 
         <span class="noteContent">{{$value.Content}}</span>
