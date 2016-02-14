@@ -35,7 +35,12 @@ $(document).ready(function(){
      $('#toggleAddFileGrp').addClass('hidden') ;
   });  
   
-  if ($('#actlMsg').html()==' <button id="btnMessage" class="btn btn-default">OK</button>'){
+  $("#noti").click(
+      function(){
+          this.fadeOut();
+      }  
+  );
+  if ($('#actlMsg').html()==''){
      $('.notification').addClass('hidden');
   } else {
     $('.notification').fadeOut(9000);
@@ -53,6 +58,22 @@ $(document).ready(function(){
         }
      }
    );*/
+   
+   $("#addNoteBtn").on("click", function() {
+       this.preventDefaults();
+        var task_id = $("#task-id").val();
+        $.ajax({
+            url: "/tasks/" + task_id,
+            type: "POST",
+	    data: {'title':'randome note', 'content':'this and that'}
+        }).done(function(res, status) {
+            console.log(status, res);
+	    var response = res
+	    $("#timeline").append(response)
+        });
+    });
+
+
 $('.toggle').click(function(){
      $(this).next().toggle();
    });

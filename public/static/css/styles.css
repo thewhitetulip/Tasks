@@ -17,8 +17,14 @@ ul{
     list-style-type: none;
 }
 
+input {
+    border:none;
+    border-bottom:1px solid gray; 
+    box-shadow:none;
+}
+
 .badge{
-  background-color: #7D8EF0;
+  background-color: #1a78c9;
   margin-right:10px;
   float:right;
 }

@@ -107,9 +107,13 @@ func UpdateTaskFunc(w http.ResponseWriter, r *http.Request) {
 			message = "Error updating task"
 		} else {
 			message = "Task updated"
+			log.Println(message)
 		}
-		log.Println("redirecting to somewhere else")
-		http.Redirect(w, r, "/", 301)
+		http.Redirect(w, r, "/", http.StatusFound)
+
+	} else {
+		message = "Method not allowed"
+		http.Redirect(w, r, "/", http.StatusFound)
 	}
 }
 

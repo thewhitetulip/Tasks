@@ -68,15 +68,14 @@ func Close() {
 //GetTasks retrieves all the tasks depending on the
 //status pending or trashed or completed
 func GetTasks(status, category string) (types.Context, error) {
-	var task []types.Task
-	var context types.Context
-	var TaskID int
-	var TaskTitle string
-	var TaskContent string
+	var tasks []types.Task
+	var task types.Task
 	var TaskCreated time.Time
-	var TaskPriority string
+	var context types.Context
 	var getTasksql string
 	var rows *sql.Rows
+
+	comments := GetComments()
 
 	basicSQL := "select id, title, content, created_date, priority from task t"
 	if status == "pending" && category == "" {
@@ -99,17 +98,24 @@ func GetTasks(status, category string) (types.Context, error) {
 	}
 	defer rows.Close()
 	for rows.Next() {
-		err := rows.Scan(&TaskID, &TaskTitle, &TaskContent, &TaskCreated, &TaskPriority)
-		TaskContent = string(md.Markdown([]byte(TaskContent)))
+		task = types.Task{}
+		err := rows.Scan(&task.Id, &task.Title, &task.Content, &TaskCreated, &task.Priority)
+		task.Content = string(md.Markdown([]byte(task.Content)))
 		// TaskContent = strings.Replace(TaskContent, "\n", "<br>", -1)
 		if err != nil {
 			log.Println(err)
 		}
+
+		if comments[task.Id] != nil {
+			task.Comments = comments[task.Id]
+		}
+
 		TaskCreated = TaskCreated.Local()
-		a := types.Task{Id: TaskID, Title: TaskTitle, Content: TaskContent, Created: TaskCreated.Format(time.UnixDate)[0:20], Priority: TaskPriority}
-		task = append(task, a)
+		task.Created = TaskCreated.Format(time.UnixDate)[0:20]
+
+		tasks = append(tasks, task)
 	}
-	context = types.Context{Tasks: task, Navigation: status}
+	context = types.Context{Tasks: tasks, Navigation: status}
 	return context, nil
 }
 
@@ -247,4 +253,40 @@ func SearchTask(query string) types.Context {
 	}
 	context = types.Context{Tasks: task, Search: query}
 	return context
+}
+
+//GetComments is used to get comments, all of them.
+//We do not want 100 different pages to show tasks, we want to use as few pages as possible
+//so we are going to populate everything on the damn home pages
+func GetComments() map[int][]types.Comment {
+	commentMap := make(map[int][]types.Comment)
+
+	var id int
+	var message types.Comment
+
+	stmt := "select taskID, content from comments;"
+	rows := database.query(stmt)
+
+	for rows.Next() {
+		err := rows.Scan(&id, &message.Content)
+		if err != nil {
+
+		}
+		commentMap[id] = append(commentMap[id], message)
+	}
+	return commentMap
+}
+
+//AddComments will be used to add comments in the database
+func AddComments(id int, comment string) error {
+	stmt := "insert into comments(taskID, content) values (?,?)"
+	err := taskQuery(stmt, id, comment)
+
+	if err != nil {
+		return err
+	}
+
+	log.Println("added comment to task ID ", id)
+
+	return nil
 }

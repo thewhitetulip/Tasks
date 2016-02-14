@@ -40,7 +40,7 @@
 
 <body>
     <!-- The navigation bar-->
-    <div class='notification {{if eq .Message ""}} hidden  {{end}}'><span id="message"><p id="actlMsg">{{.Message}} <button id="btnMessage" class="btn btn-default">OK</button></p>  </span>        </div>
+    <div id = "noti" class='notification {{if eq .Message ""}} hidden  {{end}}'><span id="message"><p id="actlMsg">{{.Message}}</div>
     <nav class="navbar navbar-default navbar-fixed-top mainHeader">
         <div class="container-fluid">
             {{$url := ""}}
@@ -55,12 +55,12 @@
                 </p>
 
                 <form action="/upd-category/{{.Navigation}}" method="POST" class="hidden" id="EditForm">
-                    <input type="text" name="catname" placeholder="new cat name" style="border:none;border-bottom:1px solid gray; box-shadow:none;">
+                    <input type="text" name="catname" placeholder="new cat name" >
                     <input type="submit" value="Submit" class="btn btn-default" />
                 </form>
 
                 <form action="/search/" method="POST" class="hidden" id="SearchForm">
-                    <input type="text" name="query" placeholder="Search" style="border:none;border-bottom:1px solid gray; box-shadow:none;">
+                    <input type="text" name="query" placeholder="Search" >
                     <input type="submit" value="Submit" class="btn btn-default" />
                 </form>
 

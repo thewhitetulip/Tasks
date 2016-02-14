@@ -13,6 +13,12 @@ type Task struct {
 	Priority string
 	Category string
 	Referer  string
+	Comments []Comment
+}
+
+//Comment is the struct used to populate comments per tasks
+type Comment struct {
+	Content string
 }
 
 //Context is the struct passed to templates

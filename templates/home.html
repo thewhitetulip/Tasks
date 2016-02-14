@@ -15,12 +15,12 @@
                 <form enctype="multipart/form-data" action="/add/" method="POST">
                     <div class="form-group">
 
-                        <input type="text" name="title" class="form-control" id="add-note-title" placeholder="Title" style="border:none;border-bottom:1px solid gray; box-shadow:none;">
-                        <input type="hidden" name="CSRFToken" value={{.CSRFToken}}>
+                        <input type="text" name="title" class="form-control" id="add-note-title" placeholder="Title" >
+                        <input class="hidden"" name="CSRFToken" value={{.CSRFToken}}>
                     </div>
                     <div class="form-group">
 
-                        <textarea class="form-control" name="content" id="add-note-content" placeholder="Content" rows="10" style="border:none;border-bottom:1px solid gray; box-shadow:none;"></textarea>
+                        <textarea class="form-control" name="content" id="add-note-content" placeholder="Content" rows="10" ></textarea>
                         <a id="toggleAddFileGrp">Add File</a>
                         <span id="file-group" class="hidden">
                             File: <input type="file" name="uploadfile" />
@@ -33,15 +33,14 @@
                     Category:
                     <select name="category" class="dropdown">
                         <option>---</option>
-                        {{$navigation := .Navigation}} {{$categories := .Categories}}
-                        {{range $cat := $categories}}
+                        {{$navigation := .Navigation}} {{$categories := .Categories}} {{range $cat := $categories}}
                         <option value="{{$cat.Name}}" {{if eq $cat.Name $navigation }} selected="true" {{end}}> {{$cat.Name}} </option>
                         {{end}}
                     </select>
             </div>
             <div class="modal-footer">
-                <button type="button" class="btn btn-default" data-dismiss="modal">Close</button>
-                <input type="submit" value="Submit" class="btn btn-default" id="addNoteBtn" />
+                <button type="button" class="btn btn-primary" data-dismiss="modal">Close</button>
+                <input type="submit" value="Submit" class="btn btn-primary" id="addNoteBtn" />
             </div>
             </form>
         </div>
@@ -50,10 +49,28 @@
 
 <div class="timeline">
     {{ if .Tasks}} {{range $key, $value := .Tasks}}
-    <div class="note" id ="{{$value.Id}}">
+    <div class="note" id="{{$value.Id}}">
         <p class="noteHeading">{{ $value.Title}}</p> <span class="toggle glyphicon glyphicon-resize-full"></span>
 
-        <span class="noteContent">{{$value.Content}}</span>
+        <span class="noteContent">
+            {{$value.Content}}
+                <span class="noteComments">
+                    <ul>
+                    {{range $value.Comments}}
+                        <li>{{.Content}}</li>
+                    {{end}}
+                    
+                    <li>
+                        <form method="POST" action="/add-comment/">
+                        <textarea rows="2" cols="30" name="commentText" placeholder="Add Comment"></textarea>
+                        <input type="text" class="hidden" name="taskID" value="{{$value.Id}}">
+                        <input type="submit" value="Comment" class="btn btn-primary" />
+                        </form> 
+                    </li>
+                    </ul>
+                </span>
+        </span>
+
         <span class="notefooter">
         <ul class="menu">
           <li role="presentation">Priority: {{$value.Priority}}</li>
@@ -84,8 +101,8 @@
     <div class="note">
         <p class="noteHeading">No Tasks here</p>
         <p class="notefooter">Create new task
-            <button class="floating-action-icon-add" style="border:none;border-bottom:1px solid gray; box-shadow:none;">
-            here </button>
+            <button class="floating-action-icon-add" >
+                here </button>
         </p>
     </div>
     {{end}}
