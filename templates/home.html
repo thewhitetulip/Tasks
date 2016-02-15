@@ -54,21 +54,19 @@
 
         <span class="noteContent">
             {{$value.Content}}
-                <span class="noteComments">
-                    <ul>
+                 <div class="commentslist">
                     {{range $value.Comments}}
-                        <li>{{.Content}}</li>
+                        <div class="comment">{{.Content}}</div>
                     {{end}}
                     
-                    <li>
+                    <div class="comment">
                         <form method="POST" action="/add-comment/">
-                        <textarea rows="2" cols="30" name="commentText" placeholder="Add Comment"></textarea>
+                        <textarea rows="1" cols="30" name="commentText" placeholder="Add Comment"></textarea>
                         <input type="text" class="hidden" name="taskID" value="{{$value.Id}}">
                         <input type="submit" value="Comment" class="btn btn-primary" />
                         </form> 
-                    </li>
-                    </ul>
-                </span>
+                    </div>
+                 </div>
         </span>
 
         <span class="notefooter">
