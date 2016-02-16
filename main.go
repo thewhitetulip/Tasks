@@ -18,6 +18,7 @@ func main() {
 	http.HandleFunc("/", views.ShowAllTasksFunc)
 	http.HandleFunc("/add-category/", views.AddCategoryFunc)
 	http.HandleFunc("/add-comment/", views.AddCommentFunc)
+	http.HandleFunc("/del-comment/", views.DeleteCommentFunc)
 	http.HandleFunc("/del-category/", views.DeleteCategoryFunc)
 	http.HandleFunc("/upd-category/", views.UpdateCategoryFunc)
 	http.HandleFunc("/category/", views.ShowCategoryFunc)

@@ -130,3 +130,25 @@ func DeleteCategoryFunc(w http.ResponseWriter, r *http.Request) {
 		http.Redirect(w, r, "/", http.StatusFound)
 	}
 }
+
+//DeleteCommentFunc will delete any category
+func DeleteCommentFunc(w http.ResponseWriter, r *http.Request) {
+	if r.Method == "GET" {
+		id := r.URL.Path[len("/del-comment/"):]
+		commentID, err := strconv.Atoi(id)
+		if err != nil {
+			http.Redirect(w, r, "/", http.StatusBadRequest)
+			return
+		}
+
+		err = db.DeleteCommentByID(commentID)
+
+		if err != nil {
+			message = "comment not deleted"
+		} else {
+			message = "comment deleted"
+		}
+
+		http.Redirect(w, r, "/", http.StatusFound)
+	}
+}
