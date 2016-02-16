@@ -35,6 +35,7 @@ func UploadedFileHandler(w http.ResponseWriter, r *http.Request) {
 //AddTaskFunc is used to handle the addition of new task, "/add" URL
 func AddTaskFunc(w http.ResponseWriter, r *http.Request) {
 	if r.Method == "POST" { // Will work only for POST requests, will redirect to home
+		var filelink string // will store the html when we have files to be uploaded, appened to the note content
 		r.ParseForm()
 		file, handler, err := r.FormFile("uploadfile")
 		if err != nil && handler != nil {
@@ -87,7 +88,11 @@ func AddTaskFunc(w http.ResponseWriter, r *http.Request) {
 				defer f.Close()
 				io.Copy(f, file)
 
-				filelink := "<br> <a href=/files/" + token + ">" + handler.Filename + "</a>"
+				if strings.HasSuffix(handler.Filename, ".png") || strings.HasSuffix(handler.Filename, ".jpg") {
+					filelink = "<br> <img src='/files/" + token + "'/>"
+				} else {
+					filelink = "<br> <a href=/files/" + token + ">" + handler.Filename + "</a>"
+				}
 				content = content + filelink
 
 				fileTruth := db.AddFile(handler.Filename, token)
