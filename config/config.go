@@ -26,7 +26,7 @@ var config Configuration
 func ReadConfig(fileName string) Configuration {
 	configFile, err := ioutil.ReadFile(fileName)
 	if err != nil {
-		log.Fatal("Unable to read log file")
+		log.Fatalf("Unable to read config file '%s'", fileName)
 	}
 	//log.Print(configFile)
 	err = json.Unmarshal(configFile, &config)
