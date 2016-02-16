@@ -15,8 +15,8 @@
                 <form enctype="multipart/form-data" action="/add/" method="POST">
                     <div class="form-group">
 
-                        <input type="text" name="title" class="form-control" id="add-note-title" placeholder="Title" >
-                        <input class="hidden"" name="CSRFToken" value={{.CSRFToken}}>
+                        <input type="text" name="title" class="form-control" id="add-note-title" placeholder="Title" />
+                        <input class="hidden" name="CSRFToken" value="{{.CSRFToken}}" />
                     </div>
                     <div class="form-group">
 
@@ -37,12 +37,12 @@
                         <option value="{{$cat.Name}}" {{if eq $cat.Name $navigation }} selected="true" {{end}}> {{$cat.Name}} </option>
                         {{end}}
                     </select>
+            </form>
             </div>
             <div class="modal-footer">
                 <button type="button" class="btn btn-primary" data-dismiss="modal">Close</button>
                 <input type="submit" value="Submit" class="btn btn-primary" id="addNoteBtn" />
             </div>
-            </form>
         </div>
     </div>
 </div>
@@ -56,7 +56,7 @@
             {{$value.Content}}
                  <div class="commentslist">
                     {{range $value.Comments}}
-                        <div class="comment">{{.Content}}</div>
+                    <div class="comment">{{.Content}}</div>
                     {{end}}
                     
                     <div class="comment">
