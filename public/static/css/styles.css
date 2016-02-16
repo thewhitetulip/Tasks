@@ -22,13 +22,17 @@ Layout
     padding-left: 25px;
     padding-top: 5px;
 }
+
 ul{
     list-style-type: none;
 }
 
+.timestamp{
+    color: #aaa;
+}
+
 input {
-    border:none;
-    border-bottom:1px solid gray; 
+    border:none; 
     box-shadow:none;
 }
 

@@ -103,7 +103,12 @@ func UpdateCategoryByName(oldName, newName string) error {
 	query := "update category set name = ? where name=?"
 	log.Println(query)
 	err := taskQuery(query, newName, oldName)
-
 	return err
+}
 
+//DeleteCommentByID will actually delete the comment from db
+func DeleteCommentByID(id int) error {
+	query := "delete from comments where id=?"
+	err := taskQuery(query, id)
+	return err
 }

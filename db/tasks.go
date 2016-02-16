@@ -75,7 +75,11 @@ func GetTasks(status, category string) (types.Context, error) {
 	var getTasksql string
 	var rows *sql.Rows
 
-	comments := GetComments()
+	comments, err := GetComments()
+
+	if err != nil {
+		return context, err
+	}
 
 	basicSQL := "select id, title, content, created_date, priority from task t"
 	if status == "pending" && category == "" {
@@ -111,7 +115,7 @@ func GetTasks(status, category string) (types.Context, error) {
 		}
 
 		TaskCreated = TaskCreated.Local()
-		task.Created = TaskCreated.Format(time.UnixDate)[0:20]
+		task.Created = TaskCreated.Format("Jan 01 2006")
 
 		tasks = append(tasks, task)
 	}
@@ -258,28 +262,32 @@ func SearchTask(query string) types.Context {
 //GetComments is used to get comments, all of them.
 //We do not want 100 different pages to show tasks, we want to use as few pages as possible
 //so we are going to populate everything on the damn home pages
-func GetComments() map[int][]types.Comment {
+func GetComments() (map[int][]types.Comment, error) {
 	commentMap := make(map[int][]types.Comment)
 
-	var id int
-	var message types.Comment
+	var taskID int
+	var comment types.Comment
+	var created time.Time
 
-	stmt := "select taskID, content from comments;"
+	stmt := "select id, taskID, content, created from comments;"
 	rows := database.query(stmt)
 
 	for rows.Next() {
-		err := rows.Scan(&id, &message.Content)
+		err := rows.Scan(&comment.ID, &taskID, &comment.Content, &created)
 		if err != nil {
-
+			return commentMap, err
 		}
-		commentMap[id] = append(commentMap[id], message)
+		// comment.Content = string(md.Markdown([]byte(comment.Content))) ## have to fix the <p> issue markdown support
+		created = created.Local()
+		comment.Created = created.Format("02 Jan 2006 15:04:05")
+		commentMap[taskID] = append(commentMap[taskID], comment)
 	}
-	return commentMap
+	return commentMap, nil
 }
 
 //AddComments will be used to add comments in the database
 func AddComments(id int, comment string) error {
-	stmt := "insert into comments(taskID, content) values (?,?)"
+	stmt := "insert into comments(taskID, content, created) values (?,?,datetime())"
 	err := taskQuery(stmt, id, comment)
 
 	if err != nil {

@@ -56,7 +56,11 @@
             {{$value.Content}}
                  <div class="commentslist">
                     {{range $value.Comments}}
-                    <div class="comment">{{.Content}}</div>
+                    <div class="comment">
+                        <span>{{.Content}}</span>
+                        <span class="timestamp">{{.Created}}</span>
+                        <a href="/del-comment/{{.ID}}"><span class="glyphicon glyphicon-trash timestamp"></span></a>
+                    </div> 
                     {{end}}
                     
                     <div class="comment">

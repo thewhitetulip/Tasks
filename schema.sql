@@ -12,4 +12,4 @@ CREATE TABLE files(name varchar(1000) not null, autoName varchar(255) not null);
 
 CREATE TABLE category( id integer primary key autoincrement ,name varchar(1000) not null);
 
-CREATE TABLE comments(id integer primary key autoincrement, content ntext, taskID references task(id));
+CREATE TABLE comments(id integer primary key autoincrement, content ntext, taskID references task(id), created datetime);

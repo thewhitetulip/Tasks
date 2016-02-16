@@ -18,7 +18,9 @@ type Task struct {
 
 //Comment is the struct used to populate comments per tasks
 type Comment struct {
+	ID      int
 	Content string
+	Created string
 }
 
 //Context is the struct passed to templates
