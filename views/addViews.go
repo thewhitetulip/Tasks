@@ -138,6 +138,9 @@ func AddCategoryFunc(w http.ResponseWriter, r *http.Request) {
 			message = "Added category"
 			http.Redirect(w, r, "/", http.StatusFound)
 		}
+	} else {
+		message = "Invalid Category Name"
+		http.Redirect(w, r, "/", http.StatusBadRequest)
 	}
 }
 
