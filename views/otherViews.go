@@ -79,7 +79,12 @@ func SearchTaskFunc(w http.ResponseWriter, r *http.Request) {
 	if r.Method == "POST" {
 		r.ParseForm()
 		query := r.Form.Get("query")
+
 		context := db.SearchTask(query)
+
+		categories := db.GetCategories()
+		context.Categories = categories
+
 		searchTemplate.Execute(w, context)
 	} else {
 		message = "Method not allowed"

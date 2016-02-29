@@ -70,6 +70,7 @@
 					{{ else if eq .Navigation "completed"}}
 					{{ else if eq .Navigation "deleted"}}
 					{{ else if eq .Navigation "edit"}} 
+                    {{ else if eq .Navigation "search"}}
                     {{else }}
                    <a href="/del-category/{{.Navigation}}"> <button  data-original-title="Delete Category" data-placement="bottom" data-toggle="tooltip" title="" class="btn btn-action glyphicon glyphicon-trash"  type="button"></button></a>
                    <button  data-original-title="Edit Category" data-placement="bottom" data-toggle="tooltip" id="editCatFrmBtn" title="" class="btn btn-action glyphicon glyphicon-pencil"  type="button"></button>

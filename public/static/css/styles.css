@@ -107,7 +107,7 @@ Navbar
   margin-left: 25px;
   font-size:1.5em;
   color:white;
-
+  max-width: 2000px;
 }
 
 .btn-action{
