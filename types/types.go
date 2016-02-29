@@ -6,14 +6,15 @@ is passed while templates are executed.
 */
 //Task is the struct used to identify tasks
 type Task struct {
-	Id       int
-	Title    string
-	Content  string
-	Created  string
-	Priority string
-	Category string
-	Referer  string
-	Comments []Comment
+	Id        int
+	Title     string
+	Content   string
+	Created   string
+	Priority  string
+	Category  string
+	Referer   string
+	Comments  []Comment
+	IsOverdue bool
 }
 
 //Comment is the struct used to populate comments per tasks

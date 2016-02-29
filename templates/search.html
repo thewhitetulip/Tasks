@@ -3,7 +3,7 @@
 <div class="timeline">
     {{ if .Tasks}} {{range $key, $value := .Tasks}}
     <div class="note" id="{{$value.Id}}">
-        <p class="noteHeading">{{ $value.Title}}</p> <span class="toggle glyphicon glyphicon-resize-full"></span>
+        <p class="noteHeading">{{ $value.Title}}{{if $value.IsOverdue}}<span class="overdue">Overdue</span>{{end}}</p> <span class="toggle glyphicon glyphicon-resize-full"></span>
 
         <span class="noteContent">
             {{$value.Content}}

@@ -146,10 +146,19 @@ nav  .glyphicon:hover{
 /*--------------------------------------
 NotesFeed
 -------------------------------------- */
+.overdue {
+    color: red;
+    margin-top: 1px;
+    font-size: 12px;
+    padding-top: -100px;
+    position: absolute;
+    padding-left: 5px;
+}
+
 .noteHeading {
     font-weight:900;
     font-size:17px;
-    color:#666666;
+    color:#666666;    
     margin-bottom:0px;
     padding-bottom:5px;
 }

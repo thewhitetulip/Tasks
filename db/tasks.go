@@ -118,6 +118,12 @@ func GetTasks(status, category string) (types.Context, error) {
 		}
 
 		TaskCreated = TaskCreated.Local()
+		CurrentTime := time.Now().Local()
+		week := TaskCreated.AddDate(0, 0, 7)
+
+		if (week.String() < CurrentTime.String()) && (task.Priority != "1") {
+			task.IsOverdue = true // If one week then overdue by default
+		}
 		task.Created = TaskCreated.Format("Jan 01 2006")
 
 		tasks = append(tasks, task)
@@ -266,6 +272,12 @@ func SearchTask(query string) types.Context {
 		task.Content = string(md.Markdown([]byte(task.Content)))
 
 		TaskCreated = TaskCreated.Local()
+		CurrentTime := time.Now().Local()
+		week := TaskCreated.AddDate(0, 0, 7)
+
+		if (week.String() < CurrentTime.String()) && (task.Priority != "1") {
+			task.IsOverdue = true // If one week then overdue by default
+		}
 		task.Created = TaskCreated.Format("Jan 01 2006")
 
 		tasks = append(tasks, task)
