@@ -81,19 +81,20 @@ func GetTasks(status, category string) (types.Context, error) {
 		return context, err
 	}
 
-	basicSQL := "select id, title, content, created_date, priority from task t"
+	basicSQL := "select t.id, title, content, created_date, priority, c.name from task t, category c where c.id = t.cat_id"
 	if status == "pending" && category == "" {
-		getTasksql = basicSQL + " where finish_date is null and is_deleted='N' order by priority desc, created_date asc"
+		getTasksql = basicSQL + " and finish_date is null and is_deleted='N' order by priority desc, created_date asc"
 	} else if status == "deleted" {
-		getTasksql = basicSQL + " where is_deleted='Y' order by priority desc, created_date asc"
+		getTasksql = basicSQL + " and is_deleted='Y' order by priority desc, created_date asc"
 	} else if status == "completed" {
-		getTasksql = basicSQL + " where finish_date is not null order by priority desc, created_date asc"
+		getTasksql = basicSQL + " and finish_date is not null order by priority desc, created_date asc"
 	}
 
 	if category != "" {
 		status = category
-		getTasksql = "select t.id, title, content, created_date, priority from task t, category c where c.id = t.cat_id and name = ?  and  t.is_deleted!='Y' and t.finish_date is null  order by priority desc, created_date asc, finish_date asc"
+		getTasksql = basicSQL + " and name = ?  and  t.is_deleted!='Y' and t.finish_date is null  order by priority desc, created_date asc, finish_date asc"
 		rows, err = database.db.Query(getTasksql, category)
+
 		if err != nil {
 			log.Println("something went wrong while getting query")
 		}
@@ -103,7 +104,9 @@ func GetTasks(status, category string) (types.Context, error) {
 	defer rows.Close()
 	for rows.Next() {
 		task = types.Task{}
-		err := rows.Scan(&task.Id, &task.Title, &task.Content, &TaskCreated, &task.Priority)
+
+		err = rows.Scan(&task.Id, &task.Title, &task.Content, &TaskCreated, &task.Priority, &task.Category)
+
 		task.Content = string(md.Markdown([]byte(task.Content)))
 		// TaskContent = strings.Replace(TaskContent, "\n", "<br>", -1)
 		if err != nil {
@@ -234,28 +237,40 @@ func taskQuery(sql string, args ...interface{}) error {
 
 //SearchTask is used to return the search results depending on the query
 func SearchTask(query string) types.Context {
-	stmt := "select id, title, content, created_date from task where title like '%" + query + "%' or content like '%" + query + "%'"
-	var task []types.Task
-	var TaskID int
-	var TaskTitle string
-	var TaskContent string
+	var tasks []types.Task
+	var task types.Task
 	var TaskCreated time.Time
 	var context types.Context
+
+	comments, err := GetComments()
+	if err != nil {
+		log.Println("SearchTask: something went wrong in finding comments")
+	}
+
+	stmt := "select t.id, title, content, created_date, priority, c.name from task t, category c where c.id = t.cat_id and (title like '%" + query + "%' or content like '%" + query + "%') order by created_date desc"
 
 	rows := database.query(stmt, query, query)
 
 	for rows.Next() {
-		err := rows.Scan(&TaskID, &TaskTitle, &TaskContent, &TaskCreated)
+		err := rows.Scan(&task.Id, &task.Title, &task.Content, &TaskCreated, &task.Priority, &task.Category)
 		if err != nil {
 			log.Println(err)
 		}
-		TaskTitle = strings.Replace(TaskTitle, query, "<span class='highlight'>"+query+"</span>", -1)
-		TaskContent = strings.Replace(TaskContent, query, "<span class='highlight'>"+query+"</span>", -1)
-		TaskContent = string(md.Markdown([]byte(TaskContent)))
-		a := types.Task{Id: TaskID, Title: TaskTitle, Content: TaskContent, Created: TaskCreated.Format(time.UnixDate)[0:20]}
-		task = append(task, a)
+
+		if comments[task.Id] != nil {
+			task.Comments = comments[task.Id]
+		}
+
+		task.Title = strings.Replace(task.Title, query, "<span class='highlight'>"+query+"</span>", -1)
+		task.Content = strings.Replace(task.Content, query, "<span class='highlight'>"+query+"</span>", -1)
+		task.Content = string(md.Markdown([]byte(task.Content)))
+
+		TaskCreated = TaskCreated.Local()
+		task.Created = TaskCreated.Format("Jan 01 2006")
+
+		tasks = append(tasks, task)
 	}
-	context = types.Context{Tasks: task, Search: query}
+	context = types.Context{Tasks: tasks, Search: query, Navigation: "search"}
 	return context
 }
 

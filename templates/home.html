@@ -65,7 +65,7 @@
                     
                     <div class="comment">
                         <form method="POST" action="/add-comment/">
-                        <textarea rows="1" cols="30" name="commentText" placeholder="Add Comment"></textarea>
+                        <textarea rows="1" cols="75" name="commentText" placeholder="Add Comment"></textarea>
                         <input type="text" class="hidden" name="taskID" value="{{$value.Id}}">
                         <input type="submit" value="Comment" class="btn btn-primary" />
                         </form> 
@@ -78,7 +78,7 @@
           <li role="presentation">Priority: {{$value.Priority}}</li>
           <li role="presentation">
               <span class="glyphicon glyphicon-time"></span> {{$value.Created}}</li>
-        <li role="presentation">
+          <li role="presentation">
 
             <a role="menuitem" tabindex="-1" href="/mask/{{.Id}}">
                 <span class="glyphicon glyphicon-lock"></span></a>
@@ -95,7 +95,9 @@
             <a role="menuitem" tabindex="-1" href="/edit/{{.Id}}">
                 <span class="glyphicon glyphicon-pencil"></span></a>
         </li>
-
+        <li role="presentation">
+              <a href="/category/{{$value.Category}}"> {{$value.Category}}</a>
+          </li>
         </ul>
         </span>
     </div>
