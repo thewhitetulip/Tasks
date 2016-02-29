@@ -118,11 +118,13 @@ func GetTasks(status, category string) (types.Context, error) {
 		}
 
 		TaskCreated = TaskCreated.Local()
-		CurrentTime := time.Now().Local()
-		week := TaskCreated.AddDate(0, 0, 7)
-
-		if (week.String() < CurrentTime.String()) && (task.Priority != "1") {
-			task.IsOverdue = true // If one week then overdue by default
+		if task.Priority != "1" { // if priority is not 1 then calculate, else why bother?
+			CurrentTime := time.Now().Local()
+			diff := CurrentTime.Sub(TaskCreated).Hours()
+			log.Println(diff)
+			if diff > 168 {
+				task.IsOverdue = true // If one week then overdue by default
+			}
 		}
 		task.Created = TaskCreated.Format("Jan 01 2006")
 
