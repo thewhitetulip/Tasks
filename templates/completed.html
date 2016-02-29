@@ -1,33 +1,28 @@
 {{template "_head.html" .}}
 
 <div class="timeline">
-    {{ if .Tasks}} 
-    {{range .Tasks}}
+    {{ if .Tasks}} {{range $key, $value := .Tasks}}
     <div class="note">
-        <p class="noteHeading">{{.Title}}</p> <span class="toggle glyphicon glyphicon-resize-full"></span>
-        <span class="noteContent">{{.Content}}</span>
+        <p class="noteHeading">{{$value.Title}}</p> <span class="toggle glyphicon glyphicon-resize-full"></span>
+        <span class="noteContent">{{$value.Content}}</span>
         <span class="notefooter">
-                    <ul class="menu">
-                      <li role="presentation">Priority: {{.Priority}}</li>
-                      <li role="presentation">
-                          <a role="menuitem" tabindex="-1" href="/incomplete/{{.Id}}">
-                          <span class="glyphicon glyphicon-eye-close"></span></a>
-        </li>
-        <li role="presentation">
-            <a role="menuitem" tabindex="-1" href="/trash/{{.Id}}">
-                <span class="glyphicon glyphicon-trash"></span></a>
-        </li>
-        <!--<li role="presentation">
-        <a role="menuitem" tabindex="-1" href="/mask/{{.Id}}">
-          <span class="glyphicon glyphicon-lock"></span> Mask</a>
-      </li>
-      <li role="presentation">
-        <a role="menuitem" tabindex="-1" href="/archive/{{.Id}}">
-          <span class="glyphicon glyphicon-inbox"></span> Edit</a>
-      </li>
-      <!-- <li role="presentation"><a role="menuitem" tabindex="-1" href="/restore/{{.Id}}">
-                           <span class="glyphicon glyphicon-inbox"></span>  Restore</a></li> -->
-        </ul>
+            <ul class="menu">
+                <li role="presentation">Priority: {{$value.Priority}}</li>
+                <li role="presentation">
+                    <span class="glyphicon glyphicon-time"></span> {{$value.Created}}</li>
+                <li role="presentation">
+                    <a role="menuitem" tabindex="-1" href="/trash/{{.Id}}">
+                        <span class="glyphicon glyphicon-trash"></span></a>
+                </li>
+                <li role="presentation">
+                    <a role="menuitem" tabindex="-1" href="/incomplete/{{.Id}}">
+                       <span class="glyphicon glyphicon-eye-close"></span>
+                    </a>
+                </li>
+                <li role="presentation">
+                    <a href="/category/{{$value.Category}}"> {{$value.Category}}</a>
+                </li>   
+            </ul>
         </span>
     </div>
     {{end}} {{else}}
