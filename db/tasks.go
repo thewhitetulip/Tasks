@@ -125,7 +125,7 @@ func GetTasks(status, category string) (types.Context, error) {
 				task.IsOverdue = true // If one week then overdue by default
 			}
 		}
-		task.Created = TaskCreated.Format("Jan 01 2006")
+		task.Created = TaskCreated.Format("Jan 2 2006")
 
 		tasks = append(tasks, task)
 	}
@@ -279,7 +279,7 @@ func SearchTask(query string) types.Context {
 		if (week.String() < CurrentTime.String()) && (task.Priority != "1") {
 			task.IsOverdue = true // If one week then overdue by default
 		}
-		task.Created = TaskCreated.Format("Jan 01 2006")
+		task.Created = TaskCreated.Format("Jan 2 2006")
 
 		tasks = append(tasks, task)
 	}
@@ -307,7 +307,7 @@ func GetComments() (map[int][]types.Comment, error) {
 		}
 		// comment.Content = string(md.Markdown([]byte(comment.Content))) ## have to fix the <p> issue markdown support
 		created = created.Local()
-		comment.Created = created.Format("02 Jan 2006 15:04:05")
+		comment.Created = created.Format("Jan 2 2006 15:04:05")
 		commentMap[taskID] = append(commentMap[taskID], comment)
 	}
 	return commentMap, nil
