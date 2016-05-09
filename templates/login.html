@@ -1,0 +1,36 @@
+<div class="timeline">
+    <div class="note">
+        Login
+        <form action="/login/" method="POST">
+            <div class="form-group">
+                <input type="text" name="username" class="form-control" placeholder="Username" />
+                <input type="password" name="password" class="form-control" placeholder="Password" />
+            </div>
+
+            <div class="modal-footer">
+                <input type="submit" value="Submit" class="btn btn-primary" id="addNoteBtn" />
+            </div>
+        </form>
+
+    </div>
+
+    <div class="note">
+        Sign up
+         <form action="/signup/" method="POST">
+            <div class="form-group">
+                <input type="text" name="username" class="form-control" placeholder="Username" />
+                <input type="password" name="password" class="form-control" placeholder="Password" />
+            </div>
+
+            <div class="modal-footer">
+                <input type="submit" value="Submit" class="btn btn-primary" id="addNoteBtn" />
+            </div>
+        </form>
+    </div>
+
+</div>
+{{template "footer.html"}}
+
+</body>
+
+</html>

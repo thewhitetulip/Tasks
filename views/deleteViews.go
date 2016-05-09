@@ -10,6 +10,7 @@ import (
 	"strconv"
 
 	"github.com/thewhitetulip/Tasks/db"
+	"github.com/thewhitetulip/Tasks/sessions"
 	"github.com/thewhitetulip/Tasks/utils"
 )
 
@@ -19,7 +20,7 @@ func TrashTaskFunc(w http.ResponseWriter, r *http.Request) {
 	//the delete transaction, we use the r.Referer() function to get the link
 	redirectUrl := utils.GetRedirectUrl(r.Referer())
 
-	if r.Method == "GET" {
+	if r.Method == "GET" && sessions.IsLoggedIn(r) {
 		id, err := strconv.Atoi(r.URL.Path[len("/trash/"):])
 		if err != nil {
 			log.Println("TrashTaskFunc", err)
@@ -42,7 +43,7 @@ func TrashTaskFunc(w http.ResponseWriter, r *http.Request) {
 
 //RestoreTaskFunc is used to restore task from trash, handles "/restore/" URL
 func RestoreTaskFunc(w http.ResponseWriter, r *http.Request) {
-	if r.Method == "GET" {
+	if r.Method == "GET" && sessions.IsLoggedIn(r) {
 		id, err := strconv.Atoi(r.URL.Path[len("/restore/"):])
 		if err != nil {
 			log.Println(err)
@@ -64,7 +65,7 @@ func RestoreTaskFunc(w http.ResponseWriter, r *http.Request) {
 
 //DeleteTaskFunc is used to delete a task, trash = move to recycle bin, delete = permanent delete
 func DeleteTaskFunc(w http.ResponseWriter, r *http.Request) {
-	if r.Method == "GET" {
+	if r.Method == "GET" && sessions.IsLoggedIn(r) {
 		id := r.URL.Path[len("/delete/"):]
 		if id == "all" {
 			err := db.DeleteAll()
@@ -96,7 +97,7 @@ func DeleteTaskFunc(w http.ResponseWriter, r *http.Request) {
 
 //RestoreFromCompleteFunc restores the task from complete to pending
 func RestoreFromCompleteFunc(w http.ResponseWriter, r *http.Request) {
-	if r.Method == "GET" {
+	if r.Method == "GET" && sessions.IsLoggedIn(r) {
 		id, err := strconv.Atoi(r.URL.Path[len("/incomplete/"):])
 		if err != nil {
 			log.Println(err)
@@ -118,7 +119,7 @@ func RestoreFromCompleteFunc(w http.ResponseWriter, r *http.Request) {
 
 //DeleteCategoryFunc will delete any category
 func DeleteCategoryFunc(w http.ResponseWriter, r *http.Request) {
-	if r.Method == "GET" {
+	if r.Method == "GET" && sessions.IsLoggedIn(r) {
 		categoryName := r.URL.Path[len("/del-category/"):]
 		err := db.DeleteCategoryByName(categoryName)
 		if err != nil {
@@ -133,7 +134,7 @@ func DeleteCategoryFunc(w http.ResponseWriter, r *http.Request) {
 
 //DeleteCommentFunc will delete any category
 func DeleteCommentFunc(w http.ResponseWriter, r *http.Request) {
-	if r.Method == "GET" {
+	if r.Method == "GET" && sessions.IsLoggedIn(r) {
 		id := r.URL.Path[len("/del-comment/"):]
 		commentID, err := strconv.Atoi(id)
 		if err != nil {

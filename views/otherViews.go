@@ -14,6 +14,7 @@ import (
 	"text/template"
 
 	"github.com/thewhitetulip/Tasks/db"
+	"github.com/thewhitetulip/Tasks/sessions"
 	"github.com/thewhitetulip/Tasks/utils"
 )
 
@@ -49,12 +50,13 @@ func PopulateTemplates() {
 	editTemplate = templates.Lookup("edit.html")
 	searchTemplate = templates.Lookup("search.html")
 	completedTemplate = templates.Lookup("completed.html")
+	loginTemplate = templates.Lookup("login.html")
 
 }
 
 //CompleteTaskFunc is used to show the complete tasks, handles "/completed/" url
 func CompleteTaskFunc(w http.ResponseWriter, r *http.Request) {
-	if r.Method == "GET" {
+	if r.Method == "GET" && sessions.IsLoggedIn(r) {
 		redirectURL := utils.GetRedirectUrl(r.Referer())
 		id, err := strconv.Atoi(r.URL.Path[len("/complete/"):])
 		if err != nil {
@@ -76,7 +78,7 @@ func CompleteTaskFunc(w http.ResponseWriter, r *http.Request) {
 
 //SearchTaskFunc is used to handle the /search/ url, handles the search function
 func SearchTaskFunc(w http.ResponseWriter, r *http.Request) {
-	if r.Method == "POST" {
+	if r.Method == "POST" && sessions.IsLoggedIn(r) {
 		r.ParseForm()
 		query := r.Form.Get("query")
 
@@ -94,7 +96,7 @@ func SearchTaskFunc(w http.ResponseWriter, r *http.Request) {
 
 //UpdateTaskFunc is used to update a task, handes "/update/" URL
 func UpdateTaskFunc(w http.ResponseWriter, r *http.Request) {
-	if r.Method == "POST" {
+	if r.Method == "POST" && sessions.IsLoggedIn(r) {
 		r.ParseForm()
 		id, err := strconv.Atoi(r.Form.Get("id"))
 		if err != nil {
@@ -124,7 +126,7 @@ func UpdateTaskFunc(w http.ResponseWriter, r *http.Request) {
 
 //UpdateCategoryFunc is used to update a task, handes "/upd-category/" URL
 func UpdateCategoryFunc(w http.ResponseWriter, r *http.Request) {
-	if r.Method == "POST" {
+	if r.Method == "POST" && sessions.IsLoggedIn(r) {
 		var redirectURL string
 		r.ParseForm()
 		oldName := r.URL.Path[len("/upd-category/"):]

@@ -16,6 +16,8 @@ func main() {
 	values := config.ReadConfig("config.json")
 	views.PopulateTemplates()
 	http.HandleFunc("/", views.ShowAllTasksFunc)
+	http.HandleFunc("/login/", views.LoginFunc)
+	http.HandleFunc("/logout/", views.LogoutFunc)
 	http.HandleFunc("/add-category/", views.AddCategoryFunc)
 	http.HandleFunc("/add-comment/", views.AddCommentFunc)
 	http.HandleFunc("/del-comment/", views.DeleteCommentFunc)

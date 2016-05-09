@@ -16,12 +16,13 @@ import (
 	"time"
 
 	"github.com/thewhitetulip/Tasks/db"
+	"github.com/thewhitetulip/Tasks/sessions"
 	"github.com/thewhitetulip/Tasks/utils"
 )
 
 // UploadedFileHandler is used to handle the uploaded file related requests
 func UploadedFileHandler(w http.ResponseWriter, r *http.Request) {
-	if r.Method == "GET" {
+	if r.Method == "GET" && sessions.IsLoggedIn(r) {
 		token := r.URL.Path[len("/files/"):]
 
 		//file, err := db.GetFileName(token)
@@ -34,7 +35,7 @@ func UploadedFileHandler(w http.ResponseWriter, r *http.Request) {
 
 //AddTaskFunc is used to handle the addition of new task, "/add" URL
 func AddTaskFunc(w http.ResponseWriter, r *http.Request) {
-	if r.Method == "POST" { // Will work only for POST requests, will redirect to home
+	if r.Method == "POST" && sessions.IsLoggedIn(r) { // Will work only for POST requests, will redirect to home
 		var filelink string // will store the html when we have files to be uploaded, appened to the note content
 		r.ParseForm()
 		file, handler, err := r.FormFile("uploadfile")
@@ -146,7 +147,7 @@ func AddCategoryFunc(w http.ResponseWriter, r *http.Request) {
 
 //EditTaskFunc is used to edit tasks, handles "/edit/" URL
 func EditTaskFunc(w http.ResponseWriter, r *http.Request) {
-	if r.Method == "GET" {
+	if r.Method == "GET" && sessions.IsLoggedIn(r) {
 		id, err := strconv.Atoi(r.URL.Path[len("/edit/"):])
 		if err != nil {
 			log.Println(err)
@@ -171,7 +172,7 @@ func EditTaskFunc(w http.ResponseWriter, r *http.Request) {
 
 //AddCommentFunc will be used
 func AddCommentFunc(w http.ResponseWriter, r *http.Request) {
-	if r.Method == "POST" {
+	if r.Method == "POST" && sessions.IsLoggedIn(r) {
 		r.ParseForm()
 		text := r.Form.Get("commentText")
 		id := r.Form.Get("taskID")
