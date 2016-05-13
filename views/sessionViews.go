@@ -1,8 +1,10 @@
 package views
 
 import (
+	"log"
 	"net/http"
 
+	"github.com/thewhitetulip/Tasks/db"
 	"github.com/thewhitetulip/Tasks/sessions"
 )
 
@@ -34,22 +36,29 @@ func LoginFunc(w http.ResponseWriter, r *http.Request) {
 	session, err := sessions.Store.Get(r, "session")
 
 	if err != nil {
-		loginTemplate.Execute(w, nil) // in case of error during fetching session info, execute login template
-	} else {
-		isLoggedIn := session.Values["loggedin"]
-		if isLoggedIn != "true" {
-			if r.Method == "POST" {
-				if r.FormValue("password") == "secret" && r.FormValue("username") == "user" {
-					session.Values["loggedin"] = "true"
-					session.Save(r, w)
-					http.Redirect(w, r, "/", 302)
-					return
-				}
-			} else if r.Method == "GET" {
-				loginTemplate.Execute(w, nil)
-			}
-		} else {
+		log.Println("error identifying session")
+		loginTemplate.Execute(w, nil)
+		return
+	}
+
+	switch r.Method {
+	case "GET":
+		loginTemplate.Execute(w, nil)
+	case "POST":
+		log.Print("Inside POST")
+		r.ParseForm()
+		username := r.Form.Get("username")
+		password := r.Form.Get("password")
+
+		if (username != "" && password != "") && db.ValidUser(username, password) {
+			session.Values["loggedin"] = "true"
+			session.Values["username"] = username
+			session.Save(r, w)
+			log.Print("user ", username, " is authenticated")
 			http.Redirect(w, r, "/", 302)
+			return
 		}
+		log.Print("Invalid user " + username)
+		loginTemplate.Execute(w, nil)
 	}
 }

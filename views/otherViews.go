@@ -134,3 +134,23 @@ func UpdateCategoryFunc(w http.ResponseWriter, r *http.Request) {
 		http.Redirect(w, r, redirectURL, http.StatusFound)
 	}
 }
+
+//SignUpFunc will enable new users to sign up to our service
+func SignUpFunc(w http.ResponseWriter, r *http.Request) {
+	if r.Method == "POST" {
+		r.ParseForm()
+
+		username := r.Form.Get("username")
+		password := r.Form.Get("password")
+		email := r.Form.Get("email")
+
+		log.Println(username, password, email)
+
+		err := db.CreateUser(username, password, email)
+		if err != nil {
+			http.Error(w, "Unable to sign user up", http.StatusInternalServerError)
+		} else {
+			http.Redirect(w, r, "/login/", 302)
+		}
+	}
+}

@@ -37,6 +37,7 @@ func main() {
 	//Login logout
 	http.HandleFunc("/login/", views.LoginFunc)
 	http.HandleFunc("/logout/", views.RequiresLogin(views.LogoutFunc))
+	http.HandleFunc("/signup/", views.SignUpFunc)
 
 	http.HandleFunc("/add-category/", views.RequiresLogin(views.AddCategoryFunc))
 	http.HandleFunc("/add-comment/", views.RequiresLogin(views.AddCommentFunc))
