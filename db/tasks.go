@@ -100,7 +100,7 @@ func GetTasks(username, status, category string) (types.Context, error) {
 		rows = database.query(getTaskSQL, username)
 	} else {
 		status = category
-		getTaskSQL = basicSQL + " and name = ?  and  s.status!='DELETED'  order by priority desc, created_date asc, finish_date asc"
+		getTaskSQL = basicSQL + " and name = ?  and  s.status='PENDING'  order by priority desc, created_date asc, finish_date asc"
 		rows, err = database.db.Query(getTaskSQL, username, category)
 		log.Print(getTaskSQL)
 
