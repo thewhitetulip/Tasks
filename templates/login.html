@@ -1,36 +1,75 @@
-<div class="timeline">
-    <div class="note">
-        Login
-        <form action="/login/" method="POST">
+<!DOCTYPE html>
+<html>
+
+<head>
+    <title> Welcome to Tasks, login or sign up
+    </title>
+
+    <!-- Mobile viewport optimized -->
+    <meta name="viewport" content="width=device-width, initial-scale=1.0, maximum-scale=1.0, user-scalable=no">
+
+    <!-- Bootstrap CSS -->
+    <link href="/static/css/bootstrap.min.css" rel="stylesheet">
+    <link href="/static/css/bootstrap-glyphicons.css" rel="stylesheet">
+
+    <!-- Custom CSS -->
+    <link href="/static/css/styles.css" rel="stylesheet">
+    <link href="/static/css/sidebar.css" rel="stylesheet">
+    <link href="/static/css/sidebar-bootstrap.css" rel="stylesheet">
+    <link href="/static/css/font-awesome.min.css" rel="stylesheet">
+
+    <!-- Include Modernizr in the head, before any other Javascript -->
+    <!--<script src="/static/js/modernizr-2.6.2.min.js"></script>-->
+    <!-- All Javascript at the bottom of the page for faster page loading -->
+    <script src="/static/js/jquery.min.js"></script>
+    <!-- If no online access, fallback to our hardcoded version of jQuery
+		<script>window.jQuery || document.write('<script src="/static/js/jquery-1.8.2.min.js"><\/script>')</script>
+		-->
+    <!-- Bootstrap JS -->
+    <script src="/static/js/bootstrap.min.js"></script>
+
+    <!-- Custom JS -->
+    <script src="/static/js/script.js"></script>
+    <script src="/static/js/hammer.min.js"></script>
+    <script src="/static/js/sidebar.js"></script>
+
+</head>
+
+<body>
+    <nav class="navbar navbar-default navbar-fixed-top mainHeader">
+        <div class="container-fluid">
+            <div class="navbar-header">
+                <p class="navbar-brand" href="/">Tasks</p>
+            </div>
+        </div>
+    </nav>
+
+    <div class="timeline">
+        <div class="note">
+            <p class="noteHeading ">Login </p>
             <div class="form-group">
-                <input type="text" name="username" class="form-control" placeholder="Username" />
-                <input type="password" name="password" class="form-control" placeholder="Password" />
+                <form action="/login/" method="POST">
+                    <input type="text" name="username" class="loginbutton" placeholder="Username" />
+                    <input type="password" name="password" class="loginbutton" placeholder="Password" />
+                    <input type="submit" value="Submit" class="btn btn-primary" />
+                </form>
             </div>
+        </div>
 
-            <div class="modal-footer">
-                <input type="submit" value="Submit" class="btn btn-primary" id="addNoteBtn" />
+        <div class="note">
+            <p class="noteHeading ">Sign up </p>
+            <div class="form-group">
+                <form action="/signup/" method="POST">
+                    <input type="text" name="username" class="loginbutton" placeholder="Username" />
+                    <input type="password" name="password" class="loginbutton" placeholder="Password" />
+                    <input type="email" name="email" class="loginbutton" placeholder="demo@demo.com" />
+                    <input type="submit" value="Submit" class="btn btn-primary" />
+                </form>
             </div>
-        </form>
-
+        </div>
     </div>
 
-    <div class="note">
-        Sign up
-         <form action="/signup/" method="POST">
-            <div class="form-group">
-                <input type="text" name="username" class="form-control" placeholder="Username" />
-                <input type="password" name="password" class="form-control" placeholder="Password" />
-                <input type="email" name="email" class="form-control" placeholder="demo@demo.com" />
-            </div>
-
-            <div class="modal-footer">
-                <input type="submit" value="Submit" class="btn btn-primary" id="addNoteBtn" />
-            </div>
-        </form>
-    </div>
-
-</div>
-{{template "footer.html"}}
+    {{template "_footer.html"}}
 
 </body>
 
