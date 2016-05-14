@@ -16,6 +16,7 @@ import (
 	"time"
 
 	"github.com/thewhitetulip/Tasks/db"
+	"github.com/thewhitetulip/Tasks/sessions"
 	"github.com/thewhitetulip/Tasks/utils"
 )
 
@@ -50,7 +51,6 @@ func AddTaskFunc(w http.ResponseWriter, r *http.Request) {
 		if priorityErr != nil {
 			log.Print(priorityErr)
 			message = "Bad task priority"
-			http.Redirect(w, r, "/", http.StatusInternalServerError)
 		}
 		priorityList := []int{1, 2, 3}
 		found := false
@@ -101,8 +101,8 @@ func AddTaskFunc(w http.ResponseWriter, r *http.Request) {
 					log.Println("error adding task to db")
 				}
 			}
-
-			taskTruth := db.AddTask(title, content, category, taskPriority)
+			username := sessions.GetCurrentUserName(r)
+			taskTruth := db.AddTask(title, content, category, taskPriority, username)
 
 			if taskTruth != nil {
 				message = "Error adding task"
@@ -128,8 +128,8 @@ func AddCategoryFunc(w http.ResponseWriter, r *http.Request) {
 	r.ParseForm()
 	category := r.Form.Get("category")
 	if strings.Trim(category, " ") != "" {
-		err := db.AddCategory(category)
-		if err != nil {
+		username := sessions.GetCurrentUserName(r)
+		if err := db.AddCategory(username, category); err != nil {
 			message = "Error adding category"
 			http.Redirect(w, r, "/", http.StatusBadRequest)
 		} else {
@@ -148,8 +148,9 @@ func EditTaskFunc(w http.ResponseWriter, r *http.Request) {
 			http.Redirect(w, r, "/", http.StatusBadRequest)
 		} else {
 			redirectURL := utils.GetRedirectUrl(r.Referer())
-			task, err := db.GetTaskByID(id)
-			categories := db.GetCategories()
+			username := sessions.GetCurrentUserName(r)
+			task, err := db.GetTaskByID(username, id)
+			categories := db.GetCategories(username)
 			task.Categories = categories
 			task.Referer = redirectURL
 
@@ -174,7 +175,8 @@ func AddCommentFunc(w http.ResponseWriter, r *http.Request) {
 			log.Println("unable to convert into integer")
 			message = "Error adding comment"
 		} else {
-			err = db.AddComments(idInt, text)
+			username := sessions.GetCurrentUserName(r)
+			err = db.AddComments(username, idInt, text)
 
 			if err != nil {
 				log.Println("unable to insert into db")

@@ -10,6 +10,7 @@ import (
 	"strconv"
 
 	"github.com/thewhitetulip/Tasks/db"
+	"github.com/thewhitetulip/Tasks/sessions"
 	"github.com/thewhitetulip/Tasks/utils"
 )
 
@@ -25,7 +26,8 @@ func TrashTaskFunc(w http.ResponseWriter, r *http.Request) {
 			message = "Incorrect command"
 			http.Redirect(w, r, redirectURL, http.StatusFound)
 		} else {
-			err = db.TrashTask(id)
+			username := sessions.GetCurrentUserName(r)
+			err = db.TrashTask(username, id)
 			if err != nil {
 				message = "Error trashing task"
 			} else {
@@ -44,7 +46,8 @@ func RestoreTaskFunc(w http.ResponseWriter, r *http.Request) {
 			log.Println(err)
 			http.Redirect(w, r, "/deleted", http.StatusBadRequest)
 		} else {
-			err = db.RestoreTask(id)
+			username := sessions.GetCurrentUserName(r)
+			err = db.RestoreTask(username, id)
 			if err != nil {
 				message = "Restore failed"
 			} else {
@@ -57,10 +60,11 @@ func RestoreTaskFunc(w http.ResponseWriter, r *http.Request) {
 
 //DeleteTaskFunc is used to delete a task, trash = move to recycle bin, delete = permanent delete
 func DeleteTaskFunc(w http.ResponseWriter, r *http.Request) {
+	username := sessions.GetCurrentUserName(r)
 	if r.Method == "GET" {
 		id := r.URL.Path[len("/delete/"):]
 		if id == "all" {
-			err := db.DeleteAll()
+			err := db.DeleteAll(username)
 			if err != nil {
 				message = "Error deleting tasks"
 				http.Redirect(w, r, "/", http.StatusInternalServerError)
@@ -72,7 +76,7 @@ func DeleteTaskFunc(w http.ResponseWriter, r *http.Request) {
 				log.Println(err)
 				http.Redirect(w, r, "/", http.StatusBadRequest)
 			} else {
-				err = db.DeleteTask(id)
+				err = db.DeleteTask(username, id)
 				if err != nil {
 					message = "Error deleting task"
 				} else {
@@ -92,7 +96,8 @@ func RestoreFromCompleteFunc(w http.ResponseWriter, r *http.Request) {
 			log.Println(err)
 			http.Redirect(w, r, "/completed", http.StatusBadRequest)
 		} else {
-			err = db.RestoreTaskFromComplete(id)
+			username := sessions.GetCurrentUserName(r)
+			err = db.RestoreTaskFromComplete(username, id)
 			if err != nil {
 				message = "Restore failed"
 			} else {
@@ -107,7 +112,8 @@ func RestoreFromCompleteFunc(w http.ResponseWriter, r *http.Request) {
 func DeleteCategoryFunc(w http.ResponseWriter, r *http.Request) {
 	if r.Method == "GET" {
 		categoryName := r.URL.Path[len("/del-category/"):]
-		err := db.DeleteCategoryByName(categoryName)
+		username := sessions.GetCurrentUserName(r)
+		err := db.DeleteCategoryByName(username, categoryName)
 		if err != nil {
 			message = "error deleting category"
 		} else {
@@ -127,8 +133,9 @@ func DeleteCommentFunc(w http.ResponseWriter, r *http.Request) {
 			http.Redirect(w, r, "/", http.StatusBadRequest)
 			return
 		}
+		username := sessions.GetCurrentUserName(r)
 
-		err = db.DeleteCommentByID(commentID)
+		err = db.DeleteCommentByID(username, commentID)
 
 		if err != nil {
 			message = "comment not deleted"

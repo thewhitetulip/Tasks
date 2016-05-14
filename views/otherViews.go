@@ -14,6 +14,7 @@ import (
 	"text/template"
 
 	"github.com/thewhitetulip/Tasks/db"
+	"github.com/thewhitetulip/Tasks/sessions"
 	"github.com/thewhitetulip/Tasks/utils"
 )
 
@@ -61,7 +62,8 @@ func CompleteTaskFunc(w http.ResponseWriter, r *http.Request) {
 		if err != nil {
 			log.Println(err)
 		} else {
-			err = db.CompleteTask(id)
+			username := sessions.GetCurrentUserName(r)
+			err = db.CompleteTask(username, id)
 			if err != nil {
 				message = "Complete task failed"
 			} else {
@@ -78,9 +80,13 @@ func SearchTaskFunc(w http.ResponseWriter, r *http.Request) {
 		r.ParseForm()
 		query := r.Form.Get("query")
 
-		context := db.SearchTask(query)
+		username := sessions.GetCurrentUserName(r)
+		context, err := db.SearchTask(username, query)
+		if err != nil {
+			log.Println("error fetching search results")
+		}
 
-		categories := db.GetCategories()
+		categories := db.GetCategories(username)
 		context.Categories = categories
 
 		searchTemplate.Execute(w, context)
@@ -102,7 +108,8 @@ func UpdateTaskFunc(w http.ResponseWriter, r *http.Request) {
 		if err != nil {
 			log.Println(err)
 		}
-		err = db.UpdateTask(id, title, content, category, priority)
+		username := sessions.GetCurrentUserName(r)
+		err = db.UpdateTask(id, title, content, category, priority, username)
 		if err != nil {
 			message = "Error updating task"
 		} else {
@@ -120,8 +127,8 @@ func UpdateCategoryFunc(w http.ResponseWriter, r *http.Request) {
 		r.ParseForm()
 		oldName := r.URL.Path[len("/upd-category/"):]
 		newName := r.Form.Get("catname")
-
-		err := db.UpdateCategoryByName(oldName, newName)
+		username := sessions.GetCurrentUserName(r)
+		err := db.UpdateCategoryByName(username, oldName, newName)
 		if err != nil {
 			message = "error updating category"
 			log.Println("not updated category " + oldName)

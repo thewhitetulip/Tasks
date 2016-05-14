@@ -19,6 +19,7 @@ import (
 )
 
 var database Database
+var taskStatus map[string]int
 var err error
 
 //Database encapsulates database
@@ -26,6 +27,7 @@ type Database struct {
 	db *sql.DB
 }
 
+//Begins a transaction
 func (db Database) begin() (tx *sql.Tx) {
 	tx, err := db.db.Begin()
 	if err != nil {
@@ -55,6 +57,7 @@ func (db Database) query(q string, args ...interface{}) (rows *sql.Rows) {
 
 func init() {
 	database.db, err = sql.Open("sqlite3", "./tasks.db")
+	taskStatus = map[string]int{"COMPLETE": 1, "PENDING": 2, "DELETED": 3, "INCOMPLETE": 4}
 	if err != nil {
 		log.Fatal(err)
 	}
@@ -67,40 +70,45 @@ func Close() {
 
 //GetTasks retrieves all the tasks depending on the
 //status pending or trashed or completed
-func GetTasks(status, category string) (types.Context, error) {
+func GetTasks(username, status, category string) (types.Context, error) {
+	log.Println("getting tasks for ", status)
 	var tasks []types.Task
 	var task types.Task
 	var TaskCreated time.Time
 	var context types.Context
-	var getTasksql string
+	var getTaskSQL string
 	var rows *sql.Rows
 
-	comments, err := GetComments()
+	comments, err := GetComments(username)
 
 	if err != nil {
 		return context, err
 	}
 
-	basicSQL := "select t.id, title, content, created_date, priority, c.name from task t, category c where c.id = t.cat_id"
-	if status == "pending" && category == "" {
-		getTasksql = basicSQL + " and finish_date is null and is_deleted='N' order by priority desc, created_date asc"
-	} else if status == "deleted" {
-		getTasksql = basicSQL + " and is_deleted='Y' order by priority desc, created_date asc"
-	} else if status == "completed" {
-		getTasksql = basicSQL + " and finish_date is not null order by priority desc, created_date asc"
-	}
+	basicSQL := "select t.id, title, content, created_date, priority, c.name from task t, category c, status s, user u where u.username=? and s.id=t.task_status_id and c.id=t.cat_id and u.id=t.user_id"
+	if category == "" {
+		switch status {
+		case "pending":
+			getTaskSQL = basicSQL + " and s.status='INCOMPLETE'"
+		case "deleted":
+			getTaskSQL = basicSQL + " and s.status='DELETED' "
+		case "completed":
+			getTaskSQL = basicSQL + " and s.status='COMPLETE'"
+		}
 
-	if category != "" {
+		basicSQL += " order by priority desc, created_date asc"
+		rows = database.query(getTaskSQL, username)
+	} else {
 		status = category
-		getTasksql = basicSQL + " and name = ?  and  t.is_deleted!='Y' and t.finish_date is null  order by priority desc, created_date asc, finish_date asc"
-		rows, err = database.db.Query(getTasksql, category)
+		getTaskSQL = basicSQL + " and name = ?  and  s.status!='DELETED'  order by priority desc, created_date asc, finish_date asc"
+		rows, err = database.db.Query(getTaskSQL, username, category)
+		log.Print(getTaskSQL)
 
 		if err != nil {
-			log.Println("something went wrong while getting query")
+			log.Println("tasks.go: something went wrong while getting query fetch tasks by category")
 		}
-	} else {
-		rows = database.query(getTasksql)
 	}
+
 	defer rows.Close()
 	for rows.Next() {
 		task = types.Task{}
@@ -134,13 +142,13 @@ func GetTasks(status, category string) (types.Context, error) {
 }
 
 //GetTaskByID function gets the tasks from the ID passed to the function, used to populate EditTask
-func GetTaskByID(id int) (types.Context, error) {
+func GetTaskByID(username string, id int) (types.Context, error) {
 	var tasks []types.Task
 	var task types.Task
 
-	getTasksql := "select t.id, t.title, t.content, t.priority, c.name from task t left outer join category c  where c.id = t.cat_id and t.id=?"
+	getTaskSQL := "select t.id, t.title, t.content, t.priority, c.name from task t join user u left outer join category c  where c.id = t.cat_id and t.id=? and u.username=?"
 
-	rows := database.query(getTasksql, id)
+	rows := database.query(getTaskSQL, id, username)
 	defer rows.Close()
 	if rows.Next() {
 		err := rows.Scan(&task.Id, &task.Title, &task.Content, &task.Priority, &task.Category)
@@ -155,60 +163,66 @@ func GetTaskByID(id int) (types.Context, error) {
 }
 
 //TrashTask is used to delete the task
-func TrashTask(id int) error {
-	err := taskQuery("update task set is_deleted='Y',last_modified_at=datetime() where id=?", id)
+func TrashTask(username string, id int) error {
+	err := taskQuery("update task set task_status_id=?,last_modified_at=datetime() where user_id=(select id from user where username=?) and id=?", taskStatus["DELETED"], username, id)
 	return err
 }
 
 //CompleteTask  is used to mark tasks as complete
-func CompleteTask(id int) error {
-	err := taskQuery("update task set is_deleted='Y', finish_date=datetime(),last_modified_at=datetime() where id=?", id)
+func CompleteTask(username string, id int) error {
+	err := taskQuery("update task set task_status_id=?, finish_date=datetime(),last_modified_at=datetime() where id=? and user_id=(select id from user where username=?) ", taskStatus["COMPLETE"], id, username)
 	return err
 }
 
 //DeleteAll is used to empty the trash
-func DeleteAll() error {
-	err := taskQuery("delete from task where is_deleted='Y'")
+func DeleteAll(username string) error {
+	err := taskQuery("delete from task where task_status_id=? where user_id=(select id from user where username=?)", taskStatus["DELETED"], username)
 	return err
 }
 
 //RestoreTask is used to restore tasks from the Trash
-func RestoreTask(id int) error {
-	err := taskQuery("update task set is_deleted='N',last_modified_at=datetime() where id=?", id)
+func RestoreTask(username string, id int) error {
+	err := taskQuery("update task set task_status_id=?,last_modified_at=datetime(),finish_date=null where id=? and user_id=(select id from user where username=?)", taskStatus["INCOMPLETE"], id, username)
 	return err
 }
 
 //RestoreTaskFromComplete is used to restore tasks from the Trash
-func RestoreTaskFromComplete(id int) error {
-	err := taskQuery("update task set finish_date=null,last_modified_at=datetime() where id=?", id)
+func RestoreTaskFromComplete(username string, id int) error {
+	err := taskQuery("update task set finish_date=null,last_modified_at=datetime(), task_status_id=? where id=? and user_id=(select id from user where username=?)", taskStatus["INCOMPLETE"], id, username)
 	return err
 }
 
 //DeleteTask is used to delete the task from the database
-func DeleteTask(id int) error {
-	err := taskQuery("delete from task where id = ?", id)
+func DeleteTask(username string, id int) error {
+	err := taskQuery("delete from task where id = ? and user_id=(select id from user where username=?)", id, username)
 	return err
 }
 
 //AddTask is used to add the task in the database
-func AddTask(title, content, category string, taskPriority int) error {
+func AddTask(title, content, category string, taskPriority int, username string) error {
+	log.Println("AddTask: started function")
 	var err error
+	userID, err := GetUserID(username)
+	if err != nil {
+		return err
+	}
+
 	if category == "" {
-		err = taskQuery("insert into task(title, content, priority, created_date, last_modified_at) values(?,?,?,datetime(), datetime())", title, content, taskPriority)
+		err = taskQuery("insert into task(title, content, priority, task_status_id, created_date, last_modified_at, user_id) values(?,?,?,?,datetime(), datetime(),?)", title, content, taskPriority, taskStatus["INCOMPLETE"], userID)
 	} else {
-		categoryID := GetCategoryByName(category)
-		err = taskQuery("insert into task(title, content, priority, created_date, last_modified_at, cat_id) values(?,?,?,datetime(), datetime(), ?)", title, content, taskPriority, categoryID)
+		categoryID := GetCategoryByName(username, category)
+		err = taskQuery("insert into task(title, content, priority, created_date, last_modified_at, cat_id, task_status_id, user_id) values(?,?,?,datetime(), datetime(), ?,?,?)", title, content, taskPriority, categoryID, taskStatus["INCOMPLETE"], userID)
 	}
 	return err
 }
 
-//GetCategoryIdByName will return the category ID for the category, used in the edit task
+//GetCategoryIDByName will return the category ID for the category, used in the edit task
 //function where we need to be able to update the categoryID of the task
-func GetCategoryIdByName(category string) int {
+func GetCategoryIDByName(username string, category string) int {
 	var categoryID int
-	getTasksql := "select id from category where name=?"
+	getTaskSQL := "select c.id from category c , user u where u.id = c.user_id and name=? and u.username=?"
 
-	rows := database.query(getTasksql, category)
+	rows := database.query(getTaskSQL, category, username)
 	defer rows.Close()
 	if rows.Next() {
 		err := rows.Scan(&categoryID)
@@ -222,9 +236,13 @@ func GetCategoryIdByName(category string) int {
 }
 
 //UpdateTask is used to update the tasks in the database
-func UpdateTask(id int, title, content, category string, priority int) error {
-	categoryID := GetCategoryIdByName(category)
-	err := taskQuery("update task set title=?, content=?, cat_id=?, priority = ? where id=?", title, content, categoryID, priority, id)
+func UpdateTask(id int, title, content, category string, priority int, username string) error {
+	categoryID := GetCategoryIDByName(username, category)
+	userID, err := GetUserID(username)
+	if err != nil {
+		return err
+	}
+	err = taskQuery("update task set title=?, content=?, cat_id=?, priority = ? where id=? and user_id=?", title, content, categoryID, priority, id, userID)
 	return err
 }
 
@@ -234,7 +252,7 @@ func taskQuery(sql string, args ...interface{}) error {
 	tx := database.begin()
 	_, err = tx.Stmt(SQL).Exec(args...)
 	if err != nil {
-		log.Println(err)
+		log.Println("taskQuery: ", err)
 		tx.Rollback()
 	} else {
 		tx.Commit()
@@ -243,20 +261,25 @@ func taskQuery(sql string, args ...interface{}) error {
 }
 
 //SearchTask is used to return the search results depending on the query
-func SearchTask(query string) types.Context {
+func SearchTask(username, query string) (types.Context, error) {
 	var tasks []types.Task
 	var task types.Task
 	var TaskCreated time.Time
 	var context types.Context
 
-	comments, err := GetComments()
+	comments, err := GetComments(username)
 	if err != nil {
 		log.Println("SearchTask: something went wrong in finding comments")
 	}
 
-	stmt := "select t.id, title, content, created_date, priority, c.name from task t, category c where c.id = t.cat_id and (title like '%" + query + "%' or content like '%" + query + "%') order by created_date desc"
+	userID, err := GetUserID(username)
+	if err != nil {
+		return context, err
+	}
 
-	rows := database.query(stmt, query, query)
+	stmt := "select t.id, title, content, created_date, priority, c.name from task t, category c where t.user_id=? and c.id = t.cat_id and (title like '%" + query + "%' or content like '%" + query + "%') order by created_date desc"
+
+	rows := database.query(stmt, userID, query, query)
 
 	for rows.Next() {
 		err := rows.Scan(&task.Id, &task.Title, &task.Content, &TaskCreated, &task.Priority, &task.Category)
@@ -284,21 +307,25 @@ func SearchTask(query string) types.Context {
 		tasks = append(tasks, task)
 	}
 	context = types.Context{Tasks: tasks, Search: query, Navigation: "search"}
-	return context
+	return context, nil
 }
 
 //GetComments is used to get comments, all of them.
 //We do not want 100 different pages to show tasks, we want to use as few pages as possible
 //so we are going to populate everything on the damn home pages
-func GetComments() (map[int][]types.Comment, error) {
+func GetComments(username string) (map[int][]types.Comment, error) {
 	commentMap := make(map[int][]types.Comment)
 
 	var taskID int
 	var comment types.Comment
 	var created time.Time
 
-	stmt := "select id, taskID, content, created from comments;"
-	rows := database.query(stmt)
+	userID, err := GetUserID(username)
+	if err != nil {
+		return commentMap, err
+	}
+	stmt := "select c.id, c.taskID, c.content, c.created from comments c, task t where t.id=c.taskID and c.user_id=?;"
+	rows := database.query(stmt, userID)
 
 	for rows.Next() {
 		err := rows.Scan(&comment.ID, &taskID, &comment.Content, &created)
@@ -310,13 +337,18 @@ func GetComments() (map[int][]types.Comment, error) {
 		comment.Created = created.Format("Jan 2 2006 15:04:05")
 		commentMap[taskID] = append(commentMap[taskID], comment)
 	}
+	rows.Close()
 	return commentMap, nil
 }
 
 //AddComments will be used to add comments in the database
-func AddComments(id int, comment string) error {
-	stmt := "insert into comments(taskID, content, created) values (?,?,datetime())"
-	err := taskQuery(stmt, id, comment)
+func AddComments(username string, id int, comment string) error {
+	userID, err := GetUserID(username)
+	if err != nil {
+		return err
+	}
+	stmt := "insert into comments(taskID, content, created, user_id) values (?,?,datetime(),?)"
+	err = taskQuery(stmt, id, comment, userID)
 
 	if err != nil {
 		return err

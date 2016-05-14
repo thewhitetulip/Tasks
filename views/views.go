@@ -26,8 +26,9 @@ var err error
 //TODO add http404 error
 func ShowAllTasksFunc(w http.ResponseWriter, r *http.Request) {
 	if r.Method == "GET" {
-		context, err := db.GetTasks("pending", "")
-		categories := db.GetCategories()
+		username := sessions.GetCurrentUserName(r)
+		context, err := db.GetTasks(username, "pending", "")
+		categories := db.GetCategories(username)
 		if err != nil {
 			http.Redirect(w, r, "/", http.StatusInternalServerError)
 		} else {
@@ -48,8 +49,9 @@ func ShowAllTasksFunc(w http.ResponseWriter, r *http.Request) {
 //ShowTrashTaskFunc is used to handle the "/trash" URL which is used to show the deleted tasks
 func ShowTrashTaskFunc(w http.ResponseWriter, r *http.Request) {
 	if r.Method == "GET" {
-		context, err := db.GetTasks("deleted", "")
-		categories := db.GetCategories()
+		username := sessions.GetCurrentUserName(r)
+		categories := db.GetCategories(username)
+		context, err := db.GetTasks(username, "deleted", "")
 		context.Categories = categories
 		if err != nil {
 			http.Redirect(w, r, "/trash", http.StatusInternalServerError)
@@ -65,8 +67,9 @@ func ShowTrashTaskFunc(w http.ResponseWriter, r *http.Request) {
 //ShowCompleteTasksFunc is used to populate the "/completed/" URL
 func ShowCompleteTasksFunc(w http.ResponseWriter, r *http.Request) {
 	if r.Method == "GET" {
-		context, err := db.GetTasks("completed", "")
-		categories := db.GetCategories()
+		username := sessions.GetCurrentUserName(r)
+		categories := db.GetCategories(username)
+		context, err := db.GetTasks(username, "completed", "")
 		context.Categories = categories
 		if err != nil {
 			http.Redirect(w, r, "/completed", http.StatusInternalServerError)
@@ -80,8 +83,9 @@ func ShowCompleteTasksFunc(w http.ResponseWriter, r *http.Request) {
 func ShowCategoryFunc(w http.ResponseWriter, r *http.Request) {
 	if r.Method == "GET" && sessions.IsLoggedIn(r) {
 		category := r.URL.Path[len("/category/"):]
-		context, err := db.GetTasks("", category)
-		categories := db.GetCategories()
+		username := sessions.GetCurrentUserName(r)
+		context, err := db.GetTasks(username, "", category)
+		categories := db.GetCategories(username)
 
 		if err != nil {
 			http.Redirect(w, r, "/", http.StatusInternalServerError)

@@ -12,15 +12,7 @@ import (
 // AddFile is used to add the md5 of a file name which is uploaded to our application
 // this will enable us to randomize the URL without worrying about the file names
 func AddFile(fileName, token string) error {
-	SQL := database.prepare("insert into files values(?,?)")
-	tx := database.begin()
-	_, err = tx.Stmt(SQL).Exec(fileName, token)
-	if err != nil {
-		log.Println(err)
-		tx.Rollback()
-	} else {
-		log.Println(tx.Commit())
-	}
+	err := taskQuery("insert into files values(?,?)", fileName, token)
 	return err
 }
 
@@ -45,9 +37,13 @@ func GetFileName(token string) (string, error) {
 
 //GetCategories will return the list of categories to be
 //rendered in the template
-func GetCategories() []types.CategoryCount {
-	stmt := "select c.name, count(*) from  category c left outer join task t  where c.id = t.cat_id and t.is_deleted='N' and t.finish_date is null   group by name    union     select name, 0  from category where name not in (select distinct name from task t join category c on t.cat_id = c.id and is_deleted!='Y'and t.finish_date is null)"
-	rows := database.query(stmt)
+func GetCategories(username string) []types.CategoryCount {
+	userID, err := GetUserID(username)
+	if err != nil {
+		return nil
+	}
+	stmt := "select c.name, count(*) from   category c left outer join task t  join status s on  c.id = t.cat_id and t.task_status_id=s.id where s.status!='DELETED' and c.user_id=?   group by name    union     select name, 0  from category c, user u where c.user_id=? and name not in (select distinct name from task t join category c join status s on s.id = t.task_status_id and t.cat_id = c.id and s.status!='DELETED' and c.user_id=?)"
+	rows := database.query(stmt, userID, userID, userID)
 	var categories []types.CategoryCount
 	var category types.CategoryCount
 
@@ -58,20 +54,25 @@ func GetCategories() []types.CategoryCount {
 		}
 		categories = append(categories, category)
 	}
+	rows.Close()
 	return categories
 }
 
 //AddCategory is used to add the task in the database
-func AddCategory(category string) error {
-	err := taskQuery("insert into category(name) values(?)", category)
+func AddCategory(username, category string) error {
+	userID, err := GetUserID(username)
+	if err != nil {
+		return nil
+	}
+	err = taskQuery("insert into category(name, user_id) values(?,?)", category, userID)
 	return err
 }
 
 // GetCategoryByName will return the ID of that category passed as args
 // used while inserting tasks into the table
-func GetCategoryByName(category string) int {
-	stmt := "select id from category where name=?"
-	rows := database.query(stmt, category)
+func GetCategoryByName(username, category string) int {
+	stmt := "select id from category where name=? and user_id = (select id from user where username=?)"
+	rows := database.query(stmt, category, username)
 	var categoryID int
 
 	for rows.Next() {
@@ -84,13 +85,17 @@ func GetCategoryByName(category string) int {
 }
 
 //DeleteCategoryByName will be used to delete a category from the category page
-func DeleteCategoryByName(category string) error {
+func DeleteCategoryByName(username, category string) error {
 	//first we delete entries from task and then from category
-	categoryID := GetCategoryByName(category)
-	query := "update task set cat_id = null where id =?"
-	err := taskQuery(query, categoryID)
+	categoryID := GetCategoryByName(username, category)
+	userID, err := GetUserID(username)
+	if err != nil {
+		return err
+	}
+	query := "update task set cat_id = null where id =? and user_id = ?"
+	err = taskQuery(query, categoryID, userID)
 	if err == nil {
-		err = taskQuery("delete from category where id=?", categoryID)
+		err = taskQuery("delete from category where id=? and user_id=?", categoryID, userID)
 		if err != nil {
 			return err
 		}
@@ -99,16 +104,24 @@ func DeleteCategoryByName(category string) error {
 }
 
 //UpdateCategoryByName will be used to delete a category from the category page
-func UpdateCategoryByName(oldName, newName string) error {
-	query := "update category set name = ? where name=?"
+func UpdateCategoryByName(username, oldName, newName string) error {
+	userID, err := GetUserID(username)
+	if err != nil {
+		return err
+	}
+	query := "update category set name = ? where name=? and user_id=?"
 	log.Println(query)
-	err := taskQuery(query, newName, oldName)
+	err = taskQuery(query, newName, oldName, userID)
 	return err
 }
 
 //DeleteCommentByID will actually delete the comment from db
-func DeleteCommentByID(id int) error {
-	query := "delete from comments where id=?"
-	err := taskQuery(query, id)
+func DeleteCommentByID(username string, id int) error {
+	userID, err := GetUserID(username)
+	if err != nil {
+		return err
+	}
+	query := "delete from comments where id=? and user_id = ?"
+	err = taskQuery(query, id, userID)
 	return err
 }
