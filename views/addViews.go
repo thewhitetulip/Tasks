@@ -129,7 +129,9 @@ func AddCategoryFunc(w http.ResponseWriter, r *http.Request) {
 	category := r.Form.Get("category")
 	if strings.Trim(category, " ") != "" {
 		username := sessions.GetCurrentUserName(r)
-		if err := db.AddCategory(username, category); err != nil {
+		log.Println("adding category")
+		err := db.AddCategory(username, category)
+		if err != nil {
 			message = "Error adding category"
 			http.Redirect(w, r, "/", http.StatusBadRequest)
 		} else {

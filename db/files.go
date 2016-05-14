@@ -21,6 +21,7 @@ func GetFileName(token string) (string, error) {
 	sql := "select name from files where autoName=?"
 	var fileName string
 	rows := database.query(sql, fileName)
+	defer rows.Close()
 	if rows.Next() {
 		err := rows.Scan(&fileName)
 		if err != nil {
@@ -47,6 +48,7 @@ func GetCategories(username string) []types.CategoryCount {
 	var categories []types.CategoryCount
 	var category types.CategoryCount
 
+	defer rows.Close()
 	for rows.Next() {
 		err := rows.Scan(&category.Name, &category.Count)
 		if err != nil {
@@ -54,7 +56,6 @@ func GetCategories(username string) []types.CategoryCount {
 		}
 		categories = append(categories, category)
 	}
-	rows.Close()
 	return categories
 }
 
@@ -64,6 +65,7 @@ func AddCategory(username, category string) error {
 	if err != nil {
 		return nil
 	}
+	log.Println("executing query to add category")
 	err = taskQuery("insert into category(name, user_id) values(?,?)", category, userID)
 	return err
 }
@@ -74,7 +76,7 @@ func GetCategoryByName(username, category string) int {
 	stmt := "select id from category where name=? and user_id = (select id from user where username=?)"
 	rows := database.query(stmt, category, username)
 	var categoryID int
-
+	defer rows.Close()
 	for rows.Next() {
 		err := rows.Scan(&categoryID)
 		if err != nil {

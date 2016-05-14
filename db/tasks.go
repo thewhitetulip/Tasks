@@ -248,6 +248,7 @@ func UpdateTask(id int, title, content, category string, priority int, username 
 
 //taskQuery encapsulates running multiple queries which don't do much things
 func taskQuery(sql string, args ...interface{}) error {
+	log.Print("inside task query")
 	SQL := database.prepare(sql)
 	tx := database.begin()
 	_, err = tx.Stmt(SQL).Exec(args...)
@@ -255,7 +256,12 @@ func taskQuery(sql string, args ...interface{}) error {
 		log.Println("taskQuery: ", err)
 		tx.Rollback()
 	} else {
-		tx.Commit()
+		err = tx.Commit()
+		if err != nil {
+			log.Println(err)
+			return err
+		}
+		log.Println("Commit successful")
 	}
 	return err
 }
@@ -280,7 +286,7 @@ func SearchTask(username, query string) (types.Context, error) {
 	stmt := "select t.id, title, content, created_date, priority, c.name from task t, category c where t.user_id=? and c.id = t.cat_id and (title like '%" + query + "%' or content like '%" + query + "%') order by created_date desc"
 
 	rows := database.query(stmt, userID, query, query)
-
+	defer rows.Close()
 	for rows.Next() {
 		err := rows.Scan(&task.Id, &task.Title, &task.Content, &TaskCreated, &task.Priority, &task.Category)
 		if err != nil {
@@ -327,6 +333,7 @@ func GetComments(username string) (map[int][]types.Comment, error) {
 	stmt := "select c.id, c.taskID, c.content, c.created from comments c, task t where t.id=c.taskID and c.user_id=?;"
 	rows := database.query(stmt, userID)
 
+	defer rows.Close()
 	for rows.Next() {
 		err := rows.Scan(&comment.ID, &taskID, &comment.Content, &created)
 		if err != nil {
@@ -337,7 +344,6 @@ func GetComments(username string) (map[int][]types.Comment, error) {
 		comment.Created = created.Format("Jan 2 2006 15:04:05")
 		commentMap[taskID] = append(commentMap[taskID], comment)
 	}
-	rows.Close()
 	return commentMap, nil
 }
 
