@@ -39,3 +39,8 @@ CREATE TABLE user (
     password varchar(1000),
     email varchar(100)
 );
+
+insert into status(status) values('COMPLETE');
+insert into status(status) values('PENDING');
+insert into status(status) values('DELETED');
+insert into status(status) values('INCOMPLETE');
