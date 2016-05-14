@@ -57,7 +57,7 @@ func (db Database) query(q string, args ...interface{}) (rows *sql.Rows) {
 
 func init() {
 	database.db, err = sql.Open("sqlite3", "./tasks.db")
-	taskStatus = map[string]int{"COMPLETE": 1, "PENDING": 2, "DELETED": 3, "INCOMPLETE": 4}
+	taskStatus = map[string]int{"COMPLETE": 1, "PENDING": 2, "DELETED": 3}
 	if err != nil {
 		log.Fatal(err)
 	}
@@ -89,7 +89,7 @@ func GetTasks(username, status, category string) (types.Context, error) {
 	if category == "" {
 		switch status {
 		case "pending":
-			getTaskSQL = basicSQL + " and s.status='INCOMPLETE'"
+			getTaskSQL = basicSQL + " and s.status='PENDING'"
 		case "deleted":
 			getTaskSQL = basicSQL + " and s.status='DELETED' "
 		case "completed":
@@ -182,13 +182,13 @@ func DeleteAll(username string) error {
 
 //RestoreTask is used to restore tasks from the Trash
 func RestoreTask(username string, id int) error {
-	err := taskQuery("update task set task_status_id=?,last_modified_at=datetime(),finish_date=null where id=? and user_id=(select id from user where username=?)", taskStatus["INCOMPLETE"], id, username)
+	err := taskQuery("update task set task_status_id=?,last_modified_at=datetime(),finish_date=null where id=? and user_id=(select id from user where username=?)", taskStatus["PENDING"], id, username)
 	return err
 }
 
 //RestoreTaskFromComplete is used to restore tasks from the Trash
 func RestoreTaskFromComplete(username string, id int) error {
-	err := taskQuery("update task set finish_date=null,last_modified_at=datetime(), task_status_id=? where id=? and user_id=(select id from user where username=?)", taskStatus["INCOMPLETE"], id, username)
+	err := taskQuery("update task set finish_date=null,last_modified_at=datetime(), task_status_id=? where id=? and user_id=(select id from user where username=?)", taskStatus["PENDING"], id, username)
 	return err
 }
 
@@ -208,10 +208,10 @@ func AddTask(title, content, category string, taskPriority int, username string)
 	}
 
 	if category == "" {
-		err = taskQuery("insert into task(title, content, priority, task_status_id, created_date, last_modified_at, user_id) values(?,?,?,?,datetime(), datetime(),?)", title, content, taskPriority, taskStatus["INCOMPLETE"], userID)
+		err = taskQuery("insert into task(title, content, priority, task_status_id, created_date, last_modified_at, user_id) values(?,?,?,?,datetime(), datetime(),?)", title, content, taskPriority, taskStatus["PENDING"], userID)
 	} else {
 		categoryID := GetCategoryByName(username, category)
-		err = taskQuery("insert into task(title, content, priority, created_date, last_modified_at, cat_id, task_status_id, user_id) values(?,?,?,datetime(), datetime(), ?,?,?)", title, content, taskPriority, categoryID, taskStatus["INCOMPLETE"], userID)
+		err = taskQuery("insert into task(title, content, priority, created_date, last_modified_at, cat_id, task_status_id, user_id) values(?,?,?,datetime(), datetime(), ?,?,?)", title, content, taskPriority, categoryID, taskStatus["PENDING"], userID)
 	}
 	return err
 }
