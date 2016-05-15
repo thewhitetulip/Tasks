@@ -11,8 +11,8 @@ import (
 
 // AddFile is used to add the md5 of a file name which is uploaded to our application
 // this will enable us to randomize the URL without worrying about the file names
-func AddFile(fileName, token string) error {
-	err := taskQuery("insert into files values(?,?)", fileName, token)
+func AddFile(fileName, token, username string) error {
+	err := taskQuery("insert into files values(?,?,?,datetime())", fileName, token, username)
 	return err
 }
 
