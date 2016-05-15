@@ -72,6 +72,7 @@ func AddTaskFunc(w http.ResponseWriter, r *http.Request) {
 
 		cookie, _ := r.Cookie("csrftoken")
 		if formToken == cookie.Value {
+			username := sessions.GetCurrentUserName(r)
 			if handler != nil {
 				// this will be executed whenever a file is uploaded
 				r.ParseMultipartForm(32 << 20) //defined maximum size of file
@@ -95,13 +96,12 @@ func AddTaskFunc(w http.ResponseWriter, r *http.Request) {
 				}
 				content = content + filelink
 
-				fileTruth := db.AddFile(handler.Filename, token)
+				fileTruth := db.AddFile(handler.Filename, token, username)
 				if fileTruth != nil {
 					message = "Error adding filename in db"
 					log.Println("error adding task to db")
 				}
 			}
-			username := sessions.GetCurrentUserName(r)
 			taskTruth := db.AddTask(title, content, category, taskPriority, username)
 
 			if taskTruth != nil {
