@@ -330,12 +330,12 @@ func GetComments(username string) (map[int][]types.Comment, error) {
 	if err != nil {
 		return commentMap, err
 	}
-	stmt := "select c.id, c.taskID, c.content, c.created from comments c, task t where t.id=c.taskID and c.user_id=?;"
+	stmt := "select c.id, c.taskID, c.content, c.created, u.username from comments c, task t, user u where t.id=c.taskID and c.user_id=t.user_id and t.user_id=u.id and u.id=?"
 	rows := database.query(stmt, userID)
 
 	defer rows.Close()
 	for rows.Next() {
-		err := rows.Scan(&comment.ID, &taskID, &comment.Content, &created)
+		err := rows.Scan(&comment.ID, &taskID, &comment.Content, &created, &comment.Username)
 		if err != nil {
 			return commentMap, err
 		}

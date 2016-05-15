@@ -60,7 +60,7 @@
                     {{range $value.Comments}}
                     <div class="comment">
                         <span>{{.Content}}</span>
-                        <span class="timestamp">{{.Created}}</span>
+                        <span class="timestamp">{{.Username}} {{.Created}}</span>
                         <a href="/del-comment/{{.ID}}"><span class="glyphicon glyphicon-trash timestamp"></span></a>
                     </div> 
                     {{end}}
