@@ -100,9 +100,14 @@ func GetTasks(username, status, category string) (types.Context, error) {
 		rows = database.query(getTaskSQL, username)
 	} else {
 		status = category
-		getTaskSQL = basicSQL + " and name = ?  and  s.status='PENDING'  order by priority desc, created_date asc, finish_date asc"
-		rows, err = database.db.Query(getTaskSQL, username, category)
-		log.Print(getTaskSQL)
+		//This is a special case for showing tasks with null categories, we do a union query
+		if category == "UNCATEGORIZED" {
+			getTaskSQL = "select t.id, title, content, created_date, priority, 'UNCATEGORIZED' from task t, status s, user u where u.username=? and s.id=t.task_status_id and u.id=t.user_id and t.cat_id=0  and  s.status='PENDING'  order by priority desc, created_date asc, finish_date asc"
+			rows, err = database.db.Query(getTaskSQL, username)
+		} else {
+			getTaskSQL = basicSQL + " and name = ?  and  s.status='PENDING'  order by priority desc, created_date asc, finish_date asc"
+			rows, err = database.db.Query(getTaskSQL, username, category)
+		}
 
 		if err != nil {
 			log.Println("tasks.go: something went wrong while getting query fetch tasks by category")
@@ -146,7 +151,7 @@ func GetTaskByID(username string, id int) (types.Context, error) {
 	var tasks []types.Task
 	var task types.Task
 
-	getTaskSQL := "select t.id, t.title, t.content, t.priority, c.name from task t join user u left outer join category c  where c.id = t.cat_id and t.id=? and u.username=?"
+	getTaskSQL := "select t.id, t.title, t.content, t.priority, 'UNCATEGORIZED' from task t join user u where t.user_id=u.id and t.cat_id=0 union select t.id, t.title, t.content, t.priority, c.name from task t join user u left outer join category c  where c.id = t.cat_id and t.user_id=u.id and t.id=? and u.username=?;"
 
 	rows := database.query(getTaskSQL, id, username)
 	defer rows.Close()
