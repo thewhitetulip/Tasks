@@ -85,7 +85,7 @@ func GetTasks(username, status, category string) (types.Context, error) {
 		return context, err
 	}
 
-	basicSQL := "select t.id, title, content, created_date, priority, c.name from task t, category c, status s, user u where u.username=? and s.id=t.task_status_id and c.id=t.cat_id and u.id=t.user_id"
+	basicSQL := "select t.id, title, content, created_date, priority, case when c.name is null then 'NA' else c.name end from task t, status s, user u left outer join  category c on c.id=t.cat_id where u.username=? and s.id=t.task_status_id and u.id=t.user_id"
 	if category == "" {
 		switch status {
 		case "pending":
@@ -96,8 +96,9 @@ func GetTasks(username, status, category string) (types.Context, error) {
 			getTaskSQL = basicSQL + " and s.status='COMPLETE'"
 		}
 
-		basicSQL += " order by priority desc, created_date asc"
-		rows = database.query(getTaskSQL, username)
+		getTaskSQL += " order by t.created_date asc"
+
+		rows = database.query(getTaskSQL, username, username)
 	} else {
 		status = category
 		//This is a special case for showing tasks with null categories, we do a union query
@@ -208,7 +209,7 @@ func AddTask(title, content, category string, taskPriority int, username string)
 	log.Println("AddTask: started function")
 	var err error
 	userID, err := GetUserID(username)
-	if err != nil {
+	if err != nil && (title != "" || content != "") {
 		return err
 	}
 
