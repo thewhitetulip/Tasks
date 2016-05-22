@@ -71,6 +71,18 @@ func main() {
 
 	http.Handle("/static/", http.FileServer(http.Dir("public")))
 
+	http.HandleFunc("/api/get-task/", views.GetTasksFuncAPI)
+	http.HandleFunc("/api/get-deleted-task/", views.GetDeletedTaskFuncAPI)
+	http.HandleFunc("/api/add-task/", views.AddTaskFuncAPI)
+	http.HandleFunc("/api/update-task/", views.UpdateTaskFuncAPI)
+	http.HandleFunc("/api/delete-task/", views.DeleteTaskFuncAPI)
+
+	http.HandleFunc("/api/get-token/", views.GetTokenHandler)
+	http.HandleFunc("/api/get-category/", views.GetCategoryFuncAPI)
+	http.HandleFunc("/api/add-category/", views.AddCategoryFuncAPI)
+	http.HandleFunc("/api/update-category/", views.UpdateCategoryFuncAPI)
+	http.HandleFunc("/api/delete-category/", views.DeleteCategoryFuncAPI)
+
 	log.Println("running server on ", values.ServerPort)
 	log.Fatal(http.ListenAndServe(values.ServerPort, nil))
 }

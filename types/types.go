@@ -6,23 +6,25 @@ is passed while templates are executed.
 */
 //Task is the struct used to identify tasks
 type Task struct {
-	Id        int
-	Title     string
-	Content   string
-	Created   string
-	Priority  string
-	Category  string
-	Referer   string
-	Comments  []Comment
-	IsOverdue bool
+	Id        int       `json:"id"`
+	Title     string    `json:"title"`
+	Content   string    `json:"content"`
+	Created   string    `json:"created"`
+	Priority  string    `json:"priority"`
+	Category  string    `json:"category"`
+	Referer   string    `json:"referer,omitempty"`
+	Comments  []Comment `json:"comments,omitempty"`
+	IsOverdue bool      `json:"isoverdue, omitempty"`
 }
+
+type Tasks []Task
 
 //Comment is the struct used to populate comments per tasks
 type Comment struct {
-	ID       int
-	Content  string
-	Created  string
-	Username string
+	ID       int    `json:"id"`
+	Content  string `json:"content"`
+	Created  string `json:"created_date"`
+	Username string `json:"username"`
 }
 
 //Context is the struct passed to templates
@@ -39,8 +41,23 @@ type Context struct {
 //CategoryCount is the struct used to populate the sidebar
 //which contains the category name and the count of the tasks
 //in each category
-
 type CategoryCount struct {
 	Name  string
 	Count int
 }
+
+//Status is the JSON struct to be returned
+type Status struct {
+	StatusCode int    `json:"status_code"`
+	Message    string `json:"message"`
+}
+
+//Category is the structure of the category table
+type Category struct {
+	ID      int    `json:"category_id"`
+	Name    string `json:"category_name"`
+	Created string `json:"created_date"`
+}
+
+//Categories will show
+type Categories []Category
