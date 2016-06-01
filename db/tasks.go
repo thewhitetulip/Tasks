@@ -342,6 +342,7 @@ func GetComments(username string) (map[int][]types.Comment, error) {
 	defer rows.Close()
 	for rows.Next() {
 		err := rows.Scan(&comment.ID, &taskID, &comment.Content, &created, &comment.Username)
+		comment.Content = string(md.Markdown([]byte(comment.Content)))
 		if err != nil {
 			return commentMap, err
 		}
