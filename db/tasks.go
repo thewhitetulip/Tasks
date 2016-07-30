@@ -205,19 +205,23 @@ func DeleteTask(username string, id int) error {
 }
 
 //AddTask is used to add the task in the database
-func AddTask(title, content, category string, taskPriority int, username string) error {
+func AddTask(title, content, category string, taskPriority int, username, dueDate string) error {
 	log.Println("AddTask: started function")
 	var err error
+	timeDueDate, err := time.Parse("31/12/2016", dueDate)
+	if err != nil {
+		log.Fatal(err)
+	}
 	userID, err := GetUserID(username)
 	if err != nil && (title != "" || content != "") {
 		return err
 	}
 
 	if category == "" {
-		err = taskQuery("insert into task(title, content, priority, task_status_id, created_date, last_modified_at, user_id) values(?,?,?,?,datetime(), datetime(),?)", title, content, taskPriority, taskStatus["PENDING"], userID)
+		err = taskQuery("insert into task(title, content, priority, task_status_id, created_date, last_modified_at, user_id,due_date) values(?,?,?,?,datetime(), datetime(),?)", title, content, taskPriority, taskStatus["PENDING"], userID, timeDueDate)
 	} else {
 		categoryID := GetCategoryByName(username, category)
-		err = taskQuery("insert into task(title, content, priority, created_date, last_modified_at, cat_id, task_status_id, user_id) values(?,?,?,datetime(), datetime(), ?,?,?)", title, content, taskPriority, categoryID, taskStatus["PENDING"], userID)
+		err = taskQuery("insert into task(title, content, priority, created_date, last_modified_at, cat_id, task_status_id, user_id,due_date) values(?,?,?,datetime(), datetime(), ?,?,?)", title, content, taskPriority, categoryID, taskStatus["PENDING"], userID, timeDueDate)
 	}
 	return err
 }

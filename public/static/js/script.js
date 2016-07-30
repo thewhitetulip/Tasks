@@ -22,6 +22,8 @@ $(document).ready(function(){
     $('#addNoteModal').modal('show');
   });
   
+  $("#datepicker").datepicker();
+  
   $('#editCatFrmBtn').click(function(){
      $('#EditForm').toggleClass('hidden') 
   });

@@ -65,6 +65,7 @@ func AddTaskFunc(w http.ResponseWriter, r *http.Request) {
 			taskPriority = 1
 		}
 
+		dueDate := r.FormValue("dueDate")
 		category := r.FormValue("category")
 		title := template.HTMLEscapeString(r.Form.Get("title"))
 		content := template.HTMLEscapeString(r.Form.Get("content"))
@@ -102,7 +103,7 @@ func AddTaskFunc(w http.ResponseWriter, r *http.Request) {
 					log.Println("error adding task to db")
 				}
 			}
-			taskTruth := db.AddTask(title, content, category, taskPriority, username)
+			taskTruth := db.AddTask(title, content, category, taskPriority, username, dueDate)
 
 			if taskTruth != nil {
 				message = "Error adding task"

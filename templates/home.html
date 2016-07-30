@@ -25,6 +25,7 @@
                         <span id="file-group" class="hidden">
                             File: <input type="file" name="uploadfile" />
                         </span>
+                         Date: <input id="datepicker" name="dueDate"/>
                         <br> Priority:
                         <input type="radio" name="priority" value="3" /> High
                         <input type="radio" name="priority" value="2" /> Medium
@@ -37,6 +38,7 @@
                         <option value="{{$cat.Name}}" {{if eq $cat.Name $navigation }} selected="true" {{end}}> {{$cat.Name}} </option>
                         {{end}}
                     </select>
+                   
             </div>
             <div class="modal-footer">
                 <button type="button" class="btn btn-primary" data-dismiss="modal">Close</button>

@@ -186,7 +186,7 @@ func AddTaskFuncAPI(w http.ResponseWriter, r *http.Request) {
 		var taskErr bool
 
 		if title != "" && content != "" {
-			taskTruth := db.AddTask(title, content, category, taskPriority, username)
+			taskTruth := db.AddTask(title, content, category, taskPriority, username, "")
 			if taskTruth != nil {
 				taskErr = true
 			}
