@@ -183,10 +183,17 @@ func AddTaskFuncAPI(w http.ResponseWriter, r *http.Request) {
 		if !found {
 			taskPriority = 1
 		}
+		var hidden int
+		hideTimeline := r.FormValue("hide")
+		if hideTimeline != "" {
+			hidden = 1
+		} else {
+			hidden = 0
+		}
 		var taskErr bool
 
 		if title != "" && content != "" {
-			taskTruth := db.AddTask(title, content, category, taskPriority, username, "")
+			taskTruth := db.AddTask(title, content, category, taskPriority, username, hidden)
 			if taskTruth != nil {
 				taskErr = true
 			}

@@ -85,15 +85,15 @@ func GetTasks(username, status, category string) (types.Context, error) {
 		return context, err
 	}
 
-	basicSQL := "select t.id, title, content, created_date, priority, case when c.name is null then 'NA' else c.name end from task t, status s, user u left outer join  category c on c.id=t.cat_id where u.username=? and s.id=t.task_status_id and u.id=t.user_id"
+	basicSQL := "select t.id, title, content, created_date, priority, case when c.name is null then 'NA' else c.name end from task t, status s, user u left outer join  category c on c.id=t.cat_id where u.username=? and s.id=t.task_status_id and u.id=t.user_id "
 	if category == "" {
 		switch status {
 		case "pending":
-			getTaskSQL = basicSQL + " and s.status='PENDING'"
+			getTaskSQL = basicSQL + " and s.status='PENDING' and t.hide!=1"
 		case "deleted":
-			getTaskSQL = basicSQL + " and s.status='DELETED' "
+			getTaskSQL = basicSQL + " and s.status='DELETED' and t.hide!=1"
 		case "completed":
-			getTaskSQL = basicSQL + " and s.status='COMPLETE'"
+			getTaskSQL = basicSQL + " and s.status='COMPLETE' and t.hide!=1"
 		}
 
 		getTaskSQL += " order by t.created_date asc"
@@ -152,12 +152,12 @@ func GetTaskByID(username string, id int) (types.Context, error) {
 	var tasks []types.Task
 	var task types.Task
 
-	getTaskSQL := "select t.id, t.title, t.content, t.priority, 'UNCATEGORIZED' from task t join user u where t.user_id=u.id and t.cat_id=0 union select t.id, t.title, t.content, t.priority, c.name from task t join user u left outer join category c  where c.id = t.cat_id and t.user_id=u.id and t.id=? and u.username=?;"
+	getTaskSQL := "select t.id, t.title, t.content, t.priority, t.hide, 'UNCATEGORIZED' from task t join user u where t.user_id=u.id and t.cat_id=0 union select t.id, t.title, t.content, t.priority, c.name from task t join user u left outer join category c  where c.id = t.cat_id and t.user_id=u.id and t.id=? and u.username=?;"
 
 	rows := database.query(getTaskSQL, id, username)
 	defer rows.Close()
 	if rows.Next() {
-		err := rows.Scan(&task.Id, &task.Title, &task.Content, &task.Priority, &task.Category)
+		err := rows.Scan(&task.Id, &task.Title, &task.Content, &task.Priority, &task.IsHidden, &task.Category)
 		if err != nil {
 			log.Println(err)
 			//send email to respective people
@@ -205,23 +205,27 @@ func DeleteTask(username string, id int) error {
 }
 
 //AddTask is used to add the task in the database
-func AddTask(title, content, category string, taskPriority int, username, dueDate string) error {
+//TODO: add dueDate feature later
+func AddTask(title, content, category string, taskPriority int, username string, hidden int) error {
 	log.Println("AddTask: started function")
 	var err error
-	timeDueDate, err := time.Parse("31/12/2016", dueDate)
-	if err != nil {
-		log.Fatal(err)
-	}
+	// var timeDueDate time.Time
+	// if dueDate != "" {
+	// 	timeDueDate, err = time.Parse("31/12/2016", dueDate)
+	// 	if err != nil {
+	// 		log.Fatal(err)
+	// 	}
+	// }
 	userID, err := GetUserID(username)
 	if err != nil && (title != "" || content != "") {
 		return err
 	}
 
 	if category == "" {
-		err = taskQuery("insert into task(title, content, priority, task_status_id, created_date, last_modified_at, user_id,due_date) values(?,?,?,?,datetime(), datetime(),?)", title, content, taskPriority, taskStatus["PENDING"], userID, timeDueDate)
+		err = taskQuery("insert into task(title, content, priority, task_status_id, created_date, last_modified_at, user_id,hide) values(?,?,?,?,datetime(), datetime(),?,?)", title, content, taskPriority, taskStatus["PENDING"], userID, hidden)
 	} else {
 		categoryID := GetCategoryByName(username, category)
-		err = taskQuery("insert into task(title, content, priority, created_date, last_modified_at, cat_id, task_status_id, user_id,due_date) values(?,?,?,datetime(), datetime(), ?,?,?)", title, content, taskPriority, categoryID, taskStatus["PENDING"], userID, timeDueDate)
+		err = taskQuery("insert into task(title, content, priority, created_date, last_modified_at, cat_id, task_status_id, user_id,hide) values(?,?,?,datetime(), datetime(), ?,?,?,?)", title, content, taskPriority, categoryID, taskStatus["PENDING"], userID, hidden)
 	}
 	return err
 }

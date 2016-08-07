@@ -15,6 +15,7 @@ type Task struct {
 	Referer   string    `json:"referer,omitempty"`
 	Comments  []Comment `json:"comments,omitempty"`
 	IsOverdue bool      `json:"isoverdue, omitempty"`
+	IsHidden  int       `json:"ishidden, omitempty`
 }
 
 type Tasks []Task
