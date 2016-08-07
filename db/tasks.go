@@ -209,13 +209,13 @@ func DeleteTask(username string, id int) error {
 func AddTask(title, content, category string, taskPriority int, username string, hidden int) error {
 	log.Println("AddTask: started function")
 	var err error
-	// var timeDueDate time.Time
-	// if dueDate != "" {
-	// 	timeDueDate, err = time.Parse("31/12/2016", dueDate)
-	// 	if err != nil {
-	// 		log.Fatal(err)
-	// 	}
-	// }
+	/*var timeDueDate time.Time
+	if duedate != "" {
+		timeDueDate, err = time.Parse("12/31/2016", duedate)
+		if err != nil {
+			log.Fatal(err)
+		}
+	}*/
 	userID, err := GetUserID(username)
 	if err != nil && (title != "" || content != "") {
 		return err

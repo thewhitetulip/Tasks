@@ -22,7 +22,7 @@ $(document).ready(function(){
     $('#addNoteModal').modal('show');
   });
   
-  $("#datepicker").datepicker();
+  // $("#datepicker").datepicker();
   
   $('#editCatFrmBtn').click(function(){
      $('#EditForm').toggleClass('hidden') 
