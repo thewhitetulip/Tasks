@@ -109,7 +109,16 @@ func UpdateTaskFunc(w http.ResponseWriter, r *http.Request) {
 			log.Println(err)
 		}
 		username := sessions.GetCurrentUserName(r)
-		err = db.UpdateTask(id, title, content, category, priority, username)
+
+		var hidden int
+		hideTimeline := r.FormValue("hide")
+		if hideTimeline != "" {
+			hidden = 1
+		} else {
+			hidden = 0
+		}
+
+		err = db.UpdateTask(id, title, content, category, priority, username, hidden)
 		if err != nil {
 			message = "Error updating task"
 		} else {

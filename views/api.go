@@ -262,8 +262,16 @@ func UpdateTaskFuncAPI(w http.ResponseWriter, r *http.Request) {
 			priority = 1
 		}
 
+		var hidden int
+		hideTimeline := r.FormValue("hide")
+		if hideTimeline != "" {
+			hidden = 1
+		} else {
+			hidden = 0
+		}
+
 		if strID != "" && title != "" && content != "" {
-			err = db.UpdateTask(id, title, content, category, priority, username)
+			err = db.UpdateTask(id, title, content, category, priority, username, hidden)
 			if err != nil {
 				taskErr = true
 			}
