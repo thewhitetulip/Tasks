@@ -132,13 +132,13 @@ func GetTasks(username, status, category string) (types.Context, error) {
 		}
 
 		TaskCreated = TaskCreated.Local()
-		if task.Priority != "1" { // if priority is not 1 then calculate, else why bother?
-			CurrentTime := time.Now().Local()
-			diff := CurrentTime.Sub(TaskCreated).Hours()
-			if diff > 168 {
-				task.IsOverdue = true // If one week then overdue by default
-			}
-		}
+		// if task.Priority != "1" { // if priority is not 1 then calculate, else why bother?
+		// CurrentTime := time.Now().Local()
+		// diff := CurrentTime.Sub(TaskCreated).Hours()
+		// if diff > 168 {
+		// 	task.IsOverdue = true // If one week then overdue by default
+		// }
+		// }
 		task.Created = TaskCreated.Format("Jan 2 2006")
 
 		tasks = append(tasks, task)
