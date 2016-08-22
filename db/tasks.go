@@ -152,7 +152,7 @@ func GetTaskByID(username string, id int) (types.Context, error) {
 	var tasks []types.Task
 	var task types.Task
 
-	getTaskSQL := "select t.id, t.title, t.content, t.priority, t.hide, 'UNCATEGORIZED' from task t join user u where t.user_id=u.id and t.cat_id=0 union select t.id, t.title, t.content, t.priority, t.hide, c.name from task t join user u left outer join category c  where c.id = t.cat_id and t.user_id=u.id and t.id=? and u.username=?;"
+	getTaskSQL := "select t.id, t.title, t.content, t.priority, t.hide, c.name from task t join user u left outer join category c  where c.id = t.cat_id and t.user_id=u.id and t.id=? and u.username=? union select t.id, t.title, t.content, t.priority, t.hide, 'UNCATEGORIZED' from task t join user u where t.user_id=u.id and t.cat_id=0 ;"
 
 	rows := database.query(getTaskSQL, id, username)
 	defer rows.Close()
