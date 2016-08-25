@@ -10,6 +10,7 @@ DeleteAll()
 import (
 	"database/sql"
 	"log"
+	"strconv"
 	"strings"
 	"time"
 
@@ -120,6 +121,19 @@ func GetTasks(username, status, category string) (types.Context, error) {
 		task = types.Task{}
 
 		err = rows.Scan(&task.Id, &task.Title, &task.Content, &TaskCreated, &task.Priority, &task.Category)
+
+		taskCompleted := 0
+		totalTasks := 0
+
+		if strings.HasPrefix(task.Content, "- [") {
+			for _, value := range strings.Split(task.Content, "\n") {
+				if strings.HasPrefix(value, "- [x]") {
+					taskCompleted += 1
+				}
+				totalTasks += 1
+			}
+			task.CompletedMsg = strconv.Itoa(taskCompleted) + " complete out of " + strconv.Itoa(totalTasks)
+		}
 
 		task.Content = string(md.Markdown([]byte(task.Content)))
 		// TaskContent = strings.Replace(TaskContent, "\n", "<br>", -1)
