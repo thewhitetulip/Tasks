@@ -56,6 +56,7 @@ func TestAddEmptyCategory(t *testing.T) {
 func TestEditTaskWithWrongMethod(t *testing.T) {
 	ts := httptest.NewServer(http.HandlerFunc(EditTaskFunc))
 	defer ts.Close()
+	ts.URL = ts.URL + "/edit/"
 	req, err := http.NewRequest("OPTIONS", ts.URL, nil)
 	if err != nil {
 		t.Errorf("Error occured while constracting request:%s", err)
@@ -64,7 +65,7 @@ func TestEditTaskWithWrongMethod(t *testing.T) {
 	EditTaskFunc(w, req)
 
 	if w.Code != http.StatusFound && message != "Method not allowed" {
-		t.Errorf("Message was: %s Return code was: %d. Should have been message: %s return code: %d", message, w.Code, "Method not allowed", http.StatusFound)
+		t.Errorf("Message was: %s Return code was: %d. Should have been message: %s return code: %d", message, w.Code, "Method not allowed", http.StatusBadRequest)
 	}
 }
 
@@ -80,6 +81,21 @@ func TestEditTaskWrongTaskName(t *testing.T) {
 	EditTaskFunc(w, req)
 	//TODO: Error should be returned as part of the string so that the message can tell
 	//why there was a problem.
+	if w.Code != http.StatusBadRequest {
+		t.Errorf("Actual status: (%d); Expected status:(%d)", w.Code, http.StatusBadRequest)
+	}
+}
+
+func TestAddCommentWithWrongMethod(t *testing.T) {
+	ts := httptest.NewServer(http.HandlerFunc(AddCommentFunc))
+	defer ts.Close()
+	req, err := http.NewRequest("GET", ts.URL, nil)
+	if err != nil {
+		t.Errorf("Error occured while constructing request: %s", err)
+	}
+
+	w := httptest.NewRecorder()
+	AddCommentFunc(w, req)
 	if w.Code != http.StatusBadRequest {
 		t.Errorf("Actual status: (%d); Expected status:(%d)", w.Code, http.StatusBadRequest)
 	}

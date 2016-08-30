@@ -150,52 +150,59 @@ func AddCategoryFunc(w http.ResponseWriter, r *http.Request) {
 
 //EditTaskFunc is used to edit tasks, handles "/edit/" URL
 func EditTaskFunc(w http.ResponseWriter, r *http.Request) {
-	if r.Method == "GET" {
-		id, err := strconv.Atoi(r.URL.Path[len("/edit/"):])
-		if err != nil {
-			log.Println(err)
-			http.Redirect(w, r, "/", http.StatusBadRequest)
-		} else {
-			redirectURL := utils.GetRedirectUrl(r.Referer())
-			username := sessions.GetCurrentUserName(r)
-			task, err := db.GetTaskByID(username, id)
-			categories := db.GetCategories(username)
-			task.Categories = categories
-			task.Referer = redirectURL
+	if r.Method != "GET" {
+		http.Redirect(w, r, "/", http.StatusBadRequest)
+		return
+	}
 
-			if err != nil {
-				task.Message = "Error fetching Tasks"
-			}
-			editTemplate.Execute(w, task)
+	id, err := strconv.Atoi(r.URL.Path[len("/edit/"):])
+	if err != nil {
+		log.Println(err)
+		http.Redirect(w, r, "/", http.StatusBadRequest)
+		return
+	} else {
+		redirectURL := utils.GetRedirectUrl(r.Referer())
+		username := sessions.GetCurrentUserName(r)
+		task, err := db.GetTaskByID(username, id)
+		categories := db.GetCategories(username)
+		task.Categories = categories
+		task.Referer = redirectURL
+
+		if err != nil {
+			task.Message = "Error fetching Tasks"
 		}
+		editTemplate.Execute(w, task)
 	}
 }
 
 //AddCommentFunc will be used
 func AddCommentFunc(w http.ResponseWriter, r *http.Request) {
-	if r.Method == "POST" {
-		r.ParseForm()
-		text := r.Form.Get("commentText")
-		id := r.Form.Get("taskID")
-
-		idInt, err := strconv.Atoi(id)
-
-		if (err != nil) || (text == "") {
-			log.Println("unable to convert into integer")
-			message = "Error adding comment"
-		} else {
-			username := sessions.GetCurrentUserName(r)
-			err = db.AddComments(username, idInt, text)
-
-			if err != nil {
-				log.Println("unable to insert into db")
-				message = "Comment not added"
-			} else {
-				message = "Comment added"
-			}
-		}
-
-		http.Redirect(w, r, "/", http.StatusFound)
-
+	if r.Method != "POST" {
+		log.Println(err)
+		http.Redirect(w, r, "/", http.StatusBadRequest)
+		return
 	}
+	r.ParseForm()
+	text := r.Form.Get("commentText")
+	id := r.Form.Get("taskID")
+
+	idInt, err := strconv.Atoi(id)
+
+	if (err != nil) || (text == "") {
+		log.Println("unable to convert into integer")
+		message = "Error adding comment"
+	} else {
+		username := sessions.GetCurrentUserName(r)
+		err = db.AddComments(username, idInt, text)
+
+		if err != nil {
+			log.Println("unable to insert into db")
+			message = "Comment not added"
+		} else {
+			message = "Comment added"
+		}
+	}
+
+	http.Redirect(w, r, "/", http.StatusFound)
+
 }

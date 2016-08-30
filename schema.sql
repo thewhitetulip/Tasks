@@ -9,8 +9,8 @@ CREATE TABLE task (
     finish_date timestamp,
     priority integer,
     cat_id references category(id),
-    user_id references user(id)
-);
+    user_id references user(id), 
+    hide int);
 CREATE TABLE status (
     id integer primary key autoincrement,
     status varchar(50) not null
