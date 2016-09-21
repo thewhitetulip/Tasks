@@ -60,5 +60,7 @@ func LoginFunc(w http.ResponseWriter, r *http.Request) {
 		}
 		log.Print("Invalid user " + username)
 		loginTemplate.Execute(w, nil)
+	default:
+		http.Redirect(w, r, "/login/", http.StatusUnauthorized)
 	}
 }
