@@ -67,10 +67,6 @@ ul {
   text-align: center;
 }
 
-textarea {
-  resize: vertical;
-}
-
 .floating-action-icon {
   position: fixed;
   bottom: 40px;
@@ -320,10 +316,17 @@ Media Queries
   body {
     margin-top: 105px;
   }
+
+  textarea {
+    resize: vertical;
+    width:50%;
+  }
+
   .timeline {
     overflow: hidden;
     width: 100%;
   }
+
   #icons {
     text-align: center;
     padding: 0;
@@ -336,9 +339,15 @@ Media Queries
     padding: 0px;
     text-align: center;
   }
-  .note-sm {
-    height: 150px;
+  
+  .btn-primary {
+    width: auto;
   }
+
+  .input {
+    width:100px;
+  }
+
   .floating-action-icon {
     position: fixed;
     bottom: 35px;
@@ -368,12 +377,20 @@ Media Queries
     float: right;
     margin-top: 10px;
   }
+
+  textarea {
+    resize: vertical;
+    width: 200px;
+  }
+
   body {
     margin-top: 105px;
   }
+
   .timeline {
     overflow: hidden;
-    width: 100%;
+    width: 80%;
+    padding-left: 40px;
   }
   .mainHeader h3 {
     padding: 0px;
@@ -396,6 +413,11 @@ Media Queries
     overflow: hidden;
     width: 55%;
     margin-left: 20%;
+  }
+
+  textarea {
+      resize: vertical;
+      width: 400px;
   }
 }
 
