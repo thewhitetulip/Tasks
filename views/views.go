@@ -3,8 +3,8 @@ package views
 /*Holds the fetch related view handlers*/
 
 import (
+	"html/template"
 	"net/http"
-	"text/template"
 	"time"
 
 	"github.com/thewhitetulip/Tasks/db"

@@ -5,13 +5,13 @@ Holds the non insert/update/delete related view handlers
 */
 
 import (
+	"html/template"
 	"io/ioutil"
 	"log"
 	"net/http"
 	"os"
 	"strconv"
 	"strings"
-	"text/template"
 
 	"github.com/thewhitetulip/Tasks/db"
 	"github.com/thewhitetulip/Tasks/sessions"

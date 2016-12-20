@@ -9,6 +9,7 @@ DeleteAll()
 
 import (
 	"database/sql"
+	"html/template"
 	"log"
 	"strconv"
 	"strings"
@@ -135,7 +136,7 @@ func GetTasks(username, status, category string) (types.Context, error) {
 			task.CompletedMsg = strconv.Itoa(taskCompleted) + " complete out of " + strconv.Itoa(totalTasks)
 		}
 
-		task.Content = string(md.Markdown([]byte(task.Content)))
+		task.ContentHTML = template.HTML(md.Markdown([]byte(task.Content)))
 		// TaskContent = strings.Replace(TaskContent, "\n", "<br>", -1)
 		if err != nil {
 			log.Println(err)
