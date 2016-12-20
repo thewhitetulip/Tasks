@@ -4,6 +4,7 @@ package views
 
 import (
 	"html/template"
+	"log"
 	"net/http"
 	"time"
 
@@ -28,6 +29,7 @@ func ShowAllTasksFunc(w http.ResponseWriter, r *http.Request) {
 	if r.Method == "GET" {
 		username := sessions.GetCurrentUserName(r)
 		context, err := db.GetTasks(username, "pending", "")
+		log.Println(context)
 		categories := db.GetCategories(username)
 		if err != nil {
 			http.Redirect(w, r, "/", http.StatusInternalServerError)
@@ -60,7 +62,10 @@ func ShowTrashTaskFunc(w http.ResponseWriter, r *http.Request) {
 			context.Message = message
 			message = ""
 		}
-		deletedTemplate.Execute(w, context)
+		err = deletedTemplate.Execute(w, context)
+		if err != nil {
+			log.Fatal(err)
+		}
 	}
 }
 
