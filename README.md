@@ -18,7 +18,7 @@ Manually:
 
 You can change the port in the [config](https://github.com/thewhitetulip/Tasks/blob/master/config.json) file
 
-##Features
+## Features
 
 1. Add, update, delete task.
 2. Search tasks, the query is highlighted in the search results page.
@@ -34,7 +34,7 @@ You can change the port in the [config](https://github.com/thewhitetulip/Tasks/b
 ##### Book
 I am learning writing webapps with Go as I build this application, I took to writing an introductory book about [building webapps in Go](https://github.com/thewhitetulip/web-dev-golang-anti-textbook) because I faced a lot of problems while learning how to write webapps in Go, it, the book strives to teach by practical examples. You are welcome to contribute to the book.
 
-#Screenshots
+# Screenshots
 The Home Page
 
 ![Home Page](https://github.com/thewhitetulip/Tasks/blob/master/screenshots/FrontEnd.png)
@@ -47,7 +47,7 @@ Navigation drawer
 
 ![Navigation Drawer](https://github.com/thewhitetulip/Tasks/blob/master/screenshots/FrontEnd%20Navigation%20Drawer.png)
 
-#License
+# License
 
 The MIT License (MIT)
 
