@@ -90,11 +90,12 @@ func AddTaskFunc(w http.ResponseWriter, r *http.Request) {
 			// this will be executed whenever a file is uploaded
 			r.ParseMultipartForm(32 << 20) //defined maximum size of file
 			defer file.Close()
+			htmlFilename := strings.Replace(handler.Filename, " ", "-", -1)
 			randomFileName := md5.New()
 			io.WriteString(randomFileName, strconv.FormatInt(time.Now().Unix(), 10))
-			io.WriteString(randomFileName, handler.Filename)
+			io.WriteString(randomFileName, htmlFilename)
 			token := fmt.Sprintf("%x", randomFileName.Sum(nil))
-			f, err := os.OpenFile("./files/"+token, os.O_WRONLY|os.O_CREATE, 0666)
+			f, err := os.OpenFile("./files/"+htmlFilename, os.O_WRONLY|os.O_CREATE, 0666)
 			if err != nil {
 				log.Println(err)
 				return
@@ -102,14 +103,14 @@ func AddTaskFunc(w http.ResponseWriter, r *http.Request) {
 			defer f.Close()
 			io.Copy(f, file)
 
-			if strings.HasSuffix(handler.Filename, ".png") || strings.HasSuffix(handler.Filename, ".jpg") {
-				filelink = "<br> <img src='/files/" + token + "'/>"
+			if strings.HasSuffix(htmlFilename, ".png") || strings.HasSuffix(htmlFilename, ".jpg") {
+				filelink = "<br> <img src='/files/" + htmlFilename + "'/>"
 			} else {
-				filelink = "<br> <a href=/files/" + token + ">" + handler.Filename + "</a>"
+				filelink = "<br> <a href=/files/" + htmlFilename + ">" + htmlFilename + "</a>"
 			}
 			content = content + filelink
 
-			fileTruth := db.AddFile(handler.Filename, token, username)
+			fileTruth := db.AddFile(htmlFilename, token, username)
 			if fileTruth != nil {
 				message = "Error adding filename in db"
 				log.Println("error adding task to db")
