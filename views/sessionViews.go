@@ -33,13 +33,7 @@ func LogoutFunc(w http.ResponseWriter, r *http.Request) {
 
 //LoginFunc implements the login functionality, will add a cookie to the cookie store for managing authentication
 func LoginFunc(w http.ResponseWriter, r *http.Request) {
-	session, err := sessions.Store.Get(r, "session")
-
-	if err != nil {
-		log.Println("error identifying session")
-		loginTemplate.Execute(w, nil)
-		return
-	}
+	session, _ := sessions.Store.Get(r, "session")
 
 	switch r.Method {
 	case "GET":
